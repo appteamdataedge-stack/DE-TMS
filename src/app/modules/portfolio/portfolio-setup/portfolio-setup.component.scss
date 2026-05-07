@@ -36,7 +36,7 @@
   background: var(--de-teal-light);
   border-left: 4px solid var(--de-teal);
   border-radius: var(--radius-md);
-  overflow: hidden;
+  overflow: visible;
 
   &__toggle {
     width: 100%;
@@ -69,7 +69,7 @@
 
   &__body {
     padding: 0 14px 14px;
-    overflow: hidden;
+    overflow: visible;
 
     p {
       font-size: 13px;
@@ -307,7 +307,7 @@
   align-items: stretch;
   border: 1px solid var(--de-neutral-200);
   border-radius: var(--radius-lg);
-  overflow: hidden;
+  overflow: visible;
   margin-bottom: 24px;
 }
 
