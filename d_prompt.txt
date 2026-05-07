@@ -1,0 +1,69 @@
+Angular Money Market app. Fix these 3 issues ONLY across ALL pages.
+Do NOT change any logic, validators, or API calls.
+
+---
+
+## FIX 1 — Sticky info bar position and width (Image 1)
+Find the existing sticky info bar component used on form pages.
+Fix its position and width:
+- position: fixed
+- top: 64px (below navbar)
+- LEFT must start at the same x position as the sidebar RIGHT edge
+  (i.e. left = sidebar width, typically 240px or whatever the sidebar width is)
+- right: 0
+- height: 36px
+- z-index: 998
+- Background: #EEF4FB, border-bottom: 1px solid #C5D9EE
+- Font-size: 13px, color: #1565C0, padding: 0 24px
+- Flex row, items centered, gap: 16px
+This means the bar spans ONLY the main content area width, NOT under the sidebar.
+
+---
+
+## FIX 2 — Fixed footer: ONE footer only, correct position (Image 2)
+There are currently TWO footers showing. Remove the old/original one.
+Keep ONLY the new fixed footer. Ensure only one footer instance exists per page.
+Fix its position and width (same rule as info bar):
+- position: fixed
+- bottom: 0
+- left = sidebar width (same value used in FIX 1)
+- right: 0
+- height: 52px
+- z-index: 1100
+- Background: #FFFFFF, border-top: 1px solid #E0E0E0
+- box-shadow: 0 -2px 6px rgba(0,0,0,0.07)
+- Left: "🔒 This record requires checker authorization before becoming active"
+  font-size: 12px, color: #757575
+- Right: [Cancel] [Save as Draft] [Submit for Approval]
+Search entire codebase for ALL places where the old footer/action-bar
+(Cancel / Save Draft / Submit buttons) is hardcoded inside any component template.
+Remove those hardcoded instances. Keep only the single global fixed footer.
+
+---
+
+## FIX 3 — Dropdown opens behind/overlapping wrong area (Image 3)
+The dropdown panel is appearing too high, overlapping fields above it.
+Fix globally in styles.css:
+.cdk-overlay-container {
+  z-index: 9999 !important;
+}
+.mat-select-panel, .mat-autocomplete-panel {
+  margin-top: 0 !important;
+  transform-origin: top center !important;
+}
+Also add to every mat-select in ALL component templates:
+[disableOptionCentering]="true"
+
+For dropdowns that show blank/nothing when clicked:
+Search all components for mat-select where the bound FormControl may be
+disabled or the options array is empty on init.
+For each: ensure the options array is initialized before component renders
+(move data fetch to ngOnInit, not ngAfterViewInit).
+Add console.warn TODO comment for any still not working.
+
+---
+
+## CONSTRAINTS
+- Do NOT change form logic, bindings, or API calls
+- Do NOT install new packages
+- Apply to ALL pages/components in the app, not just one page

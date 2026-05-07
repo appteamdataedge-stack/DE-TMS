@@ -1,0 +1,108 @@
+<!-- Breadcrumb -->
+<nav class="de-breadcrumb">
+  <a routerLink="/dashboard">Home</a><span class="sep">›</span>
+  <span>Configuration</span><span class="sep">›</span>
+  <span class="current">Business Partners</span>
+</nav>
+
+<!-- Page Header -->
+<div class="bpl-header">
+  <div>
+    <h1 class="bpl-header__title">Business Partners</h1>
+    <p class="bpl-header__sub">Registered organisations and individuals</p>
+  </div>
+  <a routerLink="/partners/create" class="de-btn de-btn--primary">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+      <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+    </svg>
+    New Business Partner
+  </a>
+</div>
+
+<!-- KPI Strip -->
+<div class="bpl-kpi-strip">
+  <div class="bpl-kpi-card">
+    <div class="bpl-kpi-card__value">{{ kpis.total }}</div>
+    <div class="bpl-kpi-card__label">Total</div>
+  </div>
+  <div class="bpl-kpi-card bpl-kpi-card--active">
+    <div class="bpl-kpi-card__value">{{ kpis.active }}</div>
+    <div class="bpl-kpi-card__label">Active</div>
+  </div>
+  <div class="bpl-kpi-card bpl-kpi-card--inactive">
+    <div class="bpl-kpi-card__value">{{ kpis.inactive }}</div>
+    <div class="bpl-kpi-card__label">Inactive</div>
+  </div>
+</div>
+
+<!-- Filter Bar -->
+<div class="bpl-filter-bar de-card">
+  <div class="bpl-filter-bar__search">
+    <svg class="bpl-filter-bar__search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+    </svg>
+    <input class="bpl-filter-bar__input" type="text" placeholder="Search BP ID or name…" [(ngModel)]="searchTerm" />
+  </div>
+  <div class="bpl-filter-bar__selects">
+    <select class="de-input bpl-filter-bar__select" [(ngModel)]="statusFilter">
+      @for (opt of statusOptions; track opt.value) {
+        <option [value]="opt.value">{{ opt.label }}</option>
+      }
+    </select>
+    <select class="de-input bpl-filter-bar__select" [(ngModel)]="categoryFilter">
+      @for (opt of categoryOptions; track opt.value) {
+        <option [value]="opt.value">{{ opt.label }}</option>
+      }
+    </select>
+  </div>
+  <span class="bpl-filter-bar__count">{{ filtered.length }} of {{ allPartners.length }}</span>
+</div>
+
+<!-- Table -->
+<div class="de-card bpl-table-card">
+  <div class="bpl-table-wrap">
+    <table class="bpl-table">
+      <thead>
+        <tr>
+          <th>BP ID</th>
+          <th>Name</th>
+          <th>Category</th>
+          <th>Type</th>
+          <th>Country</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        @if (filtered.length === 0) {
+          <tr>
+            <td colspan="6" class="bpl-empty-cell">
+              <div class="bpl-empty">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" class="bpl-empty__icon">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                  <circle cx="9" cy="7" r="4"/>
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+                </svg>
+                <p class="bpl-empty__title">No business partners found</p>
+                <p class="bpl-empty__sub">Try adjusting your search or filters</p>
+              </div>
+            </td>
+          </tr>
+        }
+        @for (p of filtered; track p.id) {
+          <tr class="bpl-table__row">
+            <td><span class="bpl-id">{{ p.id }}</span></td>
+            <td class="bpl-name">{{ p.name }}</td>
+            <td>
+              <span class="de-badge de-badge--{{ categoryBadge(p.category) }}">{{ p.category }}</span>
+            </td>
+            <td class="bpl-type">{{ p.type }}</td>
+            <td>{{ p.country }}</td>
+            <td>
+              <span class="de-badge de-badge--{{ statusBadge(p.status) }}">{{ p.status }}</span>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>

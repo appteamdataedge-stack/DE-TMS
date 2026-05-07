@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell([Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; $ProgressPreference = 'SilentlyContinue'; Invoke-WebRequest -Uri \"https://www.sqlite.org/2024/sqlite-tools-win-x64-3470200.zip\" -OutFile \"C:\\\\sqlite-tools.zip\"; \\(Get-Item \"C:\\\\sqlite-tools.zip\"\\).Length)",
+      "PowerShell($zip = [System.IO.Compression.ZipFile]::OpenRead\\(\"C:\\\\sqlite-tools.zip\"\\); $zip.Entries | Select-Object FullName; $zip.Dispose\\(\\))",
+      "PowerShell(Add-Type -AssemblyName System.IO.Compression.FileSystem; [System.IO.Compression.ZipFile]::ExtractToDirectory\\(\"C:\\\\sqlite-tools.zip\", \"C:\\\\sqlite\"\\); Get-ChildItem \"C:\\\\sqlite\" -Recurse | Select-Object FullName)",
+      "PowerShell(Set-Location \"C:\\\\Users\\\\Administrator\\\\Documents\\\\Final Frontend\\\\dataedge-tms\"; Get-Content database\\\\schema.sql | & \"C:\\\\sqlite\\\\sqlite3.exe\" database\\\\moneymarket.db; Write-Host \"Exit: $LASTEXITCODE\"; & \"C:\\\\sqlite\\\\sqlite3.exe\" database\\\\moneymarket.db \".tables\")",
+      "PowerShell(& \"C:\\\\sqlite\\\\sqlite3.exe\" \"C:\\\\Users\\\\Administrator\\\\Documents\\\\Final Frontend\\\\dataedge-tms\\\\database\\\\moneymarket.db\" \".schema MM_NEW_DEAL_INPUT\" \".schema MM_DEAL_MASTER\")",
+      "PowerShell($bytes = [System.IO.File]::ReadAllBytes\\(\"C:\\\\Users\\\\Administrator\\\\Documents\\\\Final Frontend\\\\dataedge-tms\\\\prompt_for_db.md\"\\); Write-Host \"File size: $\\($bytes.Length\\) bytes\"; [System.Text.Encoding]::UTF8.GetString\\($bytes\\))",
+      "Bash(ng build *)",
+      "Bash(npx ng *)",
+      "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\Administrator\\\\Documents\\\\Final Frontend\\\\dataedge-tms\\\\src\\\\app\" -Recurse | Where-Object { $_.PSIsContainer -and $_.Name -eq \"create\" } | Select-Object FullName)"
+    ]
+  }
+}

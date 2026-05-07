@@ -1,0 +1,305 @@
+<!-- ─── Breadcrumb ─────────────────────────────────────────────────────────── -->
+<nav class="de-breadcrumb">
+  <a routerLink="/dashboard">Home</a><span class="sep">›</span>
+  <a routerLink="/liquidity/gap">Liquidity</a><span class="sep">›</span>
+  <span class="current">Stress Testing</span>
+</nav>
+
+<!-- ─── Page Header ────────────────────────────────────────────────────────── -->
+<div class="st-header">
+  <div>
+    <h1 class="st-header__title">Liquidity Stress Testing</h1>
+    <p class="st-header__sub">Simulate market disruptions and review survival capacity</p>
+  </div>
+  <div class="st-header__actions">
+    <button class="de-btn de-btn--outline de-btn--sm" (click)="resetSimulation()">Reset</button>
+    <button class="de-btn de-btn--primary" [disabled]="running" (click)="runSimulation()">
+      @if (running) {
+        <span class="st-spinner"></span> Running…
+      } @else {
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        Run Simulation
+      }
+    </button>
+  </div>
+</div>
+
+<!-- ─── Main Two-Column Layout ─────────────────────────────────────────────── -->
+<div class="st-layout">
+
+  <!-- ── Parameters Panel ──────────────────────────────────────────────────── -->
+  <aside class="de-card st-params">
+    <h2 class="st-params__title">Scenario Parameters</h2>
+
+    <!-- Scenario presets -->
+    <div class="st-param-group">
+      <label class="st-param-label">Stress Scenario</label>
+      <div class="st-scenario-grid">
+        @for (s of scenarios; track s) {
+          <button class="st-scenario-btn"
+                  [class.st-scenario-btn--active]="scenario === s"
+                  [class.st-scenario-btn--moderate]="s === 'MODERATE' && scenario === s"
+                  [class.st-scenario-btn--severe]="s === 'SEVERE' && scenario === s"
+                  [class.st-scenario-btn--cat]="s === 'CATASTROPHIC' && scenario === s"
+                  (click)="selectScenario(s)">
+            {{ s === 'CATASTROPHIC' ? 'CATAST.' : s }}
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- Market Funding Haircut -->
+    <div class="st-param-group">
+      <div class="st-slider-hd">
+        <label class="st-param-label">Market Funding Haircut</label>
+        <span class="st-slider-val">{{ haircut }}%</span>
+      </div>
+      <input type="range" class="st-range" min="0" max="50" step="1" [(ngModel)]="haircut">
+      <div class="st-slider-scale"><span>0%</span><span>50%</span></div>
+    </div>
+
+    <!-- Retail Outflow Rate -->
+    <div class="st-param-group">
+      <div class="st-slider-hd">
+        <label class="st-param-label">Retail Outflow Rate</label>
+        <span class="st-slider-val">{{ retailOutflow }}%</span>
+      </div>
+      <input type="range" class="st-range" min="0" max="30" step="1" [(ngModel)]="retailOutflow">
+      <div class="st-slider-scale"><span>0%</span><span>30%</span></div>
+    </div>
+
+    <!-- Corporate Withdrawal -->
+    <div class="st-param-group">
+      <div class="st-slider-hd">
+        <label class="st-param-label">Corporate Withdrawal</label>
+        <span class="st-slider-val">{{ corpWithdrawal }}%</span>
+      </div>
+      <input type="range" class="st-range" min="0" max="50" step="1" [(ngModel)]="corpWithdrawal">
+      <div class="st-slider-scale"><span>0%</span><span>50%</span></div>
+    </div>
+
+    <!-- FX Shock -->
+    <div class="st-param-group">
+      <label class="st-param-label">FX Shock Applied</label>
+      <button class="st-toggle" [class.st-toggle--on]="fxShock" (click)="fxShock = !fxShock">
+        <span class="st-toggle__track">
+          <span class="st-toggle__thumb"></span>
+        </span>
+        <span>{{ fxShock ? 'ON — 15% depreciation' : 'OFF' }}</span>
+      </button>
+    </div>
+
+    <div class="st-params__divider"></div>
+
+    <!-- Remediation triggers (labels only — results column shows actions) -->
+    <div class="st-param-group">
+      <label class="st-param-label">Remediation Limits</label>
+      <ul class="st-limits">
+        <li>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+          LCR minimum: 100%
+        </li>
+        <li>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+          NSFR minimum: 100%
+        </li>
+        <li>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+          Survival horizon: 90 days
+        </li>
+        <li>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+          Peak gap limit: –BDT 100M
+        </li>
+      </ul>
+    </div>
+  </aside>
+
+  <!-- ── Results Column ─────────────────────────────────────────────────────── -->
+  <div class="st-results">
+
+    <!-- KPI Cards -->
+    <div class="st-kpi-row">
+      <!-- Survival Horizon -->
+      <div class="de-card st-kpi" [class.st-kpi--running]="running">
+        <div class="st-kpi__icon st-kpi__icon--{{ kpiColor('survival') }}">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <p class="st-kpi__label">Survival Horizon</p>
+        <p class="st-kpi__val st-kpi__val--{{ kpiColor('survival') }}">{{ displayKPIs.survivalDays }}d</p>
+        <p class="st-kpi__hint">Minimum: 90 days</p>
+      </div>
+
+      <!-- LCR -->
+      <div class="de-card st-kpi" [class.st-kpi--running]="running">
+        <div class="st-kpi__icon st-kpi__icon--{{ kpiColor('lcr') }}">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        </div>
+        <p class="st-kpi__label">LCR</p>
+        <p class="st-kpi__val st-kpi__val--{{ kpiColor('lcr') }}">{{ fmtPct(displayKPIs.lcr) }}</p>
+        <p class="st-kpi__hint">Minimum: 100%</p>
+      </div>
+
+      <!-- NSFR -->
+      <div class="de-card st-kpi" [class.st-kpi--running]="running">
+        <div class="st-kpi__icon st-kpi__icon--{{ kpiColor('nsfr') }}">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        </div>
+        <p class="st-kpi__label">NSFR</p>
+        <p class="st-kpi__val st-kpi__val--{{ kpiColor('nsfr') }}">{{ fmtPct(displayKPIs.nsfr) }}</p>
+        <p class="st-kpi__hint">Minimum: 100%</p>
+      </div>
+
+      <!-- Peak Gap -->
+      <div class="de-card st-kpi" [class.st-kpi--running]="running">
+        <div class="st-kpi__icon" [class.st-kpi__icon--teal]="displayKPIs.peakGap > -100_000_000"
+                                  [class.st-kpi__icon--red]="displayKPIs.peakGap <= -100_000_000">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        </div>
+        <p class="st-kpi__label">Peak Gap</p>
+        <p class="st-kpi__val" [class.st-kpi__val--teal]="displayKPIs.peakGap > -100_000_000"
+                               [class.st-kpi__val--red]="displayKPIs.peakGap <= -100_000_000">
+          {{ fmtM(displayKPIs.peakGap) }}
+        </p>
+        <p class="st-kpi__hint">Limit: –BDT 100M</p>
+      </div>
+    </div>
+
+    <!-- Comparison Table -->
+    <div class="de-card st-table-card">
+      <div class="st-table-hd">
+        <h2 class="st-table-hd__title">Base vs Stressed Gaps</h2>
+        <label class="st-diff-toggle">
+          <input type="checkbox" [(ngModel)]="showDiffOnly">
+          <span class="st-diff-toggle__box"></span>
+          Show Differences Only
+        </label>
+      </div>
+
+      <table class="st-table">
+        <thead>
+          <tr>
+            <th>Time Bucket</th>
+            <th class="st-col-r">Base Net Gap</th>
+            <th class="st-col-r">Stressed Net Gap</th>
+            <th class="st-col-r">Difference</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (visibleResults.length === 0) {
+            <tr>
+              <td colspan="5" class="st-empty-cell">No changed buckets — all gaps are within 5M of base.</td>
+            </tr>
+          }
+          @for (r of visibleResults; track r.label) {
+            <tr class="st-row" [class.st-row--breach]="r.status === 'BREACH'" [class.st-row--warn]="r.status === 'WARNING'">
+              <td class="st-bucket-name">{{ r.label }}</td>
+              <td class="st-col-r st-gap-val">{{ fmtM(r.baseGap) }}</td>
+              <td class="st-col-r st-gap-val"
+                  [class.st-gap-val--pos]="r.stressedGap > 0"
+                  [class.st-gap-val--neg]="r.stressedGap < 0">
+                {{ fmtM(r.stressedGap) }}
+              </td>
+              <td class="st-col-r st-diff-val"
+                  [class.st-diff-val--worse]="r.difference < 0"
+                  [class.st-diff-val--better]="r.difference > 0">
+                @if (r.changed) { {{ fmtM(r.difference) }} } @else { <span class="st-unchanged">—</span> }
+              </td>
+              <td><span class="de-badge de-badge--{{ statusBadge(r.status) }}">{{ r.status }}</span></td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Stress Chart -->
+    <div class="de-card st-chart-card">
+      <div class="st-chart-hd">
+        <h2 class="st-chart-hd__title">Gap Comparison — Base vs Stressed</h2>
+        <div class="st-chart-legend">
+          <span class="st-leg-item"><span class="st-leg-line st-leg-line--navy st-leg-line--dash"></span>Base</span>
+          <span class="st-leg-item"><span class="st-leg-line st-leg-line--red"></span>Stressed</span>
+          <span class="st-leg-item"><span class="st-leg-line st-leg-line--amber st-leg-line--dash"></span>Breach Limit</span>
+        </div>
+      </div>
+
+      <svg class="st-chart" [attr.viewBox]="stressChart.vb" preserveAspectRatio="xMidYMid meet">
+        <!-- Grid & Y-axis labels -->
+        @for (yl of stressChart.yLabels; track yl.y) {
+          <line [attr.x1]="60" [attr.x2]="684" [attr.y1]="yl.y" [attr.y2]="yl.y"
+                stroke="var(--de-neutral-100)" stroke-width="1"/>
+          <text [attr.x]="56" [attr.y]="yl.y + 4" text-anchor="end" class="st-axis-label">{{ yl.label }}</text>
+        }
+        <!-- Zero line -->
+        <line [attr.x1]="60" [attr.x2]="684" [attr.y1]="stressChart.zeroY" [attr.y2]="stressChart.zeroY"
+              stroke="var(--de-neutral-300)" stroke-width="1" stroke-dasharray="3,3"/>
+        <!-- Breach threshold line -->
+        <line [attr.x1]="60" [attr.x2]="684" [attr.y1]="stressChart.breachY" [attr.y2]="stressChart.breachY"
+              stroke="var(--de-amber)" stroke-width="1.5" stroke-dasharray="6,3" opacity="0.8"/>
+        <text [attr.x]="688" [attr.y]="stressChart.breachY + 4" class="st-axis-label st-breach-label">LIMIT</text>
+        <!-- X-axis labels -->
+        @for (xl of stressChart.xLabels; track xl.x) {
+          <text [attr.x]="xl.x" [attr.y]="195" text-anchor="middle" class="st-axis-label">{{ xl.label }}</text>
+        }
+        <!-- Base line (navy dashed) -->
+        <polyline [attr.points]="stressChart.basePts" fill="none"
+                  stroke="var(--de-navy)" stroke-width="2" stroke-dasharray="6,3"
+                  stroke-linejoin="round" stroke-linecap="round" opacity="0.6"/>
+        <!-- Stressed line (red solid) -->
+        <polyline [attr.points]="stressChart.stressPts" fill="none"
+                  stroke="var(--de-red)" stroke-width="2.5"
+                  stroke-linejoin="round" stroke-linecap="round"/>
+        <!-- Breach annotation dots -->
+        @for (dot of stressChart.breachDots; track dot.x) {
+          <circle [attr.cx]="dot.x" [attr.cy]="dot.y" r="7"
+                  fill="var(--de-red)" fill-opacity="0.15"
+                  stroke="var(--de-red)" stroke-width="2"/>
+          <text [attr.x]="dot.x" [attr.y]="dot.y - 12" text-anchor="middle" class="st-breach-dot-label">BREACH</text>
+        }
+      </svg>
+    </div>
+
+    <!-- Remediation Actions (conditional) -->
+    @if (showRemediation) {
+      <div class="de-card st-remediation">
+        <div class="st-remediation__hd">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--de-red)" stroke-width="2" stroke-linecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          <h2>Remediation Actions Required</h2>
+          <span class="de-badge de-badge--red">Breach Detected</span>
+        </div>
+        <p class="st-remediation__sub">One or more regulatory limits are breached under the <strong>{{ scenario }}</strong> scenario. Recommended actions:</p>
+        <ul class="st-remediation__actions">
+          @if (displayKPIs.lcr < 100 || displayKPIs.peakGap < -100_000_000) {
+            <li class="st-action">
+              <span class="st-action__icon">1</span>
+              <div>
+                <p class="st-action__title">Liquidate Marketable Securities</p>
+                <p class="st-action__desc">Realise HQLA (T-Bills, Bonds) to generate immediate inflow and restore LCR above 100%.</p>
+              </div>
+            </li>
+          }
+          @if (displayKPIs.peakGap < -50_000_000) {
+            <li class="st-action">
+              <span class="st-action__icon">2</span>
+              <div>
+                <p class="st-action__title">Reduce Long Tenor Placements</p>
+                <p class="st-action__desc">Limit new fixed-term deposits beyond 6 months. Prioritise short-dated or overnight placements to reduce gap concentration.</p>
+              </div>
+            </li>
+          }
+          @if (displayKPIs.survivalDays < 90) {
+            <li class="st-action">
+              <span class="st-action__icon">3</span>
+              <div>
+                <p class="st-action__title">Activate Contingency Funding Plan</p>
+                <p class="st-action__desc">Engage committed credit lines, repo facilities, and bilateral lending agreements. Notify Treasury Committee immediately.</p>
+              </div>
+            </li>
+          }
+        </ul>
+      </div>
+    }
+
+  </div><!-- /st-results -->
+</div><!-- /st-layout -->

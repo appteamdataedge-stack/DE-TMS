@@ -1,0 +1,126 @@
+// ─── ID strip ─────────────────────────────────────────────────────────────────
+
+.bpr-id-card { margin-bottom: 20px; }
+
+.bpr-id-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.bpr-id-lbl {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  color: var(--de-neutral-400);
+}
+
+.bpr-id-val {
+  font-family: var(--font-mono);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--de-navy);
+}
+
+.bpr-active-roles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--de-neutral-100);
+}
+
+// ─── Role tile grid ───────────────────────────────────────────────────────────
+
+.bpr-role-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px;
+}
+
+.bpr-role-tile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background: var(--de-neutral-50);
+  border: 2px solid var(--de-neutral-200);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  text-align: left;
+  transition: all .12s;
+  position: relative;
+  width: 100%;
+
+  &:hover { border-color: var(--de-neutral-400); background: #fff; }
+
+  &--active {
+    border-color: var(--de-teal);
+    background: var(--de-teal-light);
+  }
+
+  &__icon {
+    color: var(--de-neutral-400);
+    flex-shrink: 0;
+    .bpr-role-tile--active & { color: var(--de-teal-dark); }
+  }
+
+  &__label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--de-neutral-700);
+    flex: 1;
+    .bpr-role-tile--active & { color: var(--de-teal-dark); font-weight: 600; }
+  }
+
+  &__check {
+    color: var(--de-teal);
+    flex-shrink: 0;
+  }
+}
+
+// ─── Shared with bp-create ────────────────────────────────────────────────────
+
+.bp-page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.bp-page-sub { font-size: 13px; color: var(--de-neutral-500); margin: 4px 0 0; }
+
+.bp-card {
+  margin-bottom: 20px;
+  .de-grid-2 { row-gap: 20px; }
+  .de-card__header h3 { font-size: 14px; font-weight: 700; color: var(--de-navy); }
+}
+
+.bp-toggle-row { display: flex; align-items: center; gap: 10px; height: 40px; }
+.bp-req { color: var(--de-red); margin-left: 2px; }
+.bp-opt { font-size: 10px; font-weight: 500; color: var(--de-neutral-400); margin-left: 4px; text-transform: none; letter-spacing: 0; }
+
+.bp-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  margin-top: 20px;
+  background: #fff;
+  border: 1px solid var(--de-neutral-200);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  &__right { display: flex; gap: 12px; align-items: center; }
+}
+
+.mm-toggle {
+  position: relative; width: 44px; height: 24px; padding: 0; background: transparent; border: none; cursor: pointer;
+  &__track { position: absolute; inset: 0; border-radius: 100px; background: var(--de-neutral-300); transition: background .2s; }
+  &__thumb { position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; background: #fff; border-radius: 50%; box-shadow: 0 1px 3px rgba(0,0,0,.2); transition: transform .2s; }
+  &--on { .mm-toggle__track { background: var(--de-teal); } .mm-toggle__thumb { transform: translateX(20px); } }
+}
+
+.mm-toggle-label { font-size: 13px; font-weight: 600; color: var(--de-neutral-700); }

@@ -1,0 +1,579 @@
+﻿:host { display: block; }
+
+// ─── Page Layout ─────────────────────────────────────────────────────────────
+
+.pf-header-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 28px;
+
+  .de-page-header { flex: 1; margin-bottom: 0; }
+}
+
+.pf-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding-bottom: 88px; // clearance for sticky footer
+}
+
+.pf-card {
+  .de-grid-2 { row-gap: 20px; }
+}
+
+.pf-req {
+  color: var(--de-red);
+  margin-left: 2px;
+}
+
+// ─── Info Panel ───────────────────────────────────────────────────────────────
+
+.pf-info-panel {
+  width: 300px;
+  flex-shrink: 0;
+  background: var(--de-teal-light);
+  border-left: 4px solid var(--de-teal);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+
+  &__toggle {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    gap: 8px;
+  }
+
+  &__title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--de-teal-dark);
+  }
+
+  &__chevron {
+    color: var(--de-teal-dark);
+    transition: transform .2s;
+    flex-shrink: 0;
+
+    &--open { transform: rotate(180deg); }
+  }
+
+  &__body {
+    padding: 0 14px 14px;
+    overflow: hidden;
+
+    p {
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--de-teal-dark);
+
+      strong { font-weight: 700; }
+    }
+  }
+}
+
+// ─── Mono input ───────────────────────────────────────────────────────────────
+
+.de-input--mono {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--de-neutral-600);
+}
+
+// ─── Status dot in ng-select ─────────────────────────────────────────────────
+
+.pf-status-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  margin-right: 6px;
+  vertical-align: middle;
+
+  &--draft    { background: var(--de-neutral-400); }
+  &--active   { background: var(--de-green); }
+  &--inactive { background: var(--de-red); }
+}
+
+// ─── Status toggle ────────────────────────────────────────────────────────────
+
+.pf-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+  height: 40px;
+
+  input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+
+    &:checked + .pf-toggle__track {
+      background: var(--de-teal);
+
+      &::after { transform: translateX(20px); }
+    }
+  }
+
+  &__track {
+    width: 44px;
+    height: 24px;
+    background: var(--de-neutral-300);
+    border-radius: 100px;
+    position: relative;
+    transition: background .2s;
+    flex-shrink: 0;
+
+    &::after {
+      content: '';
+      position: absolute;
+      left: 3px;
+      top: 3px;
+      width: 18px;
+      height: 18px;
+      background: #fff;
+      border-radius: 50%;
+      transition: transform .2s;
+      box-shadow: 0 1px 3px rgba(0,0,0,.2);
+    }
+  }
+
+  &__label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--de-neutral-700);
+  }
+}
+
+// ─── Full-width column override ───────────────────────────────────────────────
+
+.pf-full-col {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+// ─── Reporting Tags ───────────────────────────────────────────────────────────
+
+.pf-tag-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  min-height: 40px;
+}
+
+.pf-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 100px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .3px;
+
+  &--navy   { background: rgba(13,27,42,.1);       color: var(--de-navy); }
+  &--teal   { background: var(--de-teal-light);    color: var(--de-teal-dark); }
+  &--purple { background: var(--de-purple-light);  color: var(--de-purple); }
+  &--amber  { background: var(--de-amber-light);   color: var(--de-amber-dark); }
+
+  &__remove {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    font-size: 11px;
+    line-height: 1;
+    color: inherit;
+    opacity: .7;
+    &:hover { opacity: 1; }
+  }
+}
+
+.pf-tag-add {
+  .pf-tag-select {
+    min-width: 120px;
+    .ng-select-container {
+      height: 32px !important;
+      min-height: 32px !important;
+    }
+  }
+}
+
+// ─── Search input with icon ───────────────────────────────────────────────────
+
+.pf-search-input {
+  position: relative;
+
+  .de-input { padding-right: 36px; }
+
+  .pf-search-icon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--de-neutral-400);
+    pointer-events: none;
+  }
+}
+
+// ─── Reveal container ─────────────────────────────────────────────────────────
+
+.pf-restrict-select {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+// ─── Dealer option in ng-select ──────────────────────────────────────────────
+
+.pf-dealer-opt {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pf-dealer-avatar {
+  width: 28px;
+  height: 28px;
+  background: var(--de-teal);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.pf-dealer-name { font-size: 13px; font-weight: 500; color: var(--de-neutral-800); }
+.pf-dealer-role { font-size: 11px; color: var(--de-neutral-500); }
+
+// ─── Pill chip (for dealer multi-select labels) ───────────────────────────────
+
+.pf-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--de-teal-light);
+  color: var(--de-teal-dark);
+  border-radius: 100px;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 2px 6px 2px 4px;
+
+  &__avatar {
+    width: 18px;
+    height: 18px;
+    background: var(--de-teal);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  &__x {
+    cursor: pointer;
+    font-size: 10px;
+    opacity: .7;
+    &:hover { opacity: 1; }
+  }
+}
+
+// ─── Shuttle List ─────────────────────────────────────────────────────────────
+
+.pf-shuttle {
+  display: flex;
+  gap: 0;
+  align-items: stretch;
+  border: 1px solid var(--de-neutral-200);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+
+.pf-shuttle__panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 280px;
+
+  &--assigned {
+    border-left: 2px solid var(--de-teal-light);
+  }
+}
+
+.pf-shuttle__panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--de-neutral-700);
+  background: var(--de-neutral-50);
+  border-bottom: 1px solid var(--de-neutral-200);
+}
+
+.pf-shuttle__count {
+  background: var(--de-neutral-200);
+  color: var(--de-neutral-600);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 1px 7px;
+  border-radius: 100px;
+
+  &--teal {
+    background: var(--de-teal-light);
+    color: var(--de-teal-dark);
+  }
+}
+
+.pf-shuttle__search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--de-neutral-100);
+  background: #fff;
+
+  svg { color: var(--de-neutral-400); flex-shrink: 0; }
+
+  input {
+    border: none;
+    outline: none;
+    font-size: 13px;
+    color: var(--de-neutral-700);
+    width: 100%;
+    font-family: var(--font-ui);
+
+    &::placeholder { color: var(--de-neutral-400); }
+  }
+}
+
+.pf-shuttle__list {
+  list-style: none;
+  flex: 1;
+  overflow-y: auto;
+  padding: 4px 0;
+  background: #fff;
+}
+
+.pf-shuttle__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 16px;
+  cursor: pointer;
+  transition: background .1s;
+  border-left: 3px solid transparent;
+  user-select: none;
+
+  &:hover { background: var(--de-neutral-50); }
+
+  &--selected {
+    background: var(--de-teal-light) !important;
+    border-left-color: var(--de-teal);
+  }
+}
+
+.pf-shuttle__item-name {
+  font-size: 13px;
+  color: var(--de-neutral-800);
+  font-weight: 500;
+}
+
+.pf-shuttle__empty {
+  padding: 24px 16px;
+  font-size: 13px;
+  color: var(--de-neutral-400);
+  text-align: center;
+}
+
+.pf-shuttle__controls {
+  width: 52px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 16px 8px;
+  background: var(--de-neutral-50);
+  border-left: 1px solid var(--de-neutral-200);
+  border-right: 1px solid var(--de-neutral-200);
+}
+
+.pf-shuttle__btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  border: 1px solid var(--de-neutral-300);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  color: var(--de-navy);
+  transition: all .12s;
+
+  &:hover:not(:disabled) {
+    background: var(--de-navy);
+    border-color: var(--de-navy);
+    color: #fff;
+  }
+
+  &:disabled {
+    opacity: .35;
+    cursor: not-allowed;
+  }
+}
+
+// ─── CP Card Grid ─────────────────────────────────────────────────────────────
+
+.pf-cp-grid-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  color: var(--de-neutral-400);
+  margin-bottom: 12px;
+}
+
+.pf-cp-grid {
+  gap: 12px;
+}
+
+.pf-cp-card {
+  border: 1px solid var(--de-neutral-200);
+  border-radius: var(--radius-md);
+  padding: 12px;
+  background: var(--de-neutral-50);
+  transition: all .15s;
+
+  &--assigned {
+    border-color: var(--de-teal);
+    background: var(--de-teal-light);
+  }
+
+  &__top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+
+  &__name {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--de-neutral-800);
+    line-height: 1.3;
+  }
+
+  &__check {
+    width: 18px;
+    height: 18px;
+    background: var(--de-teal);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    flex-shrink: 0;
+  }
+
+  &__badge { font-size: 10px; }
+}
+
+// ─── Currency dropdown ────────────────────────────────────────────────────────
+
+.pf-ccy-opt {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  &__flag { font-size: 16px; }
+  &__code { font-family: var(--font-mono); font-size: 13px; font-weight: 600; color: var(--de-navy); }
+  &__name { font-size: 12px; color: var(--de-neutral-500); }
+}
+
+.pf-ccy-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--de-neutral-100);
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-size: 12px;
+
+  &__flag { font-size: 13px; }
+  &__code { font-family: var(--font-mono); font-weight: 600; color: var(--de-navy); }
+  &__x    { cursor: pointer; font-size: 10px; color: var(--de-neutral-500); margin-left: 2px; &:hover { color: var(--de-red); } }
+}
+
+// ─── Hint with margin ─────────────────────────────────────────────────────────
+
+.pf-hint-mt { margin-top: 8px; }
+
+// ─── Sticky footer ────────────────────────────────────────────────────────────
+
+.pf-sticky-footer {
+  position: fixed;
+  bottom: 0;
+  left: var(--sidebar-w);
+  right: 0;
+  height: 64px;
+  background: #fff;
+  border-top: 1px solid var(--de-neutral-200);
+  box-shadow: 0 -4px 16px rgba(0,0,0,.06);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 28px;
+  z-index: 50;
+
+  &__info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--de-neutral-600);
+
+    svg { color: var(--de-teal); flex-shrink: 0; }
+    strong { color: var(--de-neutral-800); }
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+}
+
+.pf-toast-link {
+  color: #fff;
+  text-decoration: underline;
+  font-weight: 600;
+  font-size: 13px;
+  margin-left: 8px;
+  white-space: nowrap;
+}

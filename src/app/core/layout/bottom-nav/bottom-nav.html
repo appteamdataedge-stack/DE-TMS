@@ -1,0 +1,11 @@
+<nav class="de-bottom-nav">
+  @for (f of fields; track f.label; let last = $last) {
+    <span class="de-infobar-item">
+      <span class="de-infobar-item__key">{{ f.label }}</span>
+      <span class="de-infobar-item__val">{{ f.value || '—' }}</span>
+    </span>
+    @if (!last) {
+      <span class="de-infobar-sep">|</span>
+    }
+  }
+</nav>

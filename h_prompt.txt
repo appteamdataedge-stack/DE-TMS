@@ -1,0 +1,95 @@
+Angular Money Market app. Fix these 3 issues ONLY.
+Do NOT change any logic, validators, API calls, or dropdown position.
+
+---
+
+## FIX 1 — Info bar: start from sidebar right edge, not full width
+File: src/app/core/layout/bottom-nav/bottom-nav.component.scss
+
+The info bar must NOT cover the sidebar area.
+Find the exact sidebar width value used in this project 
+(check app-sidebar or mat-sidenav width, likely 220px or 240px).
+Replace :host position styles with:
+
+:host {
+  position: fixed !important;
+  top: 64px !important;
+  left: [sidebar-width]px !important;  /* replace with actual sidebar width */
+  right: 0 !important;
+  width: auto !important;
+  height: 36px !important;
+  z-index: 998 !important;
+  background: #EEF4FB !important;
+  border-bottom: 1px solid #C5D9EE !important;
+  display: flex !important;
+  align-items: center !important;
+  padding: 0 24px !important;
+  gap: 20px !important;
+  font-size: 13px !important;
+  color: #1565C0 !important;
+}
+
+Also remove the mobile media query that was added — do NOT override 
+this component for mobile, leave it as-is for all screen sizes.
+
+---
+
+## FIX 2 — Upper footer: same width rule as info bar
+File: src/app/core/layout/upper-footer/upper-footer.component.scss
+
+Apply same left offset as info bar:
+:host, .upper-footer {
+  position: fixed !important;
+  bottom: 0 !important;
+  left: [sidebar-width]px !important;  /* same sidebar width as FIX 1 */
+  right: 0 !important;
+  width: auto !important;
+  height: 52px !important;
+  z-index: 1100 !important;
+  background: #FFFFFF !important;
+  border-top: 1px solid #E0E0E0 !important;
+  box-shadow: 0 -2px 6px rgba(0,0,0,0.07) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 0 24px !important;
+}
+
+Upper footer must show ONLY on these routes (already implemented, 
+just verify it is still working):
+/mm-deal/create, /portfolio/create, /partners/create,
+/counterparties/create, /instruments/create,
+/gl-master/create, /products/create, /ssi/create
+Remove it from ALL other pages.
+
+---
+
+## FIX 3 — Dropdown scroll only (do NOT touch position or open logic)
+The dropdowns are opening correctly and showing options correctly.
+ONLY fix: when the dropdown list has many options, mouse wheel scroll 
+inside the open panel does not scroll the list.
+Fix only this in styles.scss:
+
+.mat-mdc-select-panel {
+  max-height: 220px !important;
+  overflow-y: auto !important;
+}
+
+.mat-mdc-select-panel::-webkit-scrollbar {
+  width: 6px;
+}
+.mat-mdc-select-panel::-webkit-scrollbar-thumb {
+  background: #B0BEC5;
+  border-radius: 3px;
+}
+
+Do NOT change disableOptionCentering, overlay position, 
+z-index, or any other dropdown property.
+Do NOT touch any dropdown component TypeScript files.
+
+---
+
+## CONSTRAINTS
+- Do NOT change any form logic, bindings, or API calls
+- Do NOT install new packages
+- Do NOT modify anything beyond the 3 files listed above

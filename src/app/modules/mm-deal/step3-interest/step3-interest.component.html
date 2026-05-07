@@ -1,0 +1,552 @@
+<!-- ─── Breadcrumb ─────────────────────────────────────────────────────────── -->
+<nav class="de-breadcrumb">
+  <a routerLink="/">Home</a><span class="sep">›</span>
+  <span>Money Market</span><span class="sep">›</span>
+  <span>MM Deals</span><span class="sep">›</span>
+  <a routerLink="/mm-deal/create/basics">New Deal</a><span class="sep">›</span>
+  <span class="current">Interest &amp; Calculation</span>
+</nav>
+
+<!-- ─── Page header ───────────────────────────────────────────────────────── -->
+<div class="mm-page-header">
+  <div>
+    <h1 style="font-size:22px;font-weight:700;color:var(--de-navy);margin:0 0 4px;display:flex;align-items:center;gap:12px">
+      New Money Market Deal
+      <span class="de-badge de-badge--neutral" style="font-family:var(--font-mono);font-size:12px">
+        {{ step1.get('dealId')?.value }}
+      </span>
+    </h1>
+    <p class="mm-page-sub">Step 3 of 3 — Configure interest basis, rate, day count, and settlement terms</p>
+  </div>
+</div>
+
+<!-- ─── Step bar ──────────────────────────────────────────────────────────── -->
+<de-deal-step-bar [currentStep]="3"></de-deal-step-bar>
+
+<!-- ─── Deal summary strip ───────────────────────────────────────────────── -->
+<div class="mm-s1-strip">
+  <span class="mm-s1-strip__label">Deal</span>
+  <span class="de-badge de-badge--{{ s1Direction === 'ACCEPT' ? 'teal' : 'navy' }}">{{ s1Direction }}</span>
+  @if (s1Counterparty) {
+    <span class="mm-s1-chip">{{ s1Counterparty.name }}</span>
+  }
+  @if (s1Instrument) {
+    <span class="mm-s1-chip">{{ s1Instrument.name }}</span>
+  }
+  @if (principal > 0) {
+    <span class="mm-s1-chip" style="font-family:var(--font-mono)">
+      {{ step2.get('currency')?.value }} {{ fmtNum(principal) }}
+    </span>
+  }
+  @if (step2.get('maturityDate')?.value) {
+    <span class="mm-s1-chip">Mat: {{ fmtDate(step2.get('maturityDate')?.value ?? '') }}</span>
+  }
+  <a routerLink="/mm-deal/create/deposit" class="mm-s1-strip__edit">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+    </svg>
+    Edit
+  </a>
+</div>
+
+<!-- ─── Form ─────────────────────────────────────────────────────────────── -->
+<form [formGroup]="step3" autocomplete="off" class="mm-form">
+
+  <!-- ── CARD 1: Interest Basis ─────────────────────────────────────────── -->
+  <div class="de-card mm-card">
+    <div class="de-card__header">
+      <div class="de-card__icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="1" x2="12" y2="23"/>
+          <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+        </svg>
+      </div>
+      <h3>Interest Basis</h3>
+    </div>
+    <div class="mm-basis-toggle">
+
+      <!-- FIXED -->
+      <button type="button" class="mm-basis-btn"
+        [class.mm-basis-btn--active-navy]="interestBasis === 'FIXED'"
+        (click)="setInterestBasis('FIXED')">
+        <div class="mm-basis-btn__icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="4" y1="8" x2="20" y2="8"/>
+            <line x1="4" y1="12" x2="20" y2="12"/>
+            <line x1="4" y1="16" x2="20" y2="16"/>
+          </svg>
+        </div>
+        <div class="mm-basis-btn__body">
+          <span class="mm-basis-btn__title">FIXED RATE</span>
+          <span class="mm-basis-btn__sub">User-defined rate p.a.</span>
+        </div>
+        @if (interestBasis === 'FIXED') {
+          <span class="mm-basis-btn__check">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+          </span>
+        }
+      </button>
+
+      <!-- FLOATING -->
+      <button type="button" class="mm-basis-btn"
+        [class.mm-basis-btn--active-amber]="interestBasis === 'FLOATING'"
+        (click)="setInterestBasis('FLOATING')">
+        <div class="mm-basis-btn__icon">
+          <svg width="22" height="22" viewBox="0 0 32 20" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M2 10 C5 4 8 16 11 10 S17 4 20 10 S26 16 30 10"/>
+          </svg>
+        </div>
+        <div class="mm-basis-btn__body">
+          <span class="mm-basis-btn__title">FLOATING RATE</span>
+          <span class="mm-basis-btn__sub">Benchmark + Spread</span>
+        </div>
+        @if (interestBasis === 'FLOATING') {
+          <span class="mm-basis-btn__check mm-basis-btn__check--amber">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+          </span>
+        }
+      </button>
+
+    </div>
+  </div>
+
+  <!-- ── CARD 2: Rate Setup (animated swap) ─────────────────────────────── -->
+  <div class="de-card mm-card mm-card--clip">
+
+    @if (interestBasis === 'FIXED') {
+      <div @cardSlide class="mm-rate-panel">
+        <div class="de-card__header">
+          <div class="de-card__icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="15" x2="20" y2="15"/>
+            </svg>
+          </div>
+          <h3>Fixed Rate Setup</h3>
+          <span class="de-badge de-badge--navy" style="margin-left:auto">FIXED</span>
+        </div>
+        <div class="de-grid-2">
+
+          <!-- Rate input + slider -->
+          <div class="de-field">
+            <label>Interest Rate <span style="color:var(--de-red)">*</span></label>
+            <div class="mm-rate-group"
+              [class.mm-rate-group--invalid]="step3.get('interestRate')!.invalid && step3.get('interestRate')!.touched">
+              <input formControlName="interestRate" type="number" step="0.01" min="0" max="100"
+                class="de-input mm-rate-input" placeholder="0.00">
+              <span class="mm-rate-suffix">% p.a.</span>
+            </div>
+            @if (step3.get('interestRate')!.errors?.['required'] && step3.get('interestRate')!.touched) {
+              <span class="de-error">Interest rate is required</span>
+            }
+            @if (step3.get('interestRate')!.errors?.['min'] && step3.get('interestRate')!.touched) {
+              <span class="de-error">Rate must be greater than zero</span>
+            }
+            <div class="mm-rate-range">
+              <div class="mm-rate-range__track">
+                <div class="mm-rate-range__fill" [style.width]="rateRangeFill"></div>
+                <input type="range" min="0" max="100" [value]="rateRangeValue"
+                  class="mm-rate-range__input" (input)="onRangeInput($event)">
+              </div>
+              <div class="mm-rate-range__labels">
+                <span>0%</span><span>5%</span><span>10%</span><span>15%</span><span>20%</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Settlement Frequency -->
+          <div class="de-field">
+            <label>Settlement Frequency</label>
+            <tms-select formControlName="settlementFreq" [items]="settlementFreqOptions"
+              bindValue="id" bindLabel="label" [clearable]="false" [searchable]="false">
+            </tms-select>
+          </div>
+
+        </div>
+      </div>
+    }
+
+    @if (interestBasis === 'FLOATING') {
+      <div @cardSlide class="mm-rate-panel">
+        <div class="de-card__header">
+          <div class="de-card__icon" style="background:var(--de-amber-light);color:var(--de-amber-dark)">
+            <svg width="16" height="16" viewBox="0 0 32 20" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M2 10 C5 4 8 16 11 10 S17 4 20 10 S26 16 30 10"/>
+            </svg>
+          </div>
+          <h3>Floating Rate Setup</h3>
+          <span class="de-badge de-badge--amber" style="margin-left:auto">FLOATING</span>
+        </div>
+        <div class="de-grid-2">
+
+          <!-- Benchmark -->
+          <div class="de-field">
+            <label>Benchmark <span style="color:var(--de-red)">*</span></label>
+            <tms-select formControlName="benchmark" [items]="benchmarkOptions"
+              bindValue="id" bindLabel="label" subLabelKey="name" [clearable]="false" placeholder="Select benchmark…">
+            </tms-select>
+            @if (step3.get('benchmark')!.errors?.['required'] && step3.get('benchmark')!.touched) {
+              <span class="de-error">Benchmark is required</span>
+            }
+          </div>
+
+          <!-- Benchmark Period -->
+          <div class="de-field">
+            <label>Benchmark Period <span style="color:var(--de-red)">*</span></label>
+            <tms-select formControlName="benchmarkPeriod" [items]="benchmarkPeriodOptions"
+              bindValue="id" bindLabel="label" [clearable]="false" [searchable]="false">
+            </tms-select>
+            @if (step3.get('benchmarkPeriod')!.errors?.['required'] && step3.get('benchmarkPeriod')!.touched) {
+              <span class="de-error">Benchmark period is required</span>
+            }
+          </div>
+
+          <!-- Spread -->
+          <div class="de-field">
+            <label>Spread</label>
+            <div class="mm-spread-group">
+              <input formControlName="spread" type="number" step="1" class="de-input" placeholder="0">
+              <span class="mm-spread-unit">bps</span>
+            </div>
+          </div>
+
+          <!-- Fixing Frequency -->
+          <div class="de-field">
+            <label>Fixing Frequency <span style="color:var(--de-red)">*</span></label>
+            <tms-select formControlName="fixingFrequency" [items]="fixingFreqOptions"
+              bindValue="id" bindLabel="label" [clearable]="false" [searchable]="false">
+            </tms-select>
+            @if (step3.get('fixingFrequency')!.errors?.['required'] && step3.get('fixingFrequency')!.touched) {
+              <span class="de-error">Fixing frequency is required</span>
+            }
+          </div>
+
+          <!-- Settlement Frequency -->
+          <div class="de-field">
+            <label>Settlement Frequency</label>
+            <tms-select formControlName="settlementFreq" [items]="settlementFreqOptions"
+              bindValue="id" bindLabel="label" [clearable]="false" [searchable]="false">
+            </tms-select>
+          </div>
+
+          <!-- All-in rate display -->
+          <div class="de-field">
+            <label>All-in Rate (indicative)</label>
+            <div class="mm-allin-display">
+              @if (effectiveRate > 0) {
+                <span class="mm-allin-value">{{ effectiveRate.toFixed(4) }}%</span>
+                <span class="mm-allin-eq">
+                  {{ step3.get('benchmark')?.value ?? '—' }} + {{ step3.get('spread')?.value || '0' }} bps
+                </span>
+              } @else {
+                <span class="mm-allin-placeholder">— set market rate in Card 4 to compute</span>
+              }
+            </div>
+          </div>
+
+        </div>
+      </div>
+    }
+
+  </div>
+
+  <!-- ── CARD 3: Day Count Rule ────────────────────────────────────────── -->
+  <div class="de-card mm-card">
+    <div class="de-card__header">
+      <div class="de-card__icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="4" width="18" height="18" rx="2"/>
+          <line x1="3" y1="10" x2="21" y2="10"/>
+          <line x1="8" y1="2" x2="8" y2="6"/>
+          <line x1="16" y1="2" x2="16" y2="6"/>
+        </svg>
+      </div>
+      <h3>Day Count Rule</h3>
+    </div>
+    <div class="de-grid-4 mm-dc-grid">
+      @for (dc of dayCountOptions; track dc.id) {
+        <button type="button" class="mm-dc-tile"
+          [class.mm-dc-tile--active]="dayCountRule === dc.id"
+          (click)="setDayCount(dc.id)">
+          <span class="mm-dc-tile__label">{{ dc.label }}</span>
+          <span class="mm-dc-tile__sub">{{ dc.sub }}</span>
+          <span class="mm-dc-tile__example">e.g. {{ dc.example }}</span>
+        </button>
+      }
+    </div>
+    <span class="de-hint" style="margin-top:12px;display:block">
+      ACT/365 and 30/360 are fully supported. Others are configurable.
+    </span>
+  </div>
+
+  <!-- ── CARD 4: Settlement & Stub Details ─────────────────────────────── -->
+  <div class="de-card mm-card">
+    <div class="de-card__header">
+      <div class="de-card__icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M9 11l3 3L22 4"/>
+          <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+        </svg>
+      </div>
+      <h3>Settlement &amp; Stub Details</h3>
+    </div>
+    <div class="de-grid-2">
+
+      <!-- Back Stub Period -->
+      <div class="de-field">
+        <label>Back Stub Period</label>
+        <tms-select formControlName="backStubPeriod" [items]="backStubOptions"
+          bindValue="id" bindLabel="label" [clearable]="false" [searchable]="false">
+        </tms-select>
+        @if (backStubDesc) {
+          <span class="de-hint">{{ backStubDesc }}</span>
+        }
+      </div>
+
+      <!-- Include First Day Interest toggle -->
+      <div class="de-field">
+        <label>First Day Interest</label>
+        <div class="mm-toggle-row">
+          <button type="button" class="mm-toggle"
+            [class.mm-toggle--on]="includeFirstDay"
+            (click)="step3.patchValue({ includeFirstDay: !includeFirstDay })"
+            title="When checked, interest accrues from and including the Value Date.">
+            <span class="mm-toggle__track"></span>
+            <span class="mm-toggle__thumb"></span>
+          </button>
+          <span class="mm-toggle-label">{{ includeFirstDay ? 'Included' : 'Excluded' }}</span>
+        </div>
+        <span class="de-hint">When on, interest accrues from and including the Value Date.</span>
+      </div>
+
+      <!-- Market Rate -->
+      <div class="de-field">
+        <label>
+          Market Rate (% p.a.)
+          @if (interestBasis === 'FLOATING') {<span style="color:var(--de-red)"> *</span>}
+        </label>
+        <div class="mm-spread-group">
+          <input formControlName="marketRate" type="number" step="0.01" class="de-input" placeholder="0.00">
+          <span class="mm-spread-unit">%</span>
+        </div>
+        <span class="de-hint">Prevailing market reference rate at deal inception.</span>
+      </div>
+
+      <!-- Remarks -->
+      <div class="de-field" style="grid-column:1/-1">
+        <label>Remarks</label>
+        <textarea formControlName="remarks" class="de-input mm-remarks" rows="3"
+          placeholder="Internal notes or deal-specific conditions…"></textarea>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── CARD 5: Maturity Value Computation (dark navy) ─────────────────── -->
+  <div class="mm-mv-card">
+    <div class="mm-mv-card__header">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+        <polyline points="14 2 14 8 20 8"/>
+        <line x1="16" y1="13" x2="8" y2="13"/>
+        <line x1="16" y1="17" x2="8" y2="17"/>
+      </svg>
+      Maturity Value Computation
+    </div>
+
+    <!-- Formula display -->
+    <div class="mm-mv-formula">
+      <span class="mm-mv-formula__text">MV = Principal × ( 1 + Rate × Days / DCBasis )</span>
+    </div>
+
+    <!-- Computed values grid -->
+    <div class="mm-mv-grid">
+      <div class="mm-mv-row">
+        <span class="mm-mv-row__label">Principal</span>
+        <span class="mm-mv-row__val">
+          @if (principal > 0) { {{ step2.get('currency')?.value }} {{ fmtNum(principal) }} } @else { — }
+        </span>
+      </div>
+      <div class="mm-mv-row">
+        <span class="mm-mv-row__label">Rate</span>
+        <span class="mm-mv-row__val">
+          @if (effectiveRate > 0) { {{ effectiveRate.toFixed(4) }}% p.a. } @else { — }
+        </span>
+      </div>
+      <div class="mm-mv-row">
+        <span class="mm-mv-row__label">Days / Basis</span>
+        <span class="mm-mv-row__val">
+          @if (depositDays > 0) { {{ depositDays }} / {{ dayCountBasis }} } @else { — }
+        </span>
+      </div>
+      <div class="mm-mv-row">
+        <span class="mm-mv-row__label">Interest Amount</span>
+        <span class="mm-mv-row__val">
+          @if (interestAmount > 0) { {{ step2.get('currency')?.value }} {{ fmtNum(interestAmount) }} } @else { — }
+        </span>
+      </div>
+      <div class="mm-mv-row mm-mv-row--total">
+        <span class="mm-mv-row__label">Maturity Value</span>
+        <span class="mm-mv-row__val mm-mv-row__val--total">
+          @if (maturityValue > 0) { {{ step2.get('currency')?.value }} {{ fmtNum(maturityValue) }} } @else { — }
+        </span>
+      </div>
+    </div>
+
+    <!-- Cash flow schedule (periodic settlement only) -->
+    @if (cashFlowRows.length > 0) {
+      <div @slideDown class="mm-cf-section">
+        <div class="mm-cf-label">Periodic Cash Flows</div>
+        <table class="mm-cf-table">
+          <thead>
+            <tr>
+              <th class="mm-cf-n">#</th>
+              <th>Date</th>
+              <th>Type</th>
+              <th>Event</th>
+              <th class="mm-cf-amount">Amount</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of cashFlowRows; track $index; let i = $index) {
+              <tr [class.mm-cf-row--maturity]="row.isMaturity">
+                <td class="mm-cf-n">{{ i + 1 }}</td>
+                <td class="mm-cf-date">{{ fmtDate(row.date) }}</td>
+                <td>
+                  <span class="mm-cf-type"
+                    [class.mm-cf-type--pay]="row.type === 'Pay'"
+                    [class.mm-cf-type--rec]="row.type === 'Rec'">
+                    {{ row.type }}
+                  </span>
+                </td>
+                <td class="mm-cf-event">{{ row.event }}</td>
+                <td class="mm-cf-amount">{{ step2.get('currency')?.value }} {{ fmtNum(row.amount) }}</td>
+                <td><span class="de-badge de-badge--neutral">Projected</span></td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+
+  </div>
+
+</form>
+
+<!-- ─── Submit Confirmation Modal ─────────────────────────────────────────── -->
+@if (showModal) {
+  <div class="de-modal-backdrop" @overlayFade (click)="cancelModal()">
+    <div class="de-modal mm-confirm-modal" (click)="$event.stopPropagation()">
+      <button type="button" class="mm-modal-close" (click)="cancelModal()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+      <div class="de-modal__header">
+        <h2>Confirm Deal Submission</h2>
+        <p>Review the deal details before sending for checker authorization.</p>
+      </div>
+      <div class="mm-modal-grid">
+        <div class="mm-modal-row">
+          <span class="mm-modal-row__label">Deal ID</span>
+          <span class="mm-modal-row__val">{{ step1.get('dealId')?.value ?? '—' }}</span>
+        </div>
+        <div class="mm-modal-row">
+          <span class="mm-modal-row__label">Direction</span>
+          <span class="mm-modal-row__val">{{ s1Direction }}</span>
+        </div>
+        <div class="mm-modal-row">
+          <span class="mm-modal-row__label">Amount</span>
+          <span class="mm-modal-row__val">
+            @if (principal > 0) { {{ step2.get('currency')?.value }} {{ fmtNum(principal) }} } @else { — }
+          </span>
+        </div>
+        <div class="mm-modal-row">
+          <span class="mm-modal-row__label">
+            @if (interestBasis === 'FIXED') { Rate } @else { All-in Rate }
+          </span>
+          <span class="mm-modal-row__val">
+            @if (effectiveRate > 0) { {{ effectiveRate.toFixed(4) }}% p.a. } @else { — }
+          </span>
+        </div>
+        <div class="mm-modal-row">
+          <span class="mm-modal-row__label">Maturity Date</span>
+          <span class="mm-modal-row__val">{{ fmtDate(step2.get('maturityDate')?.value ?? '') }}</span>
+        </div>
+        <div class="mm-modal-row mm-modal-row--highlight">
+          <span class="mm-modal-row__label">Maturity Value</span>
+          <span class="mm-modal-row__val">
+            @if (maturityValue > 0) { {{ step2.get('currency')?.value }} {{ fmtNum(maturityValue) }} } @else { — }
+          </span>
+        </div>
+      </div>
+      <div class="mm-modal-warning">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;margin-top:1px">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+          <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+        Once submitted, this deal enters the maker-checker workflow and cannot be edited until authorized.
+      </div>
+      <div class="de-modal__footer">
+        <button type="button" class="de-btn de-btn--ghost" (click)="cancelModal()">Cancel</button>
+        <button type="button" class="de-btn de-btn--primary" (click)="confirmSubmit()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          </svg>
+          Confirm &amp; Submit
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ─── Toast ──────────────────────────────────────────────────────────────── -->
+@if (showToast) {
+  <div class="de-toast-container" @overlayFade>
+    <div class="de-toast" [class.de-toast--success]="!toastIsError" [class.de-toast--error]="toastIsError">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <polyline points="20 6 9 17 4 12"/>
+      </svg>
+      {{ toastMsg }}
+    </div>
+  </div>
+}
+
+<!-- ─── Post-submit navigation ────────────────────────────────────────────── -->
+@if (showInboxBtn) {
+  <div class="mm-submit-nav">
+    <a routerLink="/auth-inbox" class="de-btn de-btn--outline">
+      Go to Authorization Inbox
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+      </svg>
+    </a>
+    <a routerLink="/blotter" class="de-btn de-btn--ghost">View Blotter</a>
+  </div>
+}
+
+<!-- ─── Wizard footer ─────────────────────────────────────────────────────── -->
+<div class="mm-wizard-footer">
+  <button type="button" class="de-btn de-btn--ghost" routerLink="/mm-deal/create/deposit">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
+    </svg>
+    Back
+  </button>
+  <div class="mm-wizard-footer__right">
+    <button type="button" class="de-btn de-btn--outline" (click)="saveDraft()">Save as Draft</button>
+    <button type="button" class="de-btn de-btn--primary" (click)="onNext()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+      </svg>
+      Save &amp; Send for Authorization
+    </button>
+  </div>
+</div>

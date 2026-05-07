@@ -1,0 +1,75 @@
+Angular Money Market app. Fix these ONLY. Do NOT change anything else.
+
+---
+
+## FIX 1 — Info bar wrong left position
+Find the .de-form-infobar CSS class in styles.scss or the component SCSS.
+Change it to:
+  position: fixed;
+  top: 64px;
+  left: 240px;   /* ← must match exact sidebar width variable */
+  right: 0;
+  width: calc(100% - 240px);
+  height: 36px;
+  z-index: 998;
+  background: #EEF4FB;
+  border-bottom: 1px solid #C5D9EE;
+  
+If sidebar width is stored as a CSS variable (e.g. --sidebar-width), use:
+  left: var(--sidebar-width);
+  width: calc(100% - var(--sidebar-width));
+
+Also check: if the app has a mat-sidenav-content or similar wrapper,
+the info bar must be INSIDE that wrapper, not inside mat-sidenav or body root.
+Move the info bar HTML element to be a direct child of the main content 
+container (the scrollable area right of sidebar), not app-root level.
+
+---
+
+## FIX 2 — Footer wrong left position
+Find the fixed footer component/element. Apply same rule:
+  position: fixed;
+  bottom: 0;
+  left: 240px;
+  right: 0;
+  width: calc(100% - 240px);
+  height: 52px;
+  z-index: 1100;
+
+Same rule: if sidebar width is a variable use var(--sidebar-width).
+Move footer HTML to be inside the main content wrapper, not app-root level.
+Confirm only ONE footer exists — search all templates for 
+"Cancel" + "Save" + "Submit" buttons appearing together and remove 
+any duplicate instances inside individual page components.
+
+---
+
+## FIX 3 — Dropdowns not working / blank
+Do these 3 things:
+
+1. In styles.scss add:
+  .cdk-overlay-container,
+  .cdk-overlay-backdrop,
+  .cdk-overlay-connected-position-bounding-box {
+    position: fixed !important;
+    z-index: 9999 !important;
+  }
+
+2. In every component that has mat-select, check the FormControl:
+  - If control is initialized as: new FormControl({value: x, disabled: true})
+    change to: new FormControl(x)
+  - If options array (e.g. instruments$, portfolios$) is loaded in 
+    ngAfterViewInit, move the load call to ngOnInit instead
+
+3. Check app's main layout component (app.component.html or shell.component.html).
+  If it uses: overflow: hidden on the main wrapper, change to overflow: auto.
+  overflow:hidden on a parent breaks CDK overlay positioning.
+  Find any CSS rule with overflow:hidden on mat-sidenav-content or 
+  .main-content or .content-wrapper and remove it.
+
+---
+
+## CONSTRAINTS
+- Do NOT change form logic or API calls
+- Do NOT install packages
+- These 3 fixes only, nothing else

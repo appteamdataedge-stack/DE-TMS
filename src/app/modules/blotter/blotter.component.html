@@ -1,0 +1,419 @@
+<!-- ─── Breadcrumb ─────────────────────────────────────────────────────────── -->
+<nav class="de-breadcrumb">
+  <a routerLink="/dashboard">Home</a><span class="sep">›</span>
+  <span>Money Market</span><span class="sep">›</span>
+  <span class="current">Deal Blotter</span>
+</nav>
+
+<!-- ─── Page Header ────────────────────────────────────────────────────────── -->
+<div class="bl-header">
+  <div class="bl-header__left">
+    <h1 class="bl-header__title">Deal Blotter</h1>
+    <p class="bl-header__sub">All money market deals</p>
+  </div>
+  <div class="bl-header__actions">
+    <button class="de-btn de-btn--outline" (click)="filterOpen = true">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/>
+      </svg>
+      Filters
+      @if (activeFilterCount > 0) {
+        <span class="bl-filter-badge">{{ activeFilterCount }}</span>
+      }
+    </button>
+    <a routerLink="/mm-deal/create/basics" class="de-btn de-btn--primary">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
+      New MM Deal
+    </a>
+  </div>
+</div>
+
+<!-- ─── Quick Filters ──────────────────────────────────────────────────────── -->
+<div class="bl-quick-filters">
+  <button class="bl-qf-btn" [class.bl-qf-btn--active]="quickFilter === 'ALL'" (click)="setQuickFilter('ALL')">
+    All Deals
+    <span class="bl-qf-count">{{ allDeals.length }}</span>
+  </button>
+  <button class="bl-qf-btn" [class.bl-qf-btn--active]="quickFilter === 'TODAY'" (click)="setQuickFilter('TODAY')">
+    Today's Deals
+  </button>
+</div>
+
+<!-- ─── Active Filter Chips ────────────────────────────────────────────────── -->
+@if (activeChips.length > 0) {
+  <div class="bl-chips">
+    @for (chip of activeChips; track chip.key + chip.value) {
+      <span class="bl-chip">
+        {{ chip.label }}
+        <button class="bl-chip__remove" (click)="removeChip(chip)" aria-label="Remove filter">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </span>
+    }
+    <button class="de-btn de-btn--outline de-btn--sm" (click)="clearFilters()">Clear all</button>
+  </div>
+}
+
+<!-- ─── Deals Table ────────────────────────────────────────────────────────── -->
+<div class="de-card bl-table-card">
+  <div class="bl-table-wrap">
+    <table class="bl-table">
+      <thead>
+        <tr>
+          <th class="bl-th--sort" (click)="toggleSort('id')">
+            Deal ID
+            <span class="bl-sort-icon" [class.bl-sort-icon--active]="sortCol === 'id'">
+              @if (sortCol === 'id' && sortDir === 'asc') { ▲ } @else { ▼ }
+            </span>
+          </th>
+          <th class="bl-th--sort" (click)="toggleSort('dealDate')">
+            Date
+            <span class="bl-sort-icon" [class.bl-sort-icon--active]="sortCol === 'dealDate'">
+              @if (sortCol === 'dealDate' && sortDir === 'asc') { ▲ } @else { ▼ }
+            </span>
+          </th>
+          <th class="bl-th--sort" (click)="toggleSort('counterparty')">
+            Counterparty
+            <span class="bl-sort-icon" [class.bl-sort-icon--active]="sortCol === 'counterparty'">
+              @if (sortCol === 'counterparty' && sortDir === 'asc') { ▲ } @else { ▼ }
+            </span>
+          </th>
+          <th class="bl-th--sort" (click)="toggleSort('direction')">
+            Direction
+            <span class="bl-sort-icon" [class.bl-sort-icon--active]="sortCol === 'direction'">
+              @if (sortCol === 'direction' && sortDir === 'asc') { ▲ } @else { ▼ }
+            </span>
+          </th>
+          <th class="bl-th--sort" (click)="toggleSort('instrument')">
+            Instrument
+            <span class="bl-sort-icon" [class.bl-sort-icon--active]="sortCol === 'instrument'">
+              @if (sortCol === 'instrument' && sortDir === 'asc') { ▲ } @else { ▼ }
+            </span>
+          </th>
+          <th class="bl-th--sort" (click)="toggleSort('currency')">
+            CCY
+            <span class="bl-sort-icon" [class.bl-sort-icon--active]="sortCol === 'currency'">
+              @if (sortCol === 'currency' && sortDir === 'asc') { ▲ } @else { ▼ }
+            </span>
+          </th>
+          <th class="bl-col-r bl-th--sort" (click)="toggleSort('amount')">
+            Amount
+            <span class="bl-sort-icon" [class.bl-sort-icon--active]="sortCol === 'amount'">
+              @if (sortCol === 'amount' && sortDir === 'asc') { ▲ } @else { ▼ }
+            </span>
+          </th>
+          <th class="bl-col-r bl-th--sort" (click)="toggleSort('rate')">
+            Rate
+            <span class="bl-sort-icon" [class.bl-sort-icon--active]="sortCol === 'rate'">
+              @if (sortCol === 'rate' && sortDir === 'asc') { ▲ } @else { ▼ }
+            </span>
+          </th>
+          <th class="bl-th--sort" (click)="toggleSort('valueDate')">
+            Value Date
+            <span class="bl-sort-icon" [class.bl-sort-icon--active]="sortCol === 'valueDate'">
+              @if (sortCol === 'valueDate' && sortDir === 'asc') { ▲ } @else { ▼ }
+            </span>
+          </th>
+          <th class="bl-th--sort" (click)="toggleSort('maturityDate')">
+            Maturity
+            <span class="bl-sort-icon" [class.bl-sort-icon--active]="sortCol === 'maturityDate'">
+              @if (sortCol === 'maturityDate' && sortDir === 'asc') { ▲ } @else { ▼ }
+            </span>
+          </th>
+          <th class="bl-col-r bl-th--sort" (click)="toggleSort('days')">
+            Days
+            <span class="bl-sort-icon" [class.bl-sort-icon--active]="sortCol === 'days'">
+              @if (sortCol === 'days' && sortDir === 'asc') { ▲ } @else { ▼ }
+            </span>
+          </th>
+          <th class="bl-th--sort" (click)="toggleSort('status')">
+            Status
+            <span class="bl-sort-icon" [class.bl-sort-icon--active]="sortCol === 'status'">
+              @if (sortCol === 'status' && sortDir === 'asc') { ▲ } @else { ▼ }
+            </span>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        @if (filteredDeals.length === 0) {
+          <tr>
+            <td colspan="12" class="bl-empty-cell">
+              <div class="bl-empty">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="1.5" stroke-linecap="round" class="bl-empty__icon">
+                  <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                </svg>
+                <p class="bl-empty__title">No deals found</p>
+                <p class="bl-empty__sub">Try adjusting filters</p>
+                <button class="de-btn de-btn--outline de-btn--sm" (click)="clearFilters()">Clear filters</button>
+              </div>
+            </td>
+          </tr>
+        } @else {
+          @for (deal of pagedDeals; track deal.id) {
+            <tr class="bl-table__row" [class.bl-table__row--selected]="selectedDeal?.id === deal.id"
+                (click)="selectDeal(deal)"
+                (contextmenu)="showContextMenu($event, deal)">
+              <td><a class="bl-deal-id" [routerLink]="['/mm-deal', deal.id]" (click)="$event.stopPropagation()">{{ deal.id }}</a></td>
+              <td class="bl-date">{{ fmtDate(deal.dealDate) }}</td>
+              <td>
+                <div class="cpty-name">{{ deal.counterparty }}</div>
+                <div class="cpty-sub">{{ deal.cpCode }}</div>
+              </td>
+              <td>
+                <span class="de-badge de-badge--{{ deal.direction === 'ACCEPT' ? 'teal' : 'navy' }}">
+                  {{ deal.direction }}
+                </span>
+              </td>
+              <td class="bl-instrument">{{ deal.instrument }}</td>
+              <td>
+                <span class="bl-ccy-tag bl-ccy-tag--{{ deal.currency.toLowerCase() }}">{{ deal.currency }}</span>
+              </td>
+              <td class="bl-col-r amount-cell">{{ deal.currency }} {{ fmtAmount(deal.amount) }}</td>
+              <td class="bl-col-r rate-cell">{{ deal.rate.toFixed(2) }}%</td>
+              <td class="bl-date">{{ fmtDate(deal.valueDate) }}</td>
+              <td class="bl-date">{{ fmtDate(deal.maturityDate) }}</td>
+              <td class="bl-col-r">
+                @if (deal.status !== 'MATURED' && deal.status !== 'CANCELLED') {
+                  <span class="de-badge de-badge--{{ daysBadge(deal.days) }}">{{ deal.days }}d</span>
+                } @else {
+                  <span class="bl-days-na">—</span>
+                }
+              </td>
+              <td>
+                <span class="de-badge de-badge--{{ statusBadge(deal.status) }}">{{ deal.status }}</span>
+              </td>
+            </tr>
+          }
+        }
+      </tbody>
+      <tfoot>
+        <tr class="bl-totals-row">
+          <td colspan="12">
+            <div class="bl-totals-cell">
+              <span class="bl-totals-count">Total Deals: {{ filteredDeals.length }}</span>
+              @for (tot of filteredTotals; track tot.currency) {
+                <span class="bl-totals-sep">|</span>
+                <span class="bl-totals-amount">Total Principal: {{ tot.currency }} {{ fmtAmount(tot.amount) }}</span>
+              }
+            </div>
+          </td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+  <!-- ─── Table Footer: page size + pagination ──────────────────────────── -->
+  <div class="bl-table-footer">
+    <select class="bl-ps-select" [ngModel]="pageSize" (ngModelChange)="setPageSize($event)">
+      @for (opt of pageSizeOptions; track opt) {
+        <option [ngValue]="opt">{{ opt }} / page</option>
+      }
+    </select>
+
+    <div class="bl-pagination">
+      <button class="bl-page-btn bl-page-btn--nav" [disabled]="currentPage === 1"
+              (click)="goToPage(currentPage - 1)" aria-label="Previous">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      @for (p of visiblePages; track $index) {
+        @if (p === '...') {
+          <span class="bl-page-ellipsis">...</span>
+        } @else {
+          <button class="bl-page-btn" [class.bl-page-btn--active]="p === currentPage"
+                  (click)="goToPage($any(p))">{{ p }}</button>
+        }
+      }
+      <button class="bl-page-btn bl-page-btn--nav" [disabled]="currentPage === totalPages"
+              (click)="goToPage(currentPage + 1)" aria-label="Next">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── Right-click Context Menu ─────────────────────────────────────────── -->
+@if (contextMenu.show) {
+  <div class="bl-ctx-menu"
+       [style.left.px]="contextMenu.x"
+       [style.top.px]="contextMenu.y"
+       (click)="$event.stopPropagation()">
+    <button class="bl-ctx-menu__item" (click)="ctxViewDetail()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+      </svg>
+      View Detail (Read Only)
+    </button>
+    <button class="bl-ctx-menu__item" (click)="ctxModifyDeal()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+      </svg>
+      Modify Deal
+    </button>
+    <div class="bl-ctx-menu__divider"></div>
+    <button class="bl-ctx-menu__item bl-ctx-menu__item--approve" (click)="ctxVerifyApprove()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+        <polyline points="20 6 9 17 4 12"/>
+      </svg>
+      Verify / Approve
+    </button>
+    <div class="bl-ctx-menu__divider"></div>
+    <button class="bl-ctx-menu__item bl-ctx-menu__item--muted" (click)="ctxResendMT320()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+      </svg>
+      Resend MT320
+    </button>
+    <button class="bl-ctx-menu__item bl-ctx-menu__item--muted" (click)="ctxExportRow()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+        <polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+      </svg>
+      Export Row
+    </button>
+  </div>
+}
+
+<!-- ─── Panel Backdrop ────────────────────────────────────────────────────── -->
+@if (filterOpen || selectedDeal) {
+  <div class="bl-backdrop" @backdropFade (click)="filterOpen = false; closeDeal()"></div>
+}
+
+<!-- ─── Deal Preview Panel ───────────────────────────────────────────────── -->
+@if (selectedDeal) {
+  <div class="bl-panel bl-panel--deal" @slideOver>
+    <div class="bl-panel__header">
+      <div class="bl-panel__deal-id-row">
+        <span class="bl-deal-id-chip">{{ selectedDeal.id }}</span>
+        <span class="de-badge de-badge--{{ statusBadge(selectedDeal.status) }}">{{ selectedDeal.status }}</span>
+      </div>
+      <p class="bl-panel__deal-cp">{{ selectedDeal.counterparty }}</p>
+      <button class="bl-panel__close" (click)="closeDeal()" aria-label="Close">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <div class="bl-panel__body">
+      <dl class="bl-panel__dl">
+        <dt>Direction</dt>
+        <dd><span class="de-badge de-badge--{{ selectedDeal.direction === 'ACCEPT' ? 'teal' : 'navy' }}">{{ selectedDeal.direction }}</span></dd>
+        <dt>Instrument</dt>  <dd>{{ selectedDeal.instrument }}</dd>
+        <dt>Currency</dt>    <dd><span class="bl-ccy-tag bl-ccy-tag--{{ selectedDeal.currency.toLowerCase() }}">{{ selectedDeal.currency }}</span></dd>
+        <dt>Amount</dt>      <dd class="bl-panel__mono">{{ selectedDeal.currency }} {{ fmtAmount(selectedDeal.amount) }}</dd>
+        <dt>Rate</dt>        <dd class="bl-panel__mono">{{ selectedDeal.rate.toFixed(2) }}% p.a.</dd>
+        <dt>Value Date</dt>  <dd>{{ fmtDate(selectedDeal.valueDate) }}</dd>
+        <dt>Maturity</dt>    <dd>{{ fmtDate(selectedDeal.maturityDate) }}</dd>
+        @if (selectedDeal.status !== 'MATURED' && selectedDeal.status !== 'CANCELLED') {
+          <dt>Days Left</dt>
+          <dd><span class="de-badge de-badge--{{ daysBadge(selectedDeal.days) }}">{{ selectedDeal.days }}d</span></dd>
+        }
+      </dl>
+    </div>
+    <div class="bl-panel__footer">
+      <a class="de-btn de-btn--primary" [routerLink]="['/mm-deal', selectedDeal.id, 'summary']">View Full Summary →</a>
+      <a class="de-btn de-btn--outline" [routerLink]="['/mm-deal', selectedDeal.id]">Deal Detail</a>
+    </div>
+  </div>
+}
+
+<!-- ─── Filter Panel ──────────────────────────────────────────────────────── -->
+@if (filterOpen) {
+  <div class="bl-panel" @slideOver>
+    <div class="bl-panel__header">
+      <h2 class="bl-panel__title">Filters</h2>
+      <button class="bl-panel__close" (click)="filterOpen = false" aria-label="Close filters">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <div class="bl-panel__body">
+      <div class="bl-filter-group">
+        <label class="bl-filter-label">Direction</label>
+        <div class="bl-seg">
+          @for (opt of ['ALL', 'ACCEPT', 'PLACE']; track opt) {
+            <button class="bl-seg__btn" [class.bl-seg__btn--active]="filters.direction === opt"
+                    (click)="filters.direction = $any(opt)">{{ opt }}</button>
+          }
+        </div>
+      </div>
+      <div class="bl-filter-group">
+        <label class="bl-filter-label">Counterparty</label>
+        <tms-select [items]="uniqueCounterparties" [multiple]="true" [(ngModel)]="filters.counterparties"
+                    placeholder="All counterparties" [closeOnSelect]="false"></tms-select>
+      </div>
+      <div class="bl-filter-group">
+        <label class="bl-filter-label">Currency</label>
+        <tms-select [items]="uniqueCurrencies" [multiple]="true" [(ngModel)]="filters.currencies"
+                    placeholder="All currencies" [closeOnSelect]="false"></tms-select>
+      </div>
+      <div class="bl-filter-group">
+        <label class="bl-filter-label">Status</label>
+        <tms-select [items]="statusOptions" [multiple]="true" [(ngModel)]="filters.statuses"
+                    placeholder="All statuses" [closeOnSelect]="false"></tms-select>
+      </div>
+    </div>
+    <div class="bl-panel__footer">
+      <button class="de-btn de-btn--outline" (click)="clearFilters()">Clear filters</button>
+    </div>
+  </div>
+}
+
+<!-- ─── Authorization Confirm Modal ─────────────────────────────────────── -->
+@if (approveModal.show) {
+  <div class="de-modal-backdrop" (click)="cancelApprove()">
+    <div class="de-modal" (click)="$event.stopPropagation()">
+      <div class="de-modal__header">
+        <h2>Verify &amp; Approve Deal</h2>
+        <p>Review the details below carefully. This action will mark the deal as authorized.</p>
+      </div>
+
+      <div class="bl-approve-grid">
+        <div class="bl-approve-row">
+          <span class="bl-approve-label">Deal ID</span>
+          <span class="bl-approve-val bl-approve-mono">{{ approveModal.deal?.id }}</span>
+        </div>
+        <div class="bl-approve-row">
+          <span class="bl-approve-label">Counterparty</span>
+          <span class="bl-approve-val">{{ approveModal.deal?.counterparty }}</span>
+        </div>
+        <div class="bl-approve-row">
+          <span class="bl-approve-label">Instrument</span>
+          <span class="bl-approve-val">{{ approveModal.deal?.instrument }}</span>
+        </div>
+        <div class="bl-approve-row">
+          <span class="bl-approve-label">Amount</span>
+          <span class="bl-approve-val bl-approve-mono">
+            {{ approveModal.deal?.currency }} {{ fmtAmount(approveModal.deal?.amount ?? 0) }}
+          </span>
+        </div>
+        <div class="bl-approve-row">
+          <span class="bl-approve-label">Rate</span>
+          <span class="bl-approve-val bl-approve-mono">{{ approveModal.deal?.rate?.toFixed(2) }}% p.a.</span>
+        </div>
+        <div class="bl-approve-row">
+          <span class="bl-approve-label">Status</span>
+          <span class="de-badge de-badge--{{ statusBadge(approveModal.deal?.status ?? '') }}">
+            {{ approveModal.deal?.status }}
+          </span>
+        </div>
+      </div>
+
+      <div class="de-modal__footer">
+        <button class="de-btn de-btn--outline" (click)="cancelApprove()">Cancel</button>
+        <button class="de-btn de-btn--teal" (click)="confirmApprove()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+          Confirm Approval
+        </button>
+      </div>
+    </div>
+  </div>
+}

@@ -1,0 +1,201 @@
+﻿:host { display: block; }
+
+// ── Page Header ───────────────────────────────────────────────────────────────
+
+.bpra-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.bpra-sub {
+  font-size: 13px;
+  color: var(--de-neutral-500);
+  margin: 4px 0 0;
+}
+
+// ── Form Cards ────────────────────────────────────────────────────────────────
+
+.bpra-card {
+  margin-bottom: 20px;
+}
+
+.bpra-card--emp {
+  border-left: 3px solid var(--de-teal);
+}
+
+.bpra-emp-icon {
+  background: var(--de-teal-light) !important;
+  color: var(--de-teal-dark) !important;
+}
+
+// ── BP search input ───────────────────────────────────────────────────────────
+
+.bpra-search-wrap {
+  position: relative;
+}
+
+.bpra-search-icon {
+  position: absolute;
+  top: 50%;
+  left: 12px;
+  transform: translateY(-50%);
+  color: var(--de-neutral-400);
+  pointer-events: none;
+}
+
+.bpra-search-input {
+  padding-left: 36px !important;
+}
+
+// ── Optional label tag ────────────────────────────────────────────────────────
+
+.bpra-opt {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--de-neutral-400);
+  text-transform: none;
+  margin-left: 4px;
+}
+
+// ── Form actions ──────────────────────────────────────────────────────────────
+
+.bpra-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+// ── Grid card ─────────────────────────────────────────────────────────────────
+
+.bpra-grid-card {
+  margin-bottom: 0;
+}
+
+.bpra-filter-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  background: var(--primary-50, #F3F3FD);
+  border: 1px solid var(--primary-light, #EDEDFB);
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--primary, #5B5BD6);
+  margin-left: 8px;
+}
+
+// ── Table ─────────────────────────────────────────────────────────────────────
+
+.bpra-table-wrap {
+  overflow-x: auto;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--de-neutral-200);
+}
+
+.bpra-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+
+  thead tr {
+    background: var(--de-neutral-50);
+    border-bottom: 2px solid var(--de-neutral-200);
+  }
+
+  th {
+    padding: 10px 14px;
+    font-size: 10.5px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--de-neutral-600);
+    white-space: nowrap;
+    text-align: left;
+  }
+
+  td {
+    padding: 11px 14px;
+    color: var(--de-neutral-800);
+    border-bottom: 1px solid var(--de-neutral-100);
+    vertical-align: middle;
+    font-size: 13px;
+  }
+
+  &__row {
+    transition: background 0.1s;
+    &:last-child td { border-bottom: none; }
+    &:hover td { background: var(--primary-50, #F3F3FD); }
+    &--editing td { background: #FFFBEB !important; }
+  }
+}
+
+.bpra-bp-id {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--de-teal-dark);
+}
+
+.bpra-na {
+  color: var(--de-neutral-400);
+}
+
+// ── Action buttons ────────────────────────────────────────────────────────────
+
+.bpra-actions-cell {
+  white-space: nowrap;
+  padding: 8px 12px !important;
+}
+
+.bpra-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--de-neutral-200);
+  border-radius: var(--radius-sm);
+  background: #fff;
+  color: var(--de-neutral-600);
+  cursor: pointer;
+  margin-right: 4px;
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
+
+  &:hover { background: var(--primary-50, #F3F3FD); color: var(--primary, #5B5BD6); border-color: var(--primary, #5B5BD6); }
+  &--danger:hover { background: #FFF0F0; color: var(--de-red); border-color: var(--de-red); }
+}
+
+// ── Empty state ───────────────────────────────────────────────────────────────
+
+.bpra-empty-cell {
+  padding: 56px 20px !important;
+  text-align: center;
+  border-bottom: none !important;
+}
+
+.bpra-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+
+  &__icon { color: var(--de-neutral-300); }
+
+  &__title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--de-neutral-700);
+    margin: 0;
+  }
+
+  &__sub {
+    font-size: 12px;
+    color: var(--de-neutral-400);
+    margin: 0;
+  }
+}

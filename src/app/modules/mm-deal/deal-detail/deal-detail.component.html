@@ -1,0 +1,328 @@
+<!-- ─── Breadcrumb ─────────────────────────────────────────────────────────── -->
+<nav class="de-breadcrumb">
+  <a routerLink="/dashboard">Home</a><span class="sep">›</span>
+  <a routerLink="/blotter">Blotter</a><span class="sep">›</span>
+  <span class="current">{{ deal.id }}</span>
+</nav>
+
+<!-- ─── Hero Card ─────────────────────────────────────────────────────────── -->
+<div class="de-card dd-hero">
+
+  <div class="dd-hero__head">
+    <div class="dd-hero__head-left">
+      <span class="de-badge de-badge--neutral dd-id-badge">{{ deal.id }}</span>
+      <span class="dd-hero__type-label">{{ deal.instrument }} · {{ deal.direction }}</span>
+    </div>
+    <span class="de-badge de-badge--green dd-status-badge">● {{ deal.status }}</span>
+  </div>
+
+  <p class="dd-hero__counterparty">{{ deal.counterparty }}</p>
+  <div class="dd-hero__amount">{{ deal.currency }} {{ fmtAmount(deal.faceValue) }}</div>
+
+  <div class="dd-hero__divider"></div>
+
+  <div class="dd-hero__metrics">
+    <div class="dd-hero__metric">
+      <span class="dd-hero__metric-label">Rate</span>
+      <span class="dd-hero__metric-value">{{ deal.rate.toFixed(2) }}% p.a.</span>
+    </div>
+    <div class="dd-hero__metric-sep"></div>
+    <div class="dd-hero__metric">
+      <span class="dd-hero__metric-label">Tenor</span>
+      <span class="dd-hero__metric-value">{{ deal.tenor }} days</span>
+    </div>
+    <div class="dd-hero__metric-sep"></div>
+    <div class="dd-hero__metric">
+      <span class="dd-hero__metric-label">Value Date</span>
+      <span class="dd-hero__metric-value">{{ deal.valueDate }}</span>
+    </div>
+    <div class="dd-hero__metric-sep"></div>
+    <div class="dd-hero__metric">
+      <span class="dd-hero__metric-label">Maturity</span>
+      <span class="dd-hero__metric-value">{{ deal.maturityDate }}</span>
+    </div>
+    <div class="dd-hero__metric-sep"></div>
+    <div class="dd-hero__metric">
+      <span class="dd-hero__metric-label">Day Count</span>
+      <span class="dd-hero__metric-value">{{ deal.dayCount }}</span>
+    </div>
+    <div class="dd-hero__metric-sep"></div>
+    <div class="dd-hero__metric">
+      <span class="dd-hero__metric-label">Portfolio</span>
+      <span class="dd-hero__metric-value dd-hero__metric-value--mono">{{ deal.portfolio }}</span>
+    </div>
+  </div>
+</div>
+
+<!-- ─── Tabs ───────────────────────────────────────────────────────────────── -->
+<div class="dd-tabs" role="tablist">
+  <button class="dd-tab" [class.dd-tab--active]="activeTab === 'summary'"    (click)="setTab('summary')">Summary</button>
+  <button class="dd-tab" [class.dd-tab--active]="activeTab === 'cashflow'"   (click)="setTab('cashflow')">Cashflow Schedule</button>
+  <button class="dd-tab" [class.dd-tab--active]="activeTab === 'accounting'" (click)="setTab('accounting')">Accounting Entries</button>
+  <button class="dd-tab" [class.dd-tab--active]="activeTab === 'audit'"      (click)="setTab('audit')">Lifecycle</button>
+</div>
+
+<!-- ─── Tab: Summary ──────────────────────────────────────────────────────── -->
+@if (activeTab === 'summary') {
+  <div class="dd-tab-content">
+    <div class="dd-summary-grid">
+
+      <!-- Deal Terms -->
+      <div class="de-card dd-info-card">
+        <div class="de-card__header">
+          <div class="de-card__icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <line x1="19" y1="5" x2="5" y2="19"/>
+              <circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/>
+            </svg>
+          </div>
+          <h3>Deal Terms</h3>
+        </div>
+        <dl class="dd-dl">
+          <div class="dd-dl__row">
+            <dt>Instrument</dt>
+            <dd>{{ deal.instrument }}</dd>
+          </div>
+          <div class="dd-dl__row">
+            <dt>Direction</dt>
+            <dd>
+              <span class="de-badge de-badge--{{ deal.direction === 'PLACE' ? 'navy' : 'teal' }}">{{ deal.direction }}</span>
+            </dd>
+          </div>
+          <div class="dd-dl__row">
+            <dt>Rate</dt>
+            <dd class="dd-dl__val--mono">{{ deal.rate.toFixed(4) }}% p.a.</dd>
+          </div>
+          <div class="dd-dl__row">
+            <dt>Day Count</dt>
+            <dd>{{ deal.dayCount }}</dd>
+          </div>
+          <div class="dd-dl__row">
+            <dt>Tenor</dt>
+            <dd>{{ deal.tenor }} days</dd>
+          </div>
+          <div class="dd-dl__row">
+            <dt>Value Date</dt>
+            <dd>{{ deal.valueDate }}</dd>
+          </div>
+          <div class="dd-dl__row">
+            <dt>Maturity Date</dt>
+            <dd>{{ deal.maturityDate }}</dd>
+          </div>
+          <div class="dd-dl__row">
+            <dt>Interest</dt>
+            <dd class="dd-dl__val--mono dd-dl__val--accent">{{ deal.currency }} {{ fmtAmount(deal.interest) }}</dd>
+          </div>
+          <div class="dd-dl__row">
+            <dt>Maturity Amount</dt>
+            <dd class="dd-dl__val--mono dd-dl__val--accent">{{ deal.currency }} {{ fmtAmount(deal.maturityAmount) }}</dd>
+          </div>
+        </dl>
+      </div>
+
+      <!-- Counterparty & Settlement -->
+      <div class="de-card dd-info-card">
+        <div class="de-card__header">
+          <div class="de-card__icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+              <circle cx="9" cy="7" r="4"/>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+          </div>
+          <h3>Counterparty &amp; Settlement</h3>
+        </div>
+        <dl class="dd-dl">
+          <div class="dd-dl__row">
+            <dt>Counterparty</dt>
+            <dd>{{ deal.counterparty }}</dd>
+          </div>
+          <div class="dd-dl__row">
+            <dt>Portfolio</dt>
+            <dd class="dd-dl__val--mono">{{ deal.portfolio }}</dd>
+          </div>
+          <div class="dd-dl__row">
+            <dt>Settlement GL</dt>
+            <dd class="dd-dl__val--mono">{{ deal.settlementGl }}</dd>
+          </div>
+          <div class="dd-dl__row">
+            <dt>Liability GL</dt>
+            <dd class="dd-dl__val--mono">{{ deal.liabilityGl }}</dd>
+          </div>
+          <div class="dd-dl__row">
+            <dt>Maker</dt>
+            <dd>{{ deal.maker }}</dd>
+          </div>
+          <div class="dd-dl__row">
+            <dt>Authorised By</dt>
+            <dd>{{ deal.authorisedBy }}</dd>
+          </div>
+          <div class="dd-dl__row">
+            <dt>Deal Date</dt>
+            <dd>{{ deal.dealDate }}</dd>
+          </div>
+          <div class="dd-dl__row">
+            <dt>Auth Date</dt>
+            <dd>{{ deal.authorisedDate }}</dd>
+          </div>
+        </dl>
+      </div>
+
+    </div>
+  </div>
+}
+
+<!-- ─── Tab: Cashflow Schedule ─────────────────────────────────────────────── -->
+@if (activeTab === 'cashflow') {
+  <div class="dd-tab-content">
+    <div class="de-card">
+      <div class="de-card__header">
+        <div class="de-card__icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+          </svg>
+        </div>
+        <h3>Cashflow Schedule</h3>
+      </div>
+      <div class="dd-table-wrap">
+        <table class="dd-table">
+          <thead>
+            <tr>
+              <th class="dd-th--num">#</th>
+              <th>Date</th>
+              <th>Type</th>
+              <th>Event</th>
+              <th class="dd-th--r">Amount ({{ deal.currency }})</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (cf of cashflows; track cf.seq) {
+              <tr class="dd-cashflow-row" [class.dd-cashflow-row--last]="$last">
+                <td class="dd-td--num">{{ cf.seq }}</td>
+                <td class="dd-date">{{ cf.date }}</td>
+                <td>
+                  <span class="de-badge de-badge--{{ cf.type === 'RECEIVE' ? 'green' : 'amber' }}">{{ cf.type }}</span>
+                </td>
+                <td>{{ cf.event }}</td>
+                <td class="dd-td--r dd-amount">{{ fmtAmount(cf.amount) }}</td>
+                <td><span class="de-badge de-badge--neutral">{{ cf.status }}</span></td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <div class="dd-cashflow-total">
+        <span class="dd-cashflow-total__label">Total outflow</span>
+        <span class="dd-cashflow-total__amount">{{ deal.currency }} {{ fmtAmount(deal.maturityAmount) }}</span>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ─── Tab: Accounting Entries ───────────────────────────────────────────── -->
+@if (activeTab === 'accounting') {
+  <div class="dd-tab-content">
+    <div class="de-card">
+      <div class="de-card__header">
+        <div class="de-card__icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/>
+            <line x1="16" y1="17" x2="8" y2="17"/>
+            <line x1="10" y1="9" x2="8" y2="9"/>
+          </svg>
+        </div>
+        <h3>Booking Entries <span class="dd-section-date">({{ deal.valueDate }})</span></h3>
+      </div>
+      <div class="dd-table-wrap">
+        <table class="dd-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Entry Description</th>
+              <th>GL Code</th>
+              <th class="dd-th--r">DR</th>
+              <th class="dd-th--r">CR</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (entry of bookingEntries; track entry.gl) {
+              <tr>
+                <td class="dd-date">{{ entry.date }}</td>
+                <td class="dd-entry-desc">{{ entry.description }}</td>
+                <td class="dd-gl-code">{{ entry.gl }}</td>
+                <td class="dd-td--r dd-amount">
+                  @if (entry.dr !== null) { {{ fmtAmount(entry.dr) }} } @else { — }
+                </td>
+                <td class="dd-td--r dd-amount">
+                  @if (entry.cr !== null) { {{ fmtAmount(entry.cr) }} } @else { — }
+                </td>
+              </tr>
+            }
+            <tr class="dd-table__total-row">
+              <td class="dd-date">—</td>
+              <td class="dd-entry-desc"><strong>Total</strong></td>
+              <td></td>
+              <td class="dd-td--r dd-amount"><strong>{{ fmtAmount(deal.faceValue) }}</strong></td>
+              <td class="dd-td--r dd-amount"><strong>{{ fmtAmount(deal.faceValue) }}</strong></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ─── Tab: Lifecycle ────────────────────────────────────────────────────── -->
+@if (activeTab === 'audit') {
+  <div class="dd-tab-content">
+    <div class="de-card dd-lifecycle-card">
+      <div class="de-card__header">
+        <div class="de-card__icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+        </div>
+        <h3>Lifecycle</h3>
+      </div>
+      @for (ev of auditEvents; track ev.id) {
+        <div class="dd-lc-row">
+          <span class="dd-lc-dot" [style.background]="dotColor(ev.action)"></span>
+          <span class="dd-lc-time">{{ fmtTs(ev.timestamp) }}</span>
+          <span class="de-badge de-badge--{{ actionBadge(ev.action) }}">{{ actionLabel(ev.action) }}</span>
+          <span class="dd-lc-desc">{{ ev.description }}</span>
+          <span class="dd-lc-user">{{ ev.user }}</span>
+        </div>
+      }
+      @if (auditEvents.length === 0) {
+        <p class="dd-lc-empty">No lifecycle events found for this deal.</p>
+      }
+    </div>
+  </div>
+}
+
+<!-- ─── Sticky Footer Actions ─────────────────────────────────────────────── -->
+<div class="dd-footer-bar">
+  <a routerLink="/blotter" class="de-btn de-btn--ghost">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
+    </svg>
+    Back to Blotter
+  </a>
+  <div class="dd-footer-bar__right">
+    @if (deal.status === 'AUTHORIZED' && deal.dealType === 'TERM') {
+      <button class="de-btn de-btn--outline dd-btn--amber">Early Terminate</button>
+      <button class="de-btn de-btn--ghost dd-btn--danger">Cancel</button>
+    }
+    @if (deal.status === 'AUTHORIZED' && deal.dealType === 'CALL') {
+      <button class="de-btn de-btn--outline dd-btn--amber">Recall</button>
+      <button class="de-btn de-btn--ghost dd-btn--danger">Cancel</button>
+    }
+    @if (deal.status === 'MATURED') {
+      <button class="de-btn de-btn--ghost">View Archived</button>
+    }
+  </div>
+</div>

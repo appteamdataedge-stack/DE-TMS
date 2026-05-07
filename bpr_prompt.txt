@@ -1,0 +1,80 @@
+Add a new sidebar menu item "BP Role Assignment" to the existing Angular app.
+Follow the exact same pattern, style, and structure as other existing sidebar pages.
+Do NOT change any other existing logic or components.
+
+---
+
+## SIDEBAR
+Add "BP Role Assignment" to the sidebar navigation.
+Route: /bp-role-assignment
+Icon: use an appropriate existing icon (e.g. badge or assignment icon)
+Position: place it under the Business Partner / BP section in the sidebar,
+or at the bottom of the sidebar if no BP section exists yet.
+
+---
+
+## PAGE: BP Role Assignment
+Route: /bp-role-assignment
+Page title: "BP Role Assignment"
+Breadcrumb: Home › BP Role Assignment
+
+### FORM — Assign Role to BP
+Fields:
+1. BP ID — searchable input with search icon (lookup from existing BP list API 
+   if available, else text input with TODO comment)
+2. Role — dropdown (LOV), options:
+   - Employee
+   - Counterparty
+   - Settlement Bank
+   - Correspondent Bank
+   - Intermediary Bank
+   - Broker
+   - Clearing Member
+   - Custodian Bank
+   - Paying Agent
+   - Issuer
+
+### CONDITIONAL SECTION — shown only when Role = "Employee"
+When user selects Role = "Employee", show these additional fields below:
+1. Emp ID — text input, required
+2. Designation — text input, required
+3. Department — text input, required
+4. Date of Joining — date picker, required
+5. Date of Leaving — date picker, optional
+6. Status — dropdown: ["Active", "Inactive"], required
+7. Login User Name — text input, required
+
+When any other role is selected, hide all Employee fields completely.
+
+### BUSINESS RULE
+A single BP can be assigned multiple roles.
+The list/grid below the form shows ALL role assignments for the entered BP ID.
+Grid columns: BP ID | Role | Emp ID | Designation | Status | Actions
+Actions column: Edit (pencil icon) | Delete (trash icon)
+Edit: opens the row data back into the form for modification
+Delete: shows confirmation dialog, then removes the assignment
+
+### BUTTONS
+- Save: validates form, saves the role assignment, refreshes the grid below,
+  shows success snackbar. If API not ready, add TODO comment and show 
+  snackbar "Saved successfully (mock)"
+- Reset: clears the form fields
+
+---
+
+## API PLACEHOLDERS
+If API endpoints do not exist yet, add TODO comments and use mock/empty responses:
+- GET /api/bp-role-assignment?bpId=xxx → fetch assignments for a BP
+- POST /api/bp-role-assignment → save new assignment
+- PUT /api/bp-role-assignment/:id → update assignment
+- DELETE /api/bp-role-assignment/:id → delete assignment
+
+---
+
+## CONSTRAINTS
+- Match exact card, form field, button, table style of existing pages in this project
+- Use existing Angular patterns, reactive forms, and service injection style
+- Do NOT install any new packages
+- Do NOT modify any existing component, route, or service
+- Employee conditional fields must show/hide reactively using existing 
+  form valueChanges pattern used elsewhere in the project

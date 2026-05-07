@@ -1,0 +1,88 @@
+<!-- ── Trigger ──────────────────────────────────────────────────────────── -->
+<div class="tms-trigger"
+  [class.tms-trigger--open]="isOpen"
+  [class.tms-trigger--disabled]="isDisabled"
+  [class.tms-trigger--has-value]="hasValue"
+  (click)="togglePanel($event)">
+
+  <div class="tms-trigger__content">
+    @if (multiple) {
+      @if (selectedItems.length > 0) {
+        <div class="tms-tags">
+          @for (item of selectedItems; track getValue(item)) {
+            <span class="tms-tag">
+              {{ getLabel(item) }}
+              <button type="button" class="tms-tag__x" (click)="removeTag(getValue(item), $event)" aria-label="Remove">
+                <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round">
+                  <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+              </button>
+            </span>
+          }
+        </div>
+      } @else {
+        <span class="tms-placeholder">{{ placeholder }}</span>
+      }
+    } @else {
+      @if (selectedSingle) {
+        <span class="tms-value">{{ getLabel(selectedSingle) }}</span>
+      } @else {
+        <span class="tms-placeholder">{{ placeholder }}</span>
+      }
+    }
+  </div>
+
+  <div class="tms-trigger__icons">
+    @if (clearable && hasValue) {
+      <button type="button" class="tms-clear" (click)="clearValue($event)" aria-label="Clear">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    }
+    <svg class="tms-chevron" [class.tms-chevron--open]="isOpen"
+      width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+      <polyline points="6 9 12 15 18 9"/>
+    </svg>
+  </div>
+</div>
+
+<!-- ── Floating Panel (position: absolute, relative to host) ───────────── -->
+@if (isOpen) {
+  <div class="tms-panel"
+    (wheel)="$event.stopPropagation()">
+
+    @if (searchable) {
+      <div class="tms-search">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" class="tms-search__icon">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input class="tms-search__input" type="text" [(ngModel)]="searchQuery"
+          placeholder="Search..." (click)="$event.stopPropagation()" />
+      </div>
+    }
+
+    <div class="tms-options">
+      @if (displayItems.length === 0) {
+        <div class="tms-empty">No results found</div>
+      }
+      @for (item of displayItems; track getValue(item)) {
+        <div class="tms-option"
+          [class.tms-option--selected]="isSelected(item)"
+          (click)="selectItem(item, $event)">
+          <div class="tms-option__body">
+            <span class="tms-option__label">{{ getLabel(item) }}</span>
+            @if (getSubLabel(item)) {
+              <span class="tms-option__sub">{{ getSubLabel(item) }}</span>
+            }
+          </div>
+          @if (multiple && isSelected(item)) {
+            <svg class="tms-option__check" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+          }
+        </div>
+      }
+    </div>
+  </div>
+}

@@ -1,0 +1,26 @@
+<aside class="de-sidebar" [class.de-sidebar--open]="isOpen">
+  <div class="aside-inner">
+  <nav class="de-sidebar__nav">
+    @for (group of navGroups; track group.label) {
+      <div class="de-sidebar__group">
+        <span class="de-sidebar__group-label">{{ group.label }}</span>
+        @for (item of group.items; track item.route) {
+          <a
+            class="de-sidebar__item"
+            [routerLink]="item.route"
+            routerLinkActive="de-sidebar__item--active"
+            [routerLinkActiveOptions]="{ exact: false }">
+            <svg class="de-sidebar__icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path [attr.d]="item.icon"/>
+            </svg>
+            <span>{{ item.label }}</span>
+            @if (item.route === '/auth-inbox' && pendingCount > 0) {
+              <span class="de-sidebar__badge">{{ pendingCount }}</span>
+            }
+          </a>
+        }
+      </div>
+    }
+  </nav>
+  </div>
+</aside>

@@ -1,0 +1,62 @@
+.dsb {
+  display: flex;
+  align-items: center;
+  padding: 20px 0 28px;
+}
+
+.dsb__step {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.dsb__circle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  flex-shrink: 0;
+  transition: all .2s;
+
+  .dsb__step--pending  & { background: var(--de-neutral-100); color: var(--de-neutral-400); border: 2px solid var(--de-neutral-200); }
+  .dsb__step--active   & { background: var(--de-navy); color: #fff; box-shadow: 0 0 0 4px rgba(13,27,42,.12); }
+  .dsb__step--complete & { background: var(--de-teal); color: #fff; }
+}
+
+.dsb__label {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+
+  .dsb__step--pending & { opacity: .5; }
+}
+
+.dsb__label-main {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--de-neutral-800);
+  white-space: nowrap;
+
+  .dsb__step--active & { color: var(--de-navy); }
+}
+
+.dsb__label-sub {
+  font-size: 11px;
+  color: var(--de-neutral-500);
+  white-space: nowrap;
+}
+
+.dsb__line {
+  flex: 1;
+  height: 2px;
+  background: var(--de-neutral-200);
+  margin: 0 12px;
+  margin-bottom: 14px; // vertically aligns with circle center
+
+  &--done { background: var(--de-teal); }
+}

@@ -1,0 +1,112 @@
+Angular Money Market app. Apply these fixes only. 
+Do NOT change any existing business logic, validators, or API calls.
+
+---
+
+## FIX 1 — Dropdown mouse wheel scroll
+On ALL mat-select / dropdown components across the entire app:
+Add (wheel)="$event.stopPropagation()" on every mat-select element.
+Also add this global CSS:
+.cdk-overlay-pane { pointer-events: auto; }
+.mat-select-panel { overflow-y: auto !important; }
+This prevents page scroll when mouse wheel is used inside an open dropdown.
+
+---
+
+## FIX 2 — Sticky navbar info bar + fixed footer on ALL form pages
+
+### TOP INFO BAR (below navbar, sticky)
+On every create/edit form page, add a sticky bar directly below the navbar.
+Background: deep blue or dark teal. White text. Height: 40px.
+Show key field values that update live as user types.
+For /mm-deal/create show: Deal Date | Dealer | Portfolio | Counterparty | Instrument
+For other form pages show the 3-4 most important identifier fields of that form.
+Empty fields show "—".
+
+### BOTTOM FIXED FOOTER (above all content, fixed)
+On every create/edit form page, add a fixed footer bar at the bottom of the viewport.
+Background: dark navy or charcoal. White text/buttons. Height: 56px.
+z-index: 1100 (above everything).
+Contents (left side): "This record requires checker authorization before becoming active"
+Contents (right side): [Cancel] [Save as Draft] [Submit for Approval]
+Button styles: Cancel=outlined white, Save as Draft=outlined accent, 
+Submit for Approval=filled primary green.
+Add enough bottom padding to page content so footer does not overlap last field.
+Apply this footer to ALL form/create/edit pages in the app.
+
+---
+
+## FIX 3 — Dashboard greeting: show logged-in user name
+On /dashboard, change the greeting to:
+"Good morning/afternoon/evening, [username]"
+where [username] is read from existing auth service / localStorage / JWT token
+(use whichever pattern already exists in this project for the current user).
+Determine morning/afternoon/evening from current time:
+before 12 = Good morning, 12–17 = Good afternoon, after 17 = Good evening.
+
+---
+
+## FIX 4 — Remove Actions column from ALL list pages
+Find every list/grid/table page in the app.
+Remove the Actions column entirely from all of them.
+Do NOT remove any form, detail, or edit page — only remove the inline 
+actions column from list views.
+Exception: /user-management — keep Edit working here (see FIX 4b).
+
+### FIX 4b — User Management: Edit users and groups must work
+In /user-management, Edit user and Edit group must:
+- Open selected record in editable form pre-populated with existing data
+- Save calls PUT /api/users/:id or PUT /api/groups/:id
+- Show success/error snackbar on response
+- Add TODO comment if endpoint does not exist yet
+
+---
+
+## FIX 5 — Persist created data across page refresh
+The app currently loses created records on refresh (data is stored in memory only).
+Fix: after every successful POST/create API call, ensure the list page 
+re-fetches data from the API on init (ngOnInit calls the GET list endpoint).
+Make sure every list page calls its GET API on ngOnInit and does NOT rely 
+on a local in-memory array as the sole data source.
+If API is not ready for some pages, store data in localStorage as fallback:
+on create → save to localStorage; on ngOnInit → load from localStorage if API fails.
+Add TODO comments where real API should replace localStorage fallback.
+
+---
+
+## FIX 6 — UI/UX: improve design, colors, theme, animations
+Audit the entire app and apply these improvements:
+- Primary color: deep indigo #3F51B5 or teal #00796B — pick whichever fits better
+- Sidebar: gradient background (dark navy to dark teal), white icons and text,
+  active item: bright accent left border + light highlight background
+- Navbar: solid deep color matching sidebar top, user name + avatar visible
+- Cards/panels: subtle box-shadow, 8px border-radius, clean white background
+- Buttons: rounded corners (border-radius: 20px for action buttons)
+- Tables: alternating row colors (white / very light grey), hover highlight
+- Add fade-in animation on page/panel load:
+  @keyframes fadeIn { from {opacity:0; transform:translateY(8px)} to {opacity:1; transform:translateY(0)} }
+  Apply to all mat-card and main content panels
+- Dashboard: add a subtle animated gradient background on stat cards
+- Form fields: use outline style mat-form-field consistently across all pages
+- Do NOT change any layout structure, only colors, shadows, animations, spacing
+
+---
+
+## FIX 7 — Admin user created by any user can log in
+In the User Management create user flow:
+- When a new user is created with Role = "Admin" (or any role),
+  that user must be able to log in with the username and password set during creation
+- On create user: save username + hashed password (use existing auth pattern)
+  to the same user store / localStorage / API used by the login page
+- On login page: authenticate against this same user store
+- If login uses localStorage: store users array, check on login attempt
+- Add TODO comment where real backend auth should replace this
+- Do NOT change existing login page UI
+
+---
+
+## CONSTRAINTS
+- Do NOT modify any existing validators, API service methods, or business logic
+- Do NOT install new packages unless already in package.json
+- Follow existing Angular patterns, reactive forms, and service injection style
+- Each fix is independent — a problem in one fix must not block others

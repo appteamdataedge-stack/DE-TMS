@@ -1,0 +1,961 @@
+<!-- ─── Breadcrumb ──────────────────────────────────────────────────────────── -->
+<nav class="de-breadcrumb">
+  <a routerLink="/dashboard">Home</a><span class="sep">›</span>
+  <span>System Admin</span><span class="sep">›</span>
+  <span class="current">User Management</span>
+</nav>
+
+<!-- ─── Page Header ─────────────────────────────────────────────────────────── -->
+<div class="um-header">
+  <div>
+    <h1 class="um-header__title">User Management</h1>
+    <p class="um-header__sub">Manage system users, groups, and access rights</p>
+  </div>
+  <button type="button" class="de-btn de-btn--primary" (click)="openCreateUser()">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+      <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+    </svg>
+    New User
+  </button>
+</div>
+
+<!-- ─── Value Strip ──────────────────────────────────────────────────────────── -->
+<div class="um-value-strip">
+  <div class="um-value-card">
+    <span class="um-value-card__val">{{ users.length }}</span>
+    <span class="um-value-card__lbl">Total Users</span>
+  </div>
+  <div class="um-value-card um-value-card--active">
+    <span class="um-value-card__val">{{ users.length }}</span>
+    <span class="um-value-card__lbl">Active</span>
+  </div>
+  <div class="um-value-card">
+    <span class="um-value-card__val">{{ groups.length }}</span>
+    <span class="um-value-card__lbl">Groups</span>
+  </div>
+  <div class="um-value-card">
+    <span class="um-value-card__val">{{ auditRows.length }}</span>
+    <span class="um-value-card__lbl">Audit Events</span>
+  </div>
+  <div class="um-value-card">
+    <span class="um-value-card__val">30 Apr 26</span>
+    <span class="um-value-card__lbl">Last Activity</span>
+  </div>
+</div>
+
+<!-- ─── Tabs ─────────────────────────────────────────────────────────────────── -->
+<div class="um-tabs">
+  <button class="um-tab" [class.um-tab--active]="activeTab === 'users'"  (click)="activeTab = 'users'">
+    Users <span class="um-tab__pill">{{ users.length }}</span>
+  </button>
+  <button class="um-tab" [class.um-tab--active]="activeTab === 'groups'" (click)="activeTab = 'groups'">
+    Groups <span class="um-tab__pill">{{ groups.length }}</span>
+  </button>
+  <button class="um-tab" [class.um-tab--active]="activeTab === 'audit'"  (click)="activeTab = 'audit'">
+    Audit Trail <span class="um-tab__pill">{{ auditRows.length }}</span>
+  </button>
+</div>
+
+<!-- ══════════════════════ USERS TAB ══════════════════════════════════════════ -->
+@if (activeTab === 'users') {
+
+  <!-- Toolbar: count + view toggle -->
+  <div class="um-toolbar">
+    <span class="um-toolbar__count">{{ users.length }} user{{ users.length !== 1 ? 's' : '' }}</span>
+    <div class="de-seg-group">
+      <button [class.active]="usersView === 'table'" (click)="usersView = 'table'">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <rect x="3" y="3" width="18" height="18" rx="2"/>
+          <line x1="3" y1="9" x2="21" y2="9"/>
+          <line x1="3" y1="15" x2="21" y2="15"/>
+          <line x1="9" y1="9" x2="9" y2="21"/>
+        </svg>
+        Table
+      </button>
+      <button [class.active]="usersView === 'value'" (click)="usersView = 'value'">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <rect x="3" y="3" width="7" height="7" rx="1"/>
+          <rect x="14" y="3" width="7" height="7" rx="1"/>
+          <rect x="3" y="14" width="7" height="7" rx="1"/>
+          <rect x="14" y="14" width="7" height="7" rx="1"/>
+        </svg>
+        Value View
+      </button>
+    </div>
+  </div>
+
+  <!-- ── Table View ──────────────────────────────────────────────────────────── -->
+  @if (usersView === 'table') {
+    <div class="de-card um-table-card">
+      <div class="um-table-wrap">
+        <table class="um-table">
+          <thead>
+            <tr>
+              <th>User ID</th>
+              <th>Name</th>
+              <th>Role</th>
+              <th>Group</th>
+              <th>Email</th>
+              <th>Last Login</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (u of users; track u.id) {
+              <tr class="um-table__row" (click)="openUser(u)">
+                <td class="um-mono">{{ u.id }}</td>
+                <td>
+                  <div class="um-user-cell">
+                    <span class="um-avatar um-avatar--{{ roleBadge(u.role) }}">{{ u.initials }}</span>
+                    <span class="um-user-name">{{ u.name }}</span>
+                  </div>
+                </td>
+                <td>
+                  <span class="de-badge de-badge--{{ roleBadge(u.role) }}">{{ u.role }}</span>
+                </td>
+                <td class="um-group-cell">{{ u.group }}</td>
+                <td class="um-email">{{ u.email }}</td>
+                <td class="um-mono um-nowrap">{{ u.lastLogin }}</td>
+                <td>
+                  <span class="de-badge de-badge--{{ statusBadge(u.status) }}">{{ u.status }}</span>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  }
+
+  <!-- ── Value View ─────────────────────────────────────────────────────────── -->
+  @if (usersView === 'value') {
+    <div class="um-value-grid">
+      @for (u of users; track u.id) {
+        <div class="um-user-card de-card" (click)="openUser(u)">
+          <div class="um-user-card__top">
+            <span class="um-avatar um-avatar--lg um-avatar--{{ roleBadge(u.role) }}">{{ u.initials }}</span>
+            <div class="um-user-card__ids">
+              <span class="um-user-card__uid">{{ u.id }}</span>
+              <span class="de-badge de-badge--{{ statusBadge(u.status) }}">{{ u.status }}</span>
+            </div>
+          </div>
+          <h3 class="um-user-card__name">{{ u.name }}</h3>
+          <div class="um-user-card__role">
+            <span class="de-badge de-badge--{{ roleBadge(u.role) }}">{{ u.role }}</span>
+          </div>
+          <div class="um-user-card__props">
+            <div class="um-user-card__prop">
+              <span class="um-user-card__prop-lbl">Group</span>
+              <span class="um-user-card__prop-val">{{ u.group }}</span>
+            </div>
+            <div class="um-user-card__prop">
+              <span class="um-user-card__prop-lbl">Email</span>
+              <span class="um-user-card__prop-val um-email">{{ u.email }}</span>
+            </div>
+            <div class="um-user-card__prop">
+              <span class="um-user-card__prop-lbl">Last Login</span>
+              <span class="um-user-card__prop-val um-mono">{{ u.lastLogin }}</span>
+            </div>
+          </div>
+          <div class="um-user-card__footer">
+            <button class="de-btn de-btn--outline de-btn--sm" (click)="$event.stopPropagation(); openUser(u)">
+              View Rights
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+}
+
+<!-- ══════════════════════ GROUPS TAB ════════════════════════════════════════ -->
+@if (activeTab === 'groups') {
+
+  <div class="um-toolbar">
+    <span class="um-toolbar__count">{{ groups.length }} group{{ groups.length !== 1 ? 's' : '' }}</span>
+    <button type="button" class="de-btn de-btn--primary de-btn--sm" (click)="openCreateGroup()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
+      New Group
+    </button>
+  </div>
+
+  <div class="de-card um-table-card">
+    <div class="um-table-wrap">
+      <table class="um-table">
+        <thead>
+          <tr>
+            <th>Group ID</th>
+            <th>Name</th>
+            <th>Users</th>
+            <th>Description</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (g of groups; track g.id) {
+            <tr class="um-table__row" (click)="openGroup(g)">
+              <td class="um-mono">{{ g.id }}</td>
+              <td>
+                <div class="um-group-name-cell">
+                  <span class="um-group-dot um-group-dot--{{ g.colorClass }}"></span>
+                  <span class="um-group-label">{{ g.name }}</span>
+                </div>
+              </td>
+              <td>
+                <span class="de-badge de-badge--{{ g.userCount > 0 ? 'teal' : 'neutral' }}">
+                  {{ g.userCount }}
+                </span>
+              </td>
+              <td class="um-desc">{{ g.description }}</td>
+              <td (click)="$event.stopPropagation()">
+                <button class="de-btn de-btn--ghost de-btn--sm" (click)="openGroup(g)">
+                  Preview Rights
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+}
+
+<!-- ══════════════════════ AUDIT TAB ══════════════════════════════════════════ -->
+@if (activeTab === 'audit') {
+
+  <!-- Toolbar: count + view toggle -->
+  <div class="um-toolbar">
+    <span class="um-toolbar__count">{{ auditRows.length }} event{{ auditRows.length !== 1 ? 's' : '' }}</span>
+    <div class="de-seg-group">
+      <button [class.active]="auditView === 'table'" (click)="auditView = 'table'">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <rect x="3" y="3" width="18" height="18" rx="2"/>
+          <line x1="3" y1="9" x2="21" y2="9"/>
+          <line x1="3" y1="15" x2="21" y2="15"/>
+          <line x1="9" y1="9" x2="9" y2="21"/>
+        </svg>
+        Table
+      </button>
+      <button [class.active]="auditView === 'timeline'" (click)="auditView = 'timeline'">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <line x1="8" y1="6"  x2="21" y2="6"/>
+          <line x1="8" y1="12" x2="21" y2="12"/>
+          <line x1="8" y1="18" x2="21" y2="18"/>
+          <line x1="3" y1="6"  x2="3.01" y2="6"/>
+          <line x1="3" y1="12" x2="3.01" y2="12"/>
+          <line x1="3" y1="18" x2="3.01" y2="18"/>
+        </svg>
+        Timeline
+      </button>
+    </div>
+  </div>
+
+  <!-- ── Table View ──────────────────────────────────────────────────────────── -->
+  @if (auditView === 'table') {
+    <div class="de-card um-table-card">
+      <div class="um-table-wrap">
+        <table class="um-table">
+          <thead>
+            <tr>
+              <th>Audit ID</th>
+              <th>Timestamp</th>
+              <th>Actor</th>
+              <th>Action</th>
+              <th>Target</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (a of auditRows; track a.id) {
+              <tr class="um-table__row">
+                <td class="um-mono">{{ a.id }}</td>
+                <td class="um-mono um-nowrap">{{ fmtTimestamp(a.timestamp) }}</td>
+                <td class="um-actor">{{ a.user }}</td>
+                <td>
+                  <span class="de-badge de-badge--{{ auditActionBadge(a.action) }}">{{ a.action }}</span>
+                </td>
+                <td class="um-mono">{{ a.target }}</td>
+                <td class="um-desc">{{ a.description }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  }
+
+  <!-- ── Timeline View ───────────────────────────────────────────────────────── -->
+  @if (auditView === 'timeline') {
+    <div class="de-card um-tl-card">
+      @for (a of auditRows; track a.id) {
+        <div class="um-tl-row">
+          <span class="um-tl-dot" [style.background]="auditDotColor(a.action)"></span>
+          <span class="um-tl-line"></span>
+          <div class="um-tl-body">
+            <div class="um-tl-head">
+              <span class="um-tl-time">{{ fmtTimestamp(a.timestamp) }}</span>
+              <span class="de-badge de-badge--{{ auditActionBadge(a.action) }}">{{ a.action }}</span>
+              <span class="um-tl-target um-mono">{{ a.target }}</span>
+            </div>
+            <p class="um-tl-desc">{{ a.description }}</p>
+            <span class="um-tl-actor">by {{ a.user }}</span>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+}
+
+<!-- ─── Backdrop ─────────────────────────────────────────────────────────────── -->
+@if (selectedUser || selectedGroup || createUserOpen || createGroupOpen) {
+  <div class="um-backdrop" @backdropFade (click)="
+    selectedUser    ? closeUser()        :
+    selectedGroup   ? closeGroup()       :
+    createUserOpen  ? closeCreateUser()  :
+                      closeCreateGroup()">
+  </div>
+}
+
+<!-- ─── User Rights Panel ──────────────────────────────────────────────────── -->
+@if (selectedUser) {
+  <aside class="um-panel" @slideOver>
+
+    <div class="um-panel__header">
+      <div class="um-panel__top-row">
+        <span class="um-avatar um-avatar--{{ roleBadge(selectedUser.role) }}">{{ selectedUser.initials }}</span>
+        <div class="um-panel__title-block">
+          <span class="um-panel__name">{{ selectedUser.name }}</span>
+          <span class="um-panel__id">{{ selectedUser.id }}</span>
+        </div>
+        <span class="de-badge de-badge--{{ roleBadge(selectedUser.role) }}">{{ selectedUser.role }}</span>
+      </div>
+
+      @if (selectedUser.isSystemAdmin) {
+        <div class="um-panel__notice">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8"  x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          Portfolio section hidden — System Admin accounts do not hold treasury dealing rights
+        </div>
+      }
+
+      <button class="um-panel__close" (click)="closeUser()" aria-label="Close">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+          <line x1="18" y1="6"  x2="6"  y2="18"/>
+          <line x1="6"  y1="6"  x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="um-panel__body">
+      @if (!editMode) {
+        <!-- View mode -->
+        <p class="um-panel__section-title">Access Rights</p>
+        @for (sec of userSections(selectedUser); track sec.label) {
+          <div class="um-rights-section">
+            <div class="um-rights-section__label">{{ sec.label }}</div>
+            @for (item of sec.items; track item.label) {
+              <div class="um-rights-item">
+                <span class="um-rights-item__name">{{ item.label }}</span>
+                <div class="um-rights-item__perms">
+                  @for (p of item.perms; track p) {
+                    <span class="de-badge de-badge--{{ permBadge(p) }}">{{ p }}</span>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        }
+      } @else {
+        <!-- Edit mode -->
+        <p class="um-panel__section-title">Edit User</p>
+        <div class="um-edit-form">
+          <div class="de-field">
+            <label class="de-label">Full Name <span class="de-required">*</span></label>
+            <input type="text" class="de-input" [(ngModel)]="editName" placeholder="Full name" />
+          </div>
+          <div class="de-field">
+            <label class="de-label">Role <span class="de-required">*</span></label>
+            <select class="de-input" [(ngModel)]="editRole">
+              @for (opt of roleOptions; track opt.value) {
+                @if (opt.value) {
+                  <option [value]="opt.value">{{ opt.label }}</option>
+                }
+              }
+            </select>
+          </div>
+          <div class="de-field">
+            <label class="de-label">Status <span class="de-required">*</span></label>
+            <select class="de-input" [(ngModel)]="editStatus">
+              <option value="ACTIVE">Active</option>
+              <option value="INACTIVE">Inactive</option>
+              <option value="LOCKED">Locked</option>
+            </select>
+          </div>
+          <div class="de-field">
+            <label class="de-label">Group</label>
+            <select class="de-input" [(ngModel)]="editGroup">
+              <option value="—">— None —</option>
+              @for (g of groups; track g.id) {
+                <option [value]="g.name">{{ g.name }}</option>
+              }
+            </select>
+          </div>
+        </div>
+      }
+    </div>
+
+    <div class="um-panel__footer">
+      @if (!editMode) {
+        <button class="de-btn de-btn--ghost" (click)="closeUser()">Close</button>
+        <button class="de-btn de-btn--primary" (click)="openEditUser()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+          </svg>
+          Edit User
+        </button>
+      } @else {
+        <button class="de-btn de-btn--ghost" (click)="cancelEditUser()">Cancel</button>
+        <button class="de-btn de-btn--primary" (click)="saveEditUser()" [disabled]="!editName.trim() || !editRole">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+            <polyline points="17 21 17 13 7 13 7 21"/>
+            <polyline points="7 3 7 8 15 8"/>
+          </svg>
+          Save Changes
+        </button>
+      }
+    </div>
+
+  </aside>
+}
+
+<!-- ─── Group Rights Preview Panel ────────────────────────────────────────── -->
+@if (selectedGroup) {
+  <aside class="um-panel" @slideOver>
+
+    <div class="um-panel__header">
+      <div class="um-panel__top-row">
+        <span class="um-group-dot um-group-dot--lg um-group-dot--{{ selectedGroup.colorClass }}"></span>
+        <div class="um-panel__title-block">
+          <span class="um-panel__name">{{ selectedGroup.name }}</span>
+          <span class="um-panel__id">{{ selectedGroup.id }} · {{ selectedGroup.userCount }} user{{ selectedGroup.userCount !== 1 ? 's' : '' }}</span>
+        </div>
+      </div>
+
+      <p class="um-panel__sub">{{ selectedGroup.description }}</p>
+
+      @if (selectedGroup.hiddenSections.length > 0) {
+        <div class="um-panel__notice">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8"  x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          Hidden sections: {{ selectedGroup.hiddenSections.join(', ') }}
+        </div>
+      }
+
+      <button class="um-panel__close" (click)="closeGroup()" aria-label="Close">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+          <line x1="18" y1="6"  x2="6"  y2="18"/>
+          <line x1="6"  y1="6"  x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="um-panel__body">
+      @if (!editGroupMode) {
+        <p class="um-panel__section-title">Group Rights Preview</p>
+        @for (sec of selectedGroup.sections; track sec.label) {
+          <div class="um-rights-section">
+            <div class="um-rights-section__label">{{ sec.label }}</div>
+            @for (item of sec.items; track item.label) {
+              <div class="um-rights-item">
+                <span class="um-rights-item__name">{{ item.label }}</span>
+                <div class="um-rights-item__perms">
+                  @for (p of item.perms; track p) {
+                    <span class="de-badge de-badge--{{ permBadge(p) }}">{{ p }}</span>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        }
+      } @else {
+        <p class="um-panel__section-title">Edit Group</p>
+        <div class="um-edit-form">
+          <div class="de-field">
+            <label class="de-label">Group Name <span class="de-required">*</span></label>
+            <input type="text" class="de-input" [(ngModel)]="editGroupName" placeholder="Group name" />
+          </div>
+          <div class="de-field">
+            <label class="de-label">Description</label>
+            <input type="text" class="de-input" [(ngModel)]="editGroupDesc" placeholder="Brief description" />
+          </div>
+        </div>
+      }
+    </div>
+
+    <div class="um-panel__footer">
+      @if (!editGroupMode) {
+        <button class="de-btn de-btn--ghost" (click)="closeGroup()">Close</button>
+        <button class="de-btn de-btn--primary" (click)="openEditGroup()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+          </svg>
+          Edit Group
+        </button>
+      } @else {
+        <button class="de-btn de-btn--ghost" (click)="cancelEditGroup()">Cancel</button>
+        <button class="de-btn de-btn--primary" (click)="saveEditGroup()" [disabled]="!editGroupName.trim()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+            <polyline points="17 21 17 13 7 13 7 21"/>
+            <polyline points="7 3 7 8 15 8"/>
+          </svg>
+          Save Changes
+        </button>
+      }
+    </div>
+
+  </aside>
+}
+
+<!-- ─── Create User Panel ─────────────────────────────────────────────────── -->
+@if (createUserOpen) {
+  <aside class="um-panel um-panel--wide" @slideOver>
+
+    <div class="um-panel__header">
+      <div class="um-panel__top-row">
+        <div class="um-panel__title-block">
+          <span class="um-panel__name">Create New User</span>
+          <span class="um-panel__id">Fill in all required fields</span>
+        </div>
+      </div>
+      <button class="um-panel__close" (click)="closeCreateUser()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="um-panel__body">
+
+      <!-- Employee BP search -->
+      <div class="um-cf-section">
+        <div class="um-cf-section__label">Business Partner</div>
+        @if (cuSelectedEmployee) {
+          <div class="um-cp-chip">
+            <span class="um-cp-chip__id">{{ cuSelectedEmployee.bpId }}</span>
+            <span class="um-cp-chip__name">{{ cuSelectedEmployee.name }}</span>
+            <span class="um-cp-chip__dept">{{ cuSelectedEmployee.designation }}</span>
+            <button type="button" class="um-cp-chip__x" (click)="cuSelectedEmployee = null; cuEmployeeSearch = ''">✕</button>
+          </div>
+        } @else {
+          <input type="text" class="de-input" placeholder="Search by name or BP ID…"
+            [(ngModel)]="cuEmployeeSearch" (input)="null" />
+          @if (filteredEmployees.length > 0) {
+            <div class="um-cp-dropdown">
+              @for (e of filteredEmployees; track e.bpId) {
+                <div class="um-cp-dropdown__item" (click)="selectEmployee(e)">
+                  <span class="um-cp-dropdown__id">{{ e.bpId }}</span>
+                  <div class="um-cp-dropdown__body">
+                    <span class="um-cp-dropdown__name">{{ e.name }}</span>
+                    <span class="um-cp-dropdown__sub">{{ e.designation }} · {{ e.department }}</span>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        }
+      </div>
+
+      <!-- Role + Status row -->
+      <div class="um-cf-row">
+        <div class="de-field">
+          <label>Role <span class="mm-req">*</span></label>
+          <select class="de-input" [(ngModel)]="cuRole">
+            @for (r of roleOptions; track r.value) {
+              <option [value]="r.value">{{ r.label }}</option>
+            }
+          </select>
+        </div>
+        <div class="de-field">
+          <label>Status</label>
+          <div class="um-toggle-row">
+            <button type="button" class="mm-toggle" [class.mm-toggle--on]="cuStatus" (click)="cuStatus = !cuStatus">
+              <span class="mm-toggle__track"></span>
+              <span class="mm-toggle__thumb"></span>
+            </button>
+            <span class="mm-toggle-label">{{ cuStatus ? 'Active' : 'Inactive' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Login Credentials -->
+      <div class="um-cf-row">
+        <div class="de-field">
+          <label>Login Username</label>
+          <input type="text" class="de-input" [(ngModel)]="cuUsername" placeholder="e.g. john.doe" autocomplete="off" />
+          <span class="de-hint">User can log in with this username</span>
+        </div>
+        <div class="de-field">
+          <label>Password</label>
+          <input type="password" class="de-input" [(ngModel)]="cuPassword" placeholder="Set initial password" autocomplete="new-password" />
+          <span class="de-hint">TODO: replace with hashed backend auth</span>
+        </div>
+      </div>
+
+      <!-- Group Based Rights -->
+      <div class="um-cf-section">
+        <div class="um-cf-toggle-row">
+          <span class="um-cf-section__label" style="margin-bottom:0">Group Based Rights</span>
+          <button type="button" class="mm-toggle" [class.mm-toggle--on]="cuGroupBased" (click)="cuGroupBased = !cuGroupBased">
+            <span class="mm-toggle__track"></span>
+            <span class="mm-toggle__thumb"></span>
+          </button>
+        </div>
+      </div>
+
+      @if (cuGroupBased) {
+        <!-- Group select -->
+        <div class="de-field" style="margin-bottom:20px">
+          <label>Group <span class="mm-req">*</span></label>
+          <select class="de-input" [(ngModel)]="cuSelectedGroupId">
+            <option value="">Select group…</option>
+            @for (g of groups; track g.id) {
+              <option [value]="g.id">{{ g.id }} — {{ g.name }}</option>
+            }
+          </select>
+          <span class="de-hint">Rights are inherited from the selected group definition.</span>
+        </div>
+        @if (cuSelectedGroupForPreview) {
+          <div class="um-cf-section">
+            <div class="um-cf-section__label">Rights Preview (read-only)</div>
+            @for (sec of cuSelectedGroupForPreview.sections; track sec.label) {
+              <div class="um-rights-section">
+                <div class="um-rights-section__label">{{ sec.label }}</div>
+                @for (item of sec.items; track item.label) {
+                  <div class="um-rights-item">
+                    <span class="um-rights-item__name">{{ item.label }}</span>
+                    <div class="um-rights-item__perms">
+                      @for (p of item.perms; track p) {
+                        <span class="de-badge de-badge--{{ permBadge(p) }}">{{ p }}</span>
+                      }
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        }
+      } @else {
+        <!-- Rights Matrix -->
+        <div class="um-cf-section">
+          <div class="um-cf-section__label">Access Rights</div>
+          <div class="um-rights-matrix-wrap">
+            <table class="um-rights-matrix">
+              <thead>
+                <tr>
+                  <th class="um-rm-module">Module</th>
+                  <th>Create</th>
+                  <th>View</th>
+                  <th>Modify</th>
+                  <th>Authorise</th>
+                  <th>Cancel</th>
+                  <th>Reverse</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (row of cuRights; track row.module) {
+                  <tr>
+                    <td class="um-rm-module-cell">{{ row.module }}</td>
+                    <td class="um-rm-chk-cell"><input type="checkbox" class="um-chk" [(ngModel)]="row.create" /></td>
+                    <td class="um-rm-chk-cell"><input type="checkbox" class="um-chk" [(ngModel)]="row.view" /></td>
+                    <td class="um-rm-chk-cell"><input type="checkbox" class="um-chk" [(ngModel)]="row.modify" /></td>
+                    <td class="um-rm-chk-cell"><input type="checkbox" class="um-chk" [(ngModel)]="row.authorise" /></td>
+                    <td class="um-rm-chk-cell"><input type="checkbox" class="um-chk" [(ngModel)]="row.cancel" /></td>
+                    <td class="um-rm-chk-cell"><input type="checkbox" class="um-chk" [(ngModel)]="row.reverse" /></td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Portfolio Assignment -->
+        <div class="um-cf-section">
+          <div class="um-cf-section__label">Portfolio Assignment</div>
+          <div class="um-pf-chips">
+            @for (pf of portfolioOptions; track pf.id) {
+              <button type="button" class="um-pf-chip"
+                [class.um-pf-chip--active]="cuPortfolios.includes(pf.id)"
+                (click)="togglePortfolio(cuPortfolios, pf.id)">
+                {{ pf.label }}
+              </button>
+            }
+          </div>
+        </div>
+
+        <!-- Deal Limit -->
+        <div class="um-cf-section">
+          <div class="um-cf-section__label">Deal Limit</div>
+          <div class="um-limit-table">
+            <div class="um-limit-hdr">
+              <span>Currency</span><span>Amount</span><span></span>
+            </div>
+            @for (row of cuDealLimits; track $index) {
+              <div class="um-limit-row">
+                <select class="de-input um-limit-ccy" [(ngModel)]="row.currency">
+                  @for (c of currencyOptions; track c) {
+                    <option [value]="c">{{ c }}</option>
+                  }
+                </select>
+                <input type="number" class="de-input" [(ngModel)]="row.amount" placeholder="0.00" min="0" />
+                @if (cuDealLimits.length > 1) {
+                  <button type="button" class="um-limit-rm" (click)="removeLimitRow(cuDealLimits, $index)">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                  </button>
+                } @else {
+                  <span></span>
+                }
+              </div>
+            }
+            <button type="button" class="de-btn de-btn--ghost de-btn--sm um-limit-add"
+              (click)="addLimitRow(cuDealLimits)">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Add Row
+            </button>
+          </div>
+        </div>
+
+        <!-- Overnight Limit -->
+        <div class="um-cf-section">
+          <div class="um-cf-section__label">Overnight Limit</div>
+          <div class="um-limit-table">
+            <div class="um-limit-hdr">
+              <span>Currency</span><span>Amount</span><span></span>
+            </div>
+            @for (row of cuOvernightLimits; track $index) {
+              <div class="um-limit-row">
+                <select class="de-input um-limit-ccy" [(ngModel)]="row.currency">
+                  @for (c of currencyOptions; track c) {
+                    <option [value]="c">{{ c }}</option>
+                  }
+                </select>
+                <input type="number" class="de-input" [(ngModel)]="row.amount" placeholder="0.00" min="0" />
+                @if (cuOvernightLimits.length > 1) {
+                  <button type="button" class="um-limit-rm" (click)="removeLimitRow(cuOvernightLimits, $index)">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                  </button>
+                } @else {
+                  <span></span>
+                }
+              </div>
+            }
+            <button type="button" class="de-btn de-btn--ghost de-btn--sm um-limit-add"
+              (click)="addLimitRow(cuOvernightLimits)">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Add Row
+            </button>
+          </div>
+          <p class="um-limit-note">Currency-wise validation available. Gross/overall validation not available.</p>
+        </div>
+      }
+
+    </div>
+
+    <div class="um-panel__footer">
+      <button class="de-btn de-btn--ghost" (click)="closeCreateUser()">Cancel</button>
+      <button type="button" class="de-btn de-btn--primary"
+        (click)="submitCreateUser()">
+        Create User
+      </button>
+    </div>
+
+  </aside>
+}
+
+<!-- ─── Create Group Panel ──────────────────────────────────────────────────── -->
+@if (createGroupOpen) {
+  <aside class="um-panel um-panel--wide" @slideOver>
+
+    <div class="um-panel__header">
+      <div class="um-panel__top-row">
+        <div class="um-panel__title-block">
+          <span class="um-panel__name">Group Maintenance</span>
+          <span class="um-panel__id">New Group — {{ nextGroupId }}</span>
+        </div>
+      </div>
+      <button class="um-panel__close" (click)="closeCreateGroup()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="um-panel__body">
+
+      <!-- Group ID + Name -->
+      <div class="um-cf-row">
+        <div class="de-field">
+          <label>Group ID</label>
+          <input type="text" class="de-input" [value]="nextGroupId" readonly />
+          <span class="de-hint">Auto-generated on save.</span>
+        </div>
+        <div class="de-field">
+          <label>Group Name <span class="mm-req">*</span></label>
+          <input type="text" class="de-input" [(ngModel)]="cgName" placeholder="e.g. Treasury Dealers" />
+        </div>
+      </div>
+
+      <div class="de-field" style="margin-bottom:20px">
+        <label>Description</label>
+        <input type="text" class="de-input" [(ngModel)]="cgDesc" placeholder="Brief description of this group's purpose" />
+      </div>
+
+      <!-- Rights Matrix -->
+      <div class="um-cf-section">
+        <div class="um-cf-section__label">Access Rights</div>
+        <div class="um-rights-matrix-wrap">
+          <table class="um-rights-matrix">
+            <thead>
+              <tr>
+                <th class="um-rm-module">Module</th>
+                <th>Create</th>
+                <th>View</th>
+                <th>Modify</th>
+                <th>Authorise</th>
+                <th>Cancel</th>
+                <th>Reverse</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of cgRights; track row.module) {
+                <tr>
+                  <td class="um-rm-module-cell">{{ row.module }}</td>
+                  <td class="um-rm-chk-cell"><input type="checkbox" class="um-chk" [(ngModel)]="row.create" /></td>
+                  <td class="um-rm-chk-cell"><input type="checkbox" class="um-chk" [(ngModel)]="row.view" /></td>
+                  <td class="um-rm-chk-cell"><input type="checkbox" class="um-chk" [(ngModel)]="row.modify" /></td>
+                  <td class="um-rm-chk-cell"><input type="checkbox" class="um-chk" [(ngModel)]="row.authorise" /></td>
+                  <td class="um-rm-chk-cell"><input type="checkbox" class="um-chk" [(ngModel)]="row.cancel" /></td>
+                  <td class="um-rm-chk-cell"><input type="checkbox" class="um-chk" [(ngModel)]="row.reverse" /></td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Portfolio Assignment -->
+      <div class="um-cf-section">
+        <div class="um-cf-section__label">Portfolio Assignment</div>
+        <div class="um-pf-chips">
+          @for (pf of portfolioOptions; track pf.id) {
+            <button type="button" class="um-pf-chip"
+              [class.um-pf-chip--active]="cgPortfolios.includes(pf.id)"
+              (click)="togglePortfolio(cgPortfolios, pf.id)">
+              {{ pf.label }}
+            </button>
+          }
+        </div>
+      </div>
+
+      <!-- Deal Limit -->
+      <div class="um-cf-section">
+        <div class="um-cf-section__label">Deal Limit</div>
+        <div class="um-limit-table">
+          <div class="um-limit-hdr">
+            <span>Currency</span><span>Amount</span><span></span>
+          </div>
+          @for (row of cgDealLimits; track $index) {
+            <div class="um-limit-row">
+              <select class="de-input um-limit-ccy" [(ngModel)]="row.currency">
+                @for (c of currencyOptions; track c) {
+                  <option [value]="c">{{ c }}</option>
+                }
+              </select>
+              <input type="number" class="de-input" [(ngModel)]="row.amount" placeholder="0.00" min="0" />
+              @if (cgDealLimits.length > 1) {
+                <button type="button" class="um-limit-rm" (click)="removeLimitRow(cgDealLimits, $index)">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+              } @else {
+                <span></span>
+              }
+            </div>
+          }
+          <button type="button" class="de-btn de-btn--ghost de-btn--sm um-limit-add"
+            (click)="addLimitRow(cgDealLimits)">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Add Row
+          </button>
+        </div>
+      </div>
+
+      <!-- Overnight Limit -->
+      <div class="um-cf-section">
+        <div class="um-cf-section__label">Overnight Limit</div>
+        <div class="um-limit-table">
+          <div class="um-limit-hdr">
+            <span>Currency</span><span>Amount</span><span></span>
+          </div>
+          @for (row of cgOvernightLimits; track $index) {
+            <div class="um-limit-row">
+              <select class="de-input um-limit-ccy" [(ngModel)]="row.currency">
+                @for (c of currencyOptions; track c) {
+                  <option [value]="c">{{ c }}</option>
+                }
+              </select>
+              <input type="number" class="de-input" [(ngModel)]="row.amount" placeholder="0.00" min="0" />
+              @if (cgOvernightLimits.length > 1) {
+                <button type="button" class="um-limit-rm" (click)="removeLimitRow(cgOvernightLimits, $index)">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+              } @else {
+                <span></span>
+              }
+            </div>
+          }
+          <button type="button" class="de-btn de-btn--ghost de-btn--sm um-limit-add"
+            (click)="addLimitRow(cgOvernightLimits)">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Add Row
+          </button>
+        </div>
+        <p class="um-limit-note">Currency-wise validation available. Gross/overall validation not available.</p>
+      </div>
+
+    </div>
+
+    <div class="um-panel__footer">
+      <button class="de-btn de-btn--ghost" (click)="closeCreateGroup()">Cancel</button>
+      <button type="button" class="de-btn de-btn--primary" (click)="submitCreateGroup()">
+        Create Group
+      </button>
+    </div>
+
+  </aside>
+}
+
+<!-- ─── Toast ─────────────────────────────────────────────────────────────── -->
+@if (toastVisible) {
+  <div class="de-toast-container">
+    <div class="de-toast de-toast--success">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+        <polyline points="20 6 9 17 4 12"/>
+      </svg>
+      {{ toastMessage }}
+    </div>
+  </div>
+}

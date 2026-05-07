@@ -1,0 +1,176 @@
+<!-- ─── Breadcrumb ─────────────────────────────────────────────────────────── -->
+<nav class="de-breadcrumb">
+  <a routerLink="/dashboard">Home</a><span class="sep">›</span>
+  <span>Configuration</span><span class="sep">›</span>
+  <span>Business Partners</span><span class="sep">›</span>
+  <span class="current">Role Assignment</span>
+</nav>
+
+<!-- ─── Page Header ───────────────────────────────────────────────────────── -->
+<div class="bp-page-header">
+  <div>
+    <h1 class="de-page-header" style="margin-bottom:0">
+      <span style="display:flex;align-items:center;gap:12px">
+        BP Role Assignment
+        <span class="de-badge de-badge--neutral" style="font-family:var(--font-mono);font-size:12px">{{ bpId }}</span>
+      </span>
+    </h1>
+    <p class="bp-page-sub">A BP can have multiple roles simultaneously. Select all applicable roles.</p>
+  </div>
+</div>
+
+<!-- ─── BP ID strip ───────────────────────────────────────────────────────── -->
+<div class="de-card bpr-id-card">
+  <div class="bpr-id-row">
+    <span class="bpr-id-lbl">BP ID</span>
+    <span class="bpr-id-val">{{ bpId }}</span>
+    <span class="de-badge de-badge--neutral">readonly</span>
+  </div>
+  @if (activeRoles.length > 0) {
+    <div class="bpr-active-roles">
+      @for (r of activeRoles; track r) {
+        <span class="de-badge de-badge--teal" style="font-family:var(--font-mono)">
+          {{ allRoles.find(x => x.id === r)?.label }}
+        </span>
+      }
+    </div>
+  }
+</div>
+
+<!-- ─── Role tiles ────────────────────────────────────────────────────────── -->
+<div class="de-card bp-card">
+  <div class="de-card__header">
+    <div class="de-card__icon">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+        <circle cx="9" cy="7" r="4"/>
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+      </svg>
+    </div>
+    <h3>Roles <span class="de-badge de-badge--{{ activeRoles.length > 0 ? 'teal' : 'neutral' }}" style="margin-left:8px;font-family:var(--font-mono)">{{ activeRoles.length }} selected</span></h3>
+  </div>
+
+  <div class="bpr-role-grid">
+    @for (role of allRoles; track role.id) {
+      <button type="button" class="bpr-role-tile"
+        [class.bpr-role-tile--active]="activeRoles.includes(role.id)"
+        (click)="toggleRole(role.id)">
+        <svg class="bpr-role-tile__icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path [attr.d]="role.icon"/>
+        </svg>
+        <span class="bpr-role-tile__label">{{ role.label }}</span>
+        @if (activeRoles.includes(role.id)) {
+          <svg class="bpr-role-tile__check" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+        }
+      </button>
+    }
+  </div>
+</div>
+
+<!-- ─── Employee Additional Fields ───────────────────────────────────────── -->
+@if (hasEmployee) {
+  <div class="de-card bp-card" @slideDown>
+    <div class="de-card__header">
+      <div class="de-card__icon" style="background:var(--de-teal-light);color:var(--de-teal-dark)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+        </svg>
+      </div>
+      <h3>Employee Details</h3>
+      <span class="de-badge de-badge--teal" style="margin-left:8px;font-size:10px">Required for Employee role</span>
+    </div>
+
+    <form [formGroup]="employeeForm" autocomplete="off">
+      <div class="de-grid-2">
+
+        <div class="de-field">
+          <label>Employee ID <span class="bp-req">*</span></label>
+          <input type="text" class="de-input" formControlName="empId" placeholder="e.g. EMP-001"
+            [class.is-invalid]="employeeForm.get('empId')!.invalid && employeeForm.get('empId')!.touched" />
+          @if (employeeForm.get('empId')!.invalid && employeeForm.get('empId')!.touched) {
+            <span class="de-error">Employee ID is required</span>
+          }
+        </div>
+
+        <div class="de-field">
+          <label>Designation <span class="bp-req">*</span></label>
+          <input type="text" class="de-input" formControlName="designation" placeholder="e.g. Treasury Dealer"
+            [class.is-invalid]="employeeForm.get('designation')!.invalid && employeeForm.get('designation')!.touched" />
+          @if (employeeForm.get('designation')!.invalid && employeeForm.get('designation')!.touched) {
+            <span class="de-error">Designation is required</span>
+          }
+        </div>
+
+        <div class="de-field">
+          <label>Department <span class="bp-opt">optional</span></label>
+          <input type="text" class="de-input" formControlName="department" placeholder="e.g. Treasury" />
+          <span class="de-hint">Department field — added per Excel specification.</span>
+        </div>
+
+        <div class="de-field">
+          <label>Login User Name <span class="bp-req">*</span></label>
+          <input type="text" class="de-input" formControlName="loginUserName" placeholder="e.g. md.rahman"
+            [class.is-invalid]="employeeForm.get('loginUserName')!.invalid && employeeForm.get('loginUserName')!.touched" />
+          @if (employeeForm.get('loginUserName')!.invalid && employeeForm.get('loginUserName')!.touched) {
+            <span class="de-error">Login username is required</span>
+          }
+        </div>
+
+        <div class="de-field">
+          <label>Date of Joining <span class="bp-req">*</span></label>
+          <input type="date" class="de-input" formControlName="dateOfJoining" [max]="today"
+            [class.is-invalid]="employeeForm.get('dateOfJoining')!.invalid && employeeForm.get('dateOfJoining')!.touched" />
+          @if (employeeForm.get('dateOfJoining')!.invalid && employeeForm.get('dateOfJoining')!.touched) {
+            <span class="de-error">Date of joining is required</span>
+          }
+        </div>
+
+        <div class="de-field">
+          <label>Date of Leaving <span class="bp-opt">optional</span></label>
+          <input type="date" class="de-input" formControlName="dateOfLeaving" [min]="today" />
+          <span class="de-hint">Setting a leaving date automatically marks status as Inactive.</span>
+        </div>
+
+        <div class="de-field">
+          <label>Status</label>
+          <div class="bp-toggle-row">
+            <button type="button" class="mm-toggle" [class.mm-toggle--on]="empStatusActive"
+              (click)="employeeForm.patchValue({ status: !empStatusActive })">
+              <span class="mm-toggle__track"></span>
+              <span class="mm-toggle__thumb"></span>
+            </button>
+            <span class="mm-toggle-label">{{ empStatusActive ? 'Active' : 'Inactive' }}</span>
+          </div>
+        </div>
+
+      </div>
+    </form>
+  </div>
+}
+
+<!-- ─── Footer ───────────────────────────────────────────────────────────── -->
+<div class="bp-footer">
+  <button type="button" class="de-btn de-btn--ghost" routerLink="/counterparties">Cancel</button>
+  <div class="bp-footer__right">
+    <button type="button" class="de-btn de-btn--primary"
+      [disabled]="activeRoles.length === 0"
+      (click)="onSubmit()">
+      Submit for Approval
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+      </svg>
+    </button>
+  </div>
+</div>
+
+<!-- ─── Toast ────────────────────────────────────────────────────────────── -->
+@if (toastVisible) {
+  <div class="de-toast-container">
+    <div class="de-toast de-toast--success">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <polyline points="20 6 9 17 4 12"/>
+      </svg>
+      {{ toastMessage }}
+    </div>
+  </div>
+}

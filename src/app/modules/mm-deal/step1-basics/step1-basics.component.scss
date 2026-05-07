@@ -1,0 +1,443 @@
+// ─── Page header ──────────────────────────────────────────────────────────────
+
+.mm-page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 4px;
+
+  h1 { margin-bottom: 0; }
+}
+
+.mm-page-sub {
+  font-size: 13px;
+  color: var(--de-neutral-500);
+  margin: 4px 0 0;
+}
+
+.mm-deal-id-badge {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  vertical-align: middle;
+}
+
+// ─── Form layout ──────────────────────────────────────────────────────────────
+
+.mm-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding-bottom: 88px;
+}
+
+.mm-card .de-grid-2 { row-gap: 20px; }
+
+.mm-req { color: var(--de-red); margin-left: 2px; }
+
+.mm-field { display: flex; flex-direction: column; gap: 6px; }
+
+.mm-section-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .6px;
+  color: var(--de-neutral-500);
+  margin-bottom: 10px;
+}
+
+// ─── Dealer select ────────────────────────────────────────────────────────────
+
+.mm-avatar {
+  width: 30px;
+  height: 30px;
+  background: var(--de-teal);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff;
+  flex-shrink: 0;
+
+  &--sm { width: 22px; height: 22px; font-size: 9px; }
+}
+
+.mm-dealer-opt {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mm-dealer-name { font-size: 13px; font-weight: 500; }
+.mm-dealer-role { font-size: 11px; color: var(--de-neutral-500); }
+
+.mm-dealer-selected {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+// ─── Counterparty typeahead ───────────────────────────────────────────────────
+
+.mm-cp-search {
+  position: relative;
+
+  &__wrap {
+    position: relative;
+    .de-input { padding-right: 38px; }
+  }
+
+  &__icon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--de-neutral-400);
+    pointer-events: none;
+  }
+}
+
+.mm-cp-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: #fff;
+  border: 1px solid var(--de-neutral-200);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  z-index: 200;
+  overflow: hidden;
+
+  &--empty {
+    padding: 14px 16px;
+    font-size: 13px;
+    color: var(--de-neutral-400);
+  }
+
+  &__item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    cursor: pointer;
+    transition: background .1s;
+
+    &:hover { background: var(--de-neutral-50); }
+    &:not(:last-child) { border-bottom: 1px solid var(--de-neutral-100); }
+  }
+
+  &__id {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--de-neutral-500);
+    background: var(--de-neutral-100);
+    padding: 1px 6px;
+    border-radius: 4px;
+    flex-shrink: 0;
+  }
+
+  &__name {
+    flex: 1;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--de-neutral-800);
+  }
+}
+
+// ─── Counterparty chip ────────────────────────────────────────────────────────
+
+.mm-cp-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 12px;
+  background: var(--de-teal-light);
+  border: 1px solid rgba(15,163,131,.2);
+  border-radius: var(--radius-md);
+  min-height: 40px;
+
+  &__id {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--de-neutral-500);
+    background: rgba(255,255,255,.7);
+    padding: 1px 6px;
+    border-radius: 4px;
+  }
+
+  &__name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--de-navy);
+  }
+
+  &__x {
+    margin-left: auto;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--de-neutral-500);
+    padding: 0 2px;
+    &:hover { color: var(--de-red); }
+  }
+}
+
+// ─── Direction cards ──────────────────────────────────────────────────────────
+
+.mm-direction-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.mm-direction-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 20px;
+  background: var(--de-neutral-50);
+  border: 2px solid var(--de-neutral-200);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  text-align: left;
+  transition: all .15s;
+  position: relative;
+  width: 100%;
+
+  &:hover {
+    border-color: var(--de-neutral-300);
+    background: #fff;
+    box-shadow: var(--shadow-sm);
+  }
+
+  &--active {
+    border-color: var(--de-teal);
+    background: var(--de-teal-light);
+    box-shadow: 0 0 0 3px rgba(15,163,131,.1);
+  }
+
+  &__icon {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    &--accept {
+      background: rgba(15,163,131,.12);
+      color: var(--de-teal);
+
+      .mm-direction-card--active & { background: var(--de-teal); color: #fff; }
+    }
+
+    &--place {
+      background: rgba(13,27,42,.08);
+      color: var(--de-navy);
+
+      .mm-direction-card--active & { background: var(--de-navy); color: #fff; }
+    }
+  }
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+  }
+
+  &__title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--de-navy);
+    font-family: var(--font-mono);
+    letter-spacing: .5px;
+  }
+
+  &__sub {
+    font-size: 12px;
+    color: var(--de-neutral-600);
+  }
+
+  &__role {
+    font-size: 12px;
+    color: var(--de-neutral-500);
+    margin-top: 2px;
+
+    strong { color: var(--de-navy); }
+  }
+
+  &__check {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 20px;
+    height: 20px;
+    background: var(--de-teal);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+  }
+}
+
+// ─── Pricing type cards ───────────────────────────────────────────────────────
+
+.mm-pricing-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.mm-pricing-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 16px 20px;
+  background: var(--de-neutral-50);
+  border: 2px solid var(--de-neutral-200);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  text-align: left;
+  transition: all .15s;
+  width: 100%;
+
+  &:hover {
+    border-color: var(--de-neutral-300);
+    background: #fff;
+  }
+
+  &--active {
+    border-color: var(--de-navy);
+    background: rgba(13,27,42,.04);
+  }
+
+  &__icon {
+    color: var(--de-neutral-400);
+    margin-bottom: 4px;
+
+    .mm-pricing-card--active & { color: var(--de-navy); }
+  }
+
+  &__title {
+    font-size: 13px;
+    font-weight: 700;
+    font-family: var(--font-mono);
+    color: var(--de-navy);
+    letter-spacing: .3px;
+  }
+
+  &__sub {
+    font-size: 12px;
+    color: var(--de-neutral-500);
+  }
+}
+
+// ─── Instrument & Portfolio selects ──────────────────────────────────────────
+
+.mm-instrument-opt {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+
+  &__name { flex: 1; font-size: 13px; }
+  &__cat  { font-size: 10px; margin-left: auto; }
+}
+
+.mm-portfolio-opt {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+
+  &__id {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--de-neutral-500);
+    background: var(--de-neutral-100);
+    padding: 1px 5px;
+    border-radius: 3px;
+  }
+
+  &__name   { flex: 1; font-size: 13px; }
+  &__status { font-size: 10px; }
+}
+
+// ─── Optional label tag ───────────────────────────────────────────────────────
+
+.mm-opt-tag {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--de-neutral-400);
+  margin-left: 4px;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+// ─── Instrument info strip ────────────────────────────────────────────────────
+
+.mm-inst-strip {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  margin-top: 8px;
+  background: var(--de-neutral-50);
+  border: 1px solid var(--de-neutral-200);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+
+  &__cell {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding: 10px 14px;
+  }
+
+  &__divider {
+    width: 1px;
+    background: var(--de-neutral-200);
+    flex-shrink: 0;
+  }
+
+  &__label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .6px;
+    color: var(--de-neutral-400);
+  }
+
+  &__val {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--de-navy);
+  }
+}
+
+// ─── Wizard footer ────────────────────────────────────────────────────────────
+
+.mm-wizard-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 0 0;
+  margin-top: 8px;
+  border-top: 1px solid var(--de-neutral-200);
+
+  &__right {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+}

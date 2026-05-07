@@ -1,0 +1,68 @@
+Angular Money Market app. Fix these 2 issues ONLY.
+Do NOT change anything else.
+
+---
+
+## FIX 1 — Info bar: show ONLY on same create pages as footer
+File: src/app/core/layout/bottom-nav/bottom-nav.component.ts
+
+The info bar currently appears on ALL pages. Restrict it to these routes only,
+exactly like the upper-footer component already does:
+
+Copy the exact same showFooter route-checking logic from
+upper-footer.component.ts into bottom-nav.component.ts.
+Use the exact same allowedRoutes array:
+[
+  '/mm-deal/create',
+  '/portfolio/create',
+  '/partners/create',
+  '/counterparties/create',
+  '/instruments/create',
+  '/gl-master/create',
+  '/products/create',
+  '/ssi/create'
+]
+
+In bottom-nav.component.html wrap everything with *ngIf="showFooter"
+(or @if if project uses Angular 17+ control flow).
+
+Keep the SCSS position exactly as-is (fixed, top 64px, left 0, width 100%).
+Do NOT change any SCSS.
+
+---
+
+## FIX 2 — Restore dropdown functionality (broken by last fix)
+The last prompt broke all mat-select dropdowns. Revert ONLY the dropdown
+CSS changes made to styles.scss in the last fix.
+
+In styles.scss, find and REMOVE these lines that were added:
+.cdk-overlay-pane {
+  width: auto !important;
+  left: auto !important;
+  transform: none !important;
+}
+.mat-mdc-select-panel {
+  min-width: 100% !important;
+  position: relative !important;
+}
+
+Replace with ONLY this (safe fix that does not break positioning):
+.cdk-overlay-container {
+  z-index: 9999 !important;
+}
+.mat-mdc-select-panel {
+  max-height: 220px !important;
+  overflow-y: auto !important;
+}
+
+Also remove [disableOptionCentering]="true" if it was added to any
+mat-select elements — revert those templates back to original.
+
+Do NOT change any component TS or HTML beyond removing disableOptionCentering.
+
+---
+
+## CONSTRAINTS
+- Do NOT change any form logic, bindings, or API calls
+- Do NOT install new packages
+- Do NOT modify anything beyond these 2 files

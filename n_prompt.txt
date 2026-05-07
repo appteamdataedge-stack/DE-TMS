@@ -1,0 +1,64 @@
+Angular Money Market app. Apply these fixes only. Do NOT change any other logic.
+
+---
+
+## FIX 1 — Sticky summary bar in New Deal page
+Route: /mm-deals/new-deal
+Add a fixed bar directly below the navbar (position: sticky, top: navbar height).
+Show these fields as read-only chips/labels — update live as user fills the form:
+Deal Date | Dealer | Portfolio | Counterparty | Instrument
+This bar must be visible across ALL sections: Basics, Price & Dates, Interest.
+Empty fields show placeholder "—".
+
+---
+
+## FIX 2 — MM Deals list page
+Make the MM Deals list page look and function exactly like the Counterparties 
+list page (same card layout, same table/grid style, same search bar).
+Add a "New Deal" button in the top-right corner that navigates to /mm-deals/new-deal.
+Grid columns: Deal ID | Counterparty | Instrument | Face Value | Deal Date | Status | Actions
+Actions: View (eye) | Edit (pencil) — no delete for deals.
+
+---
+
+## FIX 3 — List pages: match Counterparties page design
+Apply the same layout, table style, search bar, and top-right "New" button pattern 
+from the Counterparties page to these pages:
+- Portfolio list page
+- Business Partner list page
+- Instrument list page
+Each page's "New" button opens its respective create form.
+Do NOT change any existing form logic inside those pages.
+
+---
+
+## FIX 4 — Remove Actions column from ALL list pages
+Remove the Actions column entirely from every list/grid page in the app.
+Do NOT remove View/Edit/Delete functionality from detail or form pages.
+
+---
+
+## FIX 5 — Authorization: visible items for authorized users
+Ensure the following sidebar/menu items are visible and accessible 
+to authorized users:
+Deals | Counterparties | Portfolio | Business Partner | Instrument |
+GL Master | Products | SSI | UDF Maintenance | Auth Inbox | User Management
+Do NOT change the existing auth/role logic — only ensure these routes 
+and sidebar items exist and are not hidden incorrectly.
+
+---
+
+## FIX 6 — User Management: make Edit rights functional
+In the User Management page, the Edit button/action must:
+- Open the selected user's data in an editable form
+- Allow updating user fields (name, role, status, rights)
+- On Save: call PUT /api/users/:id (add TODO if endpoint missing)
+- Show success/error snackbar
+Do NOT change any other User Management functionality.
+
+---
+
+## CONSTRAINTS
+- Do NOT modify any existing validators, API calls, or business logic
+- Do NOT install new packages
+- Follow existing Angular patterns and component styles throughout

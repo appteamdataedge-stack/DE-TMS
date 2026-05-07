@@ -1,0 +1,153 @@
+Angular Money Market app (dataedge-tms). Fix these issues ONLY.
+Do NOT change any logic, API calls, or other files.
+
+---
+
+## FIX 1 — User Management: Create User and Create Group buttons
+
+Find user-management component files.
+Search for the "Create User" and "Create Group" button click handlers.
+
+Check and fix ALL of these:
+- If button has no (click) handler, add one
+- If the handler method is empty, implement it to open the form/dialog
+- If button is [disabled]="form.invalid", check why form is invalid on init
+  and fix the initial form state
+- If a dialog/modal is used, ensure MatDialog is injected and .open() is called
+- If form submission does nothing, ensure the save API call is made and
+  the list refreshes after success
+
+---
+
+## FIX 2 — app-upper-footer: position above de-footer, same width as bottom-nav
+
+The bottom-nav position is already correct (you fixed in app.html).
+Follow the EXACT same pattern for app-upper-footer.
+
+In app.component.html (or wherever bottom-nav was placed correctly):
+Find where <de-bottom-nav> is placed.
+Add <app-upper-footer *ngIf="showFooter"> just above <de-footer>.
+
+The structure should be:
+... main content ...
+<de-bottom-nav *ngIf="showInfoBar"></de-bottom-nav>  ← already correct
+... page content ...
+<app-upper-footer *ngIf="showFooter"></app-upper-footer>  ← add here
+<de-footer></de-footer>
+
+In app.component.ts (or shell.component.ts, wherever showInfoBar is defined):
+Add showFooter using the same route check pattern already used for showInfoBar.
+Use the same createRoutes array already defined.
+Set this.showFooter = this.showInfoBar (same routes apply to both).
+
+In upper-footer.component.scss replace ALL styles:
+:host {
+  display: block;
+  width: 100%;
+}
+.uf {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 52px;
+  padding: 0 24px;
+  background: #FFFFFF;
+  border-top: 1px solid #E0E0E0;
+  box-shadow: 0 -2px 6px rgba(0,0,0,0.06);
+}
+.uf__message {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 12px; color: #757575;
+}
+.uf__actions { display: flex; gap: 8px; align-items: center; }
+.uf__cancel {
+  padding: 6px 16px; border: 1px solid #B0BEC5;
+  border-radius: 6px; background: transparent;
+  color: #546E7A; cursor: pointer; font-size: 13px;
+}
+.uf__draft {
+  padding: 6px 16px; border: 1px solid #1565C0;
+  border-radius: 6px; background: transparent;
+  color: #1565C0; cursor: pointer; font-size: 13px;
+}
+.uf__submit {
+  padding: 6px 16px; border: none; border-radius: 6px;
+  background: #1565C0; color: #FFFFFF;
+  cursor: pointer; font-size: 13px;
+  display: flex; align-items: center; gap: 6px;
+}
+
+Remove any position: fixed or position: absolute from upper-footer SCSS.
+
+---
+
+## FIX 3 — upper-footer buttons must work (Cancel, Save as Draft, Submit)
+
+In upper-footer.component.ts the buttons currently do nothing.
+The footer needs to communicate with the active page form.
+
+Create a shared service: src/app/core/layout/footer-action.service.ts
+
+@Injectable({ providedIn: 'root' })
+export class FooterActionService {
+  private action = new Subject<'cancel' | 'draft' | 'submit'>();
+  action$ = this.action.asObservable();
+  emit(action: 'cancel' | 'draft' | 'submit') {
+    this.action.next(action);
+  }
+}
+
+In upper-footer.component.ts inject FooterActionService:
+onCancel()  { this.footerActionService.emit('cancel');  }
+onSaveDraft(){ this.footerActionService.emit('draft');  }
+onSubmit()  { this.footerActionService.emit('submit'); }
+
+In EACH create page component ts file inject FooterActionService:
+ngOnInit() {
+  this.footerActionService.action$.pipe(
+    takeUntil(this.destroy$)
+  ).subscribe(action => {
+    if (action === 'cancel')  this.onCancel();
+    if (action === 'draft')   this.onSaveDraft();
+    if (action === 'submit')  this.onSubmit();
+  });
+}
+ngOnDestroy() { this.destroy$.next(); this.destroy$.complete(); }
+
+Wire to the existing cancel/save/submit methods already in each component.
+If those methods don't exist yet, add TODO comments.
+
+Apply this to all 8 create pages:
+mm-deal, portfolio, partners, counterparties,
+instruments, gl-master, products, ssi
+
+---
+
+## FIX 4 — tms-select dropdown list cut off on some pages
+
+Some pages show the dropdown list partially clipped.
+Search ALL component SCSS files for overflow: hidden on parent containers.
+Specifically check these classes on every page:
+.de-card, .dc-main, .dc-panel, .de-grid-2,
+.mm-field, .de-field, .page-content, .content-inner
+
+For each that has overflow: hidden, change to overflow: visible
+UNLESS that element needs scrolling — in that case add:
+  position: relative; z-index: auto;
+and let tms-select z-index: 9999 handle the overflow.
+
+Also in styles.scss ensure:
+.tms-panel {
+  z-index: 9999 !important;
+  position: absolute !important;
+}
+
+---
+
+## CONSTRAINTS
+- Only touch: user-management component, app.component.html,
+  app.component.ts (or shell equivalent), upper-footer component,
+  footer-action.service.ts (new file), 8 create page components,
+  tms-select SCSS, and component SCSS files with overflow:hidden
+- Do NOT change any existing form validation or API call logic
+- Do NOT install new packages

@@ -1,0 +1,82 @@
+<!-- Breadcrumb -->
+<nav class="de-breadcrumb">
+  <a routerLink="/dashboard">Home</a><span class="sep">›</span>
+  <span>Configuration</span><span class="sep">›</span>
+  <span class="current">Products</span>
+</nav>
+
+<!-- Page Header -->
+<div class="prod-header">
+  <div>
+    <h1 class="prod-header__title">Products</h1>
+    <p class="prod-header__sub">Commercial product registry — linked to instruments, GL mapped at this level</p>
+  </div>
+  <a routerLink="/products/create" class="de-btn de-btn--primary">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+      <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+    </svg>
+    New Product
+  </a>
+</div>
+
+<!-- KPI Strip -->
+<div class="prod-kpi-strip">
+  <div class="prod-kpi-item">
+    <span class="prod-kpi-item__val">{{ products.length }}</span>
+    <span class="prod-kpi-item__lbl">Total</span>
+  </div>
+  <div class="prod-kpi-item prod-kpi-item--active">
+    <span class="prod-kpi-item__val">{{ activeCount }}</span>
+    <span class="prod-kpi-item__lbl">Active</span>
+  </div>
+  <div class="prod-kpi-item">
+    <span class="prod-kpi-item__val">{{ products.length - activeCount }}</span>
+    <span class="prod-kpi-item__lbl">Inactive</span>
+  </div>
+</div>
+
+<!-- 2-col card grid -->
+<div class="prod-grid">
+  @for (prod of products; track prod.id) {
+    <div class="prod-card de-card">
+
+      <!-- Card header row -->
+      <div class="prod-card__header">
+        <div class="prod-card__icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
+            <line x1="7" y1="7" x2="7.01" y2="7"/>
+          </svg>
+        </div>
+        <div class="prod-card__meta">
+          <span class="prod-card__id">{{ prod.id }}</span>
+          <span class="prod-card__status de-badge {{ prod.status === 'ACTIVE' ? 'de-badge--green' : 'de-badge--neutral' }}">
+            {{ prod.status }}
+          </span>
+        </div>
+      </div>
+
+      <h3 class="prod-card__name">{{ prod.name }}</h3>
+
+      <!-- Properties -->
+      <div class="prod-card__props">
+        <div class="prod-card__prop">
+          <span class="prod-card__prop-lbl">Instrument</span>
+          <span class="prod-card__prop-val">{{ prod.instrument }}</span>
+        </div>
+        <div class="prod-card__prop">
+          <span class="prod-card__prop-lbl">Category</span>
+          <span class="de-badge {{ categoryBadge[prod.category] }}">{{ categoryLabel[prod.category] }}</span>
+        </div>
+        <div class="prod-card__prop">
+          <span class="prod-card__prop-lbl">Pricing</span>
+          <span class="prod-card__prop-val">{{ prod.pricingType }}</span>
+        </div>
+        <div class="prod-card__prop">
+          <span class="prod-card__prop-lbl">Effective</span>
+          <span class="prod-card__prop-val">{{ prod.effectiveDate }}</span>
+        </div>
+      </div>
+    </div>
+  }
+</div>

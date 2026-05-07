@@ -1,0 +1,33 @@
+@if (showShell) {
+  <div class="shell">
+    <div class="shell-nav">
+      <de-navbar></de-navbar>
+    </div>
+    
+    <div class="shell-body">
+      @if (sidebarOpen) {
+        <div class="app-sidebar-backdrop" (click)="closeNav()"></div>
+      }
+      <div class="shell-aside">
+        <de-sidebar [activeItem]="activeRoute" [isOpen]="sidebarOpen"></de-sidebar>
+        <de-footer></de-footer>
+      </div>
+      <main class="shell-main">
+        @if (showInfoBar) {
+          <de-bottom-nav></de-bottom-nav>
+        }
+        <div class="content-inner">
+          <router-outlet></router-outlet>
+        </div>
+        @if (showFooter) {
+          <app-upper-footer></app-upper-footer>
+        }
+      </main>
+    </div>
+    
+  </div>
+} @else {
+  <div class="shell-bare">
+    <router-outlet></router-outlet>
+  </div>
+}

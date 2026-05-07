@@ -1,0 +1,131 @@
+I have an Angular Money Market frontend app. Apply the following 8 fixes. 
+Do NOT change any other logic, API calls, or existing functionality.
+
+---
+
+## FIX 1 — Reorder fields in Basic Information
+
+### Basics section — exact order:
+1. Deal Date
+2. Deal Time
+3. Dealer
+4. Portfolio
+5. Deal Type
+6. Deposit Type
+7. Counterparty
+8. Instrument
+
+### Rename "Deposit & Dates" section to "Price & Dates"
+### Price & Dates section — exact order:
+1. Pricing Type
+2. Face Value Amount
+3. Value Date & Tenor
+4. Compounding Rule
+
+Do NOT change any field logic, validators, or bindings. Reorder template only.
+
+---
+
+## FIX 2 — Summary bar for required fields (red-marked)
+
+In the Basics section of the New Deal page, add a summary bar at the TOP 
+of the content panel (above the form fields). 
+- Scan all fields that have a red mark (required + currently empty/invalid)
+- Display them as small chips/badges: e.g. [Deal Date] [Counterparty] [Instrument]
+- Label above chips: "Required fields:"
+- When a field is filled, its chip disappears from the bar
+- Use existing form validation state to determine which fields are incomplete
+- Style: light yellow or light red background bar, small font, compact
+
+---
+
+## FIX 3 — Fix "Requires Checker Authorization" footer — make it sticky
+
+The "This record requires checker authorization before becoming active" 
+bar with Cancel / Save buttons is currently scrolling with the page.
+Make it a fixed bottom bar that stays visible at all times regardless of scroll.
+Apply: position: fixed; bottom: 0; width: 100%; z-index: 1000;
+Make sure the page content has enough bottom padding so the footer does not 
+overlap the last form field.
+
+---
+
+## FIX 4 — Fix dropdown scroll issue
+
+In all dropdown fields across the New Deal page, when the user opens a 
+dropdown and scrolls inside it, the page is also scrolling simultaneously.
+Fix: prevent page scroll propagation when user is scrolling inside an open 
+dropdown/select overlay.
+Apply this fix globally to all mat-select or dropdown components on this page.
+Standard fix: add CSS overlay-scroll containment or use 
+(wheel)="$event.stopPropagation()" on the dropdown panel where applicable.
+
+---
+
+## FIX 5 — All list pages: enable View, Edit, Delete actions
+
+For ALL entity list pages in the app (MM Deals, counterparties, portfolios, 
+instruments, or any other list/grid page):
+- Add an Actions column if not present
+- Actions: View (eye icon) | Edit (pencil icon) | Delete (trash icon)
+- View: opens a read-only detail dialog or navigates to detail page
+- Edit: opens the same form in edit mode pre-populated with existing data
+- Delete: shows a confirmation dialog, then removes the record
+- All actions must call the existing API service methods (GET by id, PUT, DELETE)
+- If API methods don't exist yet, add TODO comments and show a snackbar 
+  "Feature coming soon" for now
+- Do NOT change existing form logic, only add action handlers
+
+---
+
+## FIX 6 — Show logged-in user name on Dashboard + Profile & Settings buttons
+
+In the top navbar or dashboard header:
+- Display the logged-in user's name (fetch from existing auth service / 
+  JWT token / localStorage — use whichever pattern already exists in this project)
+- Add a Profile button (person icon) next to the user name
+- Add a Settings button (gear icon) next to Profile
+- Clicking Profile: navigate to /profile route or show a placeholder snackbar 
+  "Profile page coming soon"
+- Clicking Settings: navigate to /settings route or show a placeholder snackbar 
+  "Settings page coming soon"
+- Do NOT change existing auth logic
+
+---
+
+## FIX 7 — After creating/adding any record, allow view and edit
+
+For any form where a record is created (New Deal, or any other create form):
+- After successful save, navigate to the detail/view page of the newly created record
+- The detail page must show all saved field values in read-only mode
+- Add an Edit button on the detail page that switches to edit mode
+- In edit mode, all fields become editable and a Save button appears
+- Saving in edit mode calls the existing PUT/update API
+- If the detail page already exists, just ensure the navigation after create 
+  points to it correctly
+
+---
+
+## FIX 8 — Dashboard: live data only, no create buttons, add charts
+
+On the Dashboard page:
+- Remove any "Add", "New", or "Create" buttons
+- Replace any static/mock data with live API calls to existing endpoints
+- Add the following widgets using Angular Material or Chart.js 
+  (whichever is already installed):
+  1. Total Deals count card (fetch from deals list API, show count)
+  2. Deals by Status donut/pie chart (group by status field)
+  3. Recent Deals table (last 5 deals, columns: Deal ID, Counterparty, Amount, Status)
+  4. Total Face Value amount card
+- Add a simple count-up animation when number cards load
+- All data must refresh on page load via API calls
+- Do NOT add any static/hardcoded data
+
+---
+
+## GLOBAL CONSTRAINTS
+- Do NOT change any existing form validators, API service methods, or business logic
+- Do NOT install new npm packages unless Chart.js is needed and not present 
+  (if so, use: npm install chart.js ng2-charts)
+- Follow all existing Angular patterns, service injection style, and component structure
+- Apply fixes independently — if one fix area has an issue, do not let it block others

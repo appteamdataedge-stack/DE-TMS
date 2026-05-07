@@ -1,0 +1,243 @@
+<!-- ─── Breadcrumb ─────────────────────────────────────────────────────────── -->
+<nav class="de-breadcrumb">
+  <a routerLink="/dashboard">Home</a><span class="sep">›</span>
+  <span>Workflow</span><span class="sep">›</span>
+  <span class="current">Authorization Inbox</span>
+</nav>
+
+<!-- ─── Page Header ────────────────────────────────────────────────────────── -->
+<div class="ap-header">
+  <div class="ap-header__left">
+    <h1 class="ap-header__title">Authorization Inbox</h1>
+    <p class="ap-header__sub">Review and authorize submitted deals and portfolios</p>
+  </div>
+  @if (items.length > 0) {
+    <span class="ap-header__count">{{ items.length }} pending</span>
+  }
+</div>
+
+<!-- ─── Empty State ────────────────────────────────────────────────────────── -->
+@if (items.length === 0) {
+  <div class="ap-empty">
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+         stroke-width="1.5" stroke-linecap="round" class="ap-empty__icon">
+      <path d="M9 12l2 2 4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"/>
+    </svg>
+    <p class="ap-empty__title">All caught up</p>
+    <p class="ap-empty__sub">No items pending authorization</p>
+  </div>
+}
+
+<!-- ─── Card List ──────────────────────────────────────────────────────────── -->
+@if (items.length > 0) {
+  <div class="ap-list">
+    @for (item of items; track item.id) {
+      <div class="ap-card ap-card--{{ item.type === 'MM_DEAL' ? 'deal' : 'portfolio' }}"
+           [@cardLeave]>
+
+        <!-- ── Top row ── -->
+        <div class="ap-card__top">
+          <span class="de-badge de-badge--{{ item.type === 'MM_DEAL' ? 'teal' : 'green' }}">
+            {{ item.type === 'MM_DEAL' ? 'MM Deal' : 'Portfolio' }}
+          </span>
+          <span class="ap-id-chip">{{ item.id }}</span>
+          @if (isSelf(item)) {
+            <span class="ap-self-chip">⚠ Your submission</span>
+          }
+          @if (item.urgency === 'HIGH') {
+            <span class="ap-urgency">⚡ High Priority</span>
+          }
+        </div>
+
+        <!-- ── Title + Subtitle ── -->
+        <div class="ap-card__body">
+          <h3 class="ap-card__title">{{ item.title }}</h3>
+          <p class="ap-card__sub">{{ item.subtitle }}</p>
+        </div>
+
+        <!-- ── Inline Detail Expand ── -->
+        @if (expandedIds.has(item.id)) {
+          <div class="ap-card__expand" @slideDown>
+            <div class="ap-expand-grid">
+              @for (d of item.details; track d.label) {
+                <div class="ap-expand-cell">
+                  <span class="ap-expand-cell__label">{{ d.label }}</span>
+                  <span class="ap-expand-cell__val">{{ d.value }}</span>
+                </div>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- ── Meta row ── -->
+        <div class="ap-card__meta">
+          <span class="ap-meta__person">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2" stroke-linecap="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+              <circle cx="12" cy="7" r="4"/>
+            </svg>
+            Submitted by: {{ item.submittedBy }} ({{ item.submittedByRole }})
+          </span>
+          <span class="ap-meta__time">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2" stroke-linecap="round">
+              <circle cx="12" cy="12" r="10"/>
+              <polyline points="12 6 12 12 16 14"/>
+            </svg>
+            {{ item.submittedAt }}
+          </span>
+        </div>
+
+        <!-- ── Actions ── -->
+        <div class="ap-card__actions">
+          <button class="de-btn de-btn--outline de-btn--sm"
+                  (click)="toggleExpand(item.id)">
+            @if (expandedIds.has(item.id)) {
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                <polyline points="18 15 12 9 6 15"/>
+              </svg>
+              Hide Details
+            } @else {
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+              View Details
+            }
+          </button>
+
+          <div class="ap-card__actions-right">
+            @if (isSelf(item)) {
+              <span class="ap-tooltip-wrap" data-tooltip="You cannot authorize your own submission">
+                <button class="de-btn de-btn--sm ap-btn--reject ap-btn--self" disabled>
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round">
+                    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                  </svg>
+                  Reject
+                </button>
+              </span>
+              <span class="ap-tooltip-wrap" data-tooltip="You cannot authorize your own submission">
+                <button class="de-btn de-btn--primary de-btn--sm ap-btn--self" disabled>
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                  Approve
+                </button>
+              </span>
+            } @else {
+              <button class="de-btn de-btn--sm ap-btn--reject"
+                      (click)="openRejectModal(item)">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round">
+                  <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+                Reject
+              </button>
+              <button class="de-btn de-btn--primary de-btn--sm"
+                      (click)="openApproveModal(item)">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round">
+                  <polyline points="20 6 9 17 4 12"/>
+                </svg>
+                Approve
+              </button>
+            }
+          </div>
+        </div>
+
+      </div>
+    }
+  </div>
+}
+
+<!-- ─── Approve Modal ─────────────────────────────────────────────────────── -->
+@if (approveModal) {
+  <div class="de-modal-backdrop" (click)="closeModals()">
+    <div class="de-modal" (click)="$event.stopPropagation()">
+      <div class="de-modal__header">
+        <h2>Authorize {{ approveModal.type === 'MM_DEAL' ? 'Deal' : 'Portfolio' }}</h2>
+        <p>Submitted by {{ approveModal.submittedBy }} on {{ approveModal.submittedAt }}</p>
+      </div>
+
+      <div class="ap-modal-item">
+        <span class="ap-id-chip">{{ approveModal.id }}</span>
+        <span class="ap-modal-item__title">{{ approveModal.title }}</span>
+      </div>
+
+      <label class="ap-modal-check">
+        <input type="checkbox" [(ngModel)]="approveChecked" />
+        <span class="ap-modal-check__text">
+          I confirm this submission has been reviewed and is within policy limits
+        </span>
+      </label>
+
+      <div class="de-modal__footer">
+        <button class="de-btn de-btn--outline" (click)="closeModals()">Cancel</button>
+        <button class="de-btn de-btn--primary" [disabled]="!approveChecked"
+                (click)="confirmApprove()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+          Authorize
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ─── Reject Modal ──────────────────────────────────────────────────────── -->
+@if (rejectModal) {
+  <div class="de-modal-backdrop" (click)="closeModals()">
+    <div class="de-modal" (click)="$event.stopPropagation()">
+      <div class="de-modal__header">
+        <h2>Reject Submission</h2>
+        <p>
+          <span class="ap-id-chip" style="font-size:12px">{{ rejectModal.id }}</span>
+          {{ rejectModal.title }}
+        </p>
+      </div>
+
+      <div class="de-field">
+        <label class="de-label">
+          Reason for rejection
+          <span class="ap-opt-label">(optional)</span>
+        </label>
+        <textarea class="de-input ap-reject-textarea" rows="3"
+                  [(ngModel)]="rejectReason"
+                  placeholder="Explain why this submission is being rejected…">
+        </textarea>
+      </div>
+
+      <div class="de-modal__footer">
+        <button class="de-btn de-btn--outline" (click)="closeModals()">Cancel</button>
+        <button class="de-btn de-btn--sm ap-btn--reject ap-btn--reject-confirm"
+                (click)="confirmReject()">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+          Confirm Reject
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ─── Toast ─────────────────────────────────────────────────────────────── -->
+@if (toastVisible) {
+  <div class="de-toast-container">
+    <div class="de-toast" [class.de-toast--success]="toastType === 'success'"
+                          [class.de-toast--warning]="toastType === 'warning'">
+      @if (toastType === 'success') {
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2.5" stroke-linecap="round">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+      } @else {
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2.5" stroke-linecap="round">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+          <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+      }
+      {{ toastMessage }}
+    </div>
+  </div>
+}

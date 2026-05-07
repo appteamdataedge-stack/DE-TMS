@@ -1,0 +1,207 @@
+﻿
+<!-- Breadcrumb -->
+<nav class="de-breadcrumb">
+  <a routerLink="/dashboard">Home</a><span class="sep">›</span>
+  <a routerLink="/gl-master">GL Master</a><span class="sep">›</span>
+  <span class="current">New GL Account</span>
+</nav>
+
+<!-- Page Header -->
+<div class="gl-page-header">
+  <div>
+    <h1 class="gl-page-header__title">
+      New GL Account
+      <span class="de-badge de-badge--neutral gl-id-badge">{{ glNumber }}</span>
+    </h1>
+    <p class="gl-page-header__sub">Define a general ledger account and submit for authorization</p>
+  </div>
+</div>
+
+<!-- ── Design Principles Panel ─────────────────────────────────────────────── -->
+<div class="dp-panel">
+  <button type="button" class="dp-panel__toggle" (click)="dpOpen = !dpOpen">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+    </svg>
+    <span>Design Principles</span>
+    <svg class="dp-panel__chevron" [class.dp-panel__chevron--open]="dpOpen"
+         width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+      <polyline points="6 9 12 15 18 9"/>
+    </svg>
+  </button>
+  @if (dpOpen) {
+    <div class="dp-panel__body" @slideDown>
+      <div class="dp-rule">
+        <span class="dp-rule__heading">GL Master</span>
+        <p class="dp-rule__text">
+          GL mappings must be set at <strong>Product level only.</strong><br>
+          Portfolio &rarr; No GL mapping.&nbsp;&nbsp;Instrument &rarr; No GL mapping.
+        </p>
+      </div>
+    </div>
+  }
+</div>
+
+<!-- Form -->
+<form [formGroup]="form" (ngSubmit)="onSubmit()" autocomplete="off">
+
+  <!-- ── Card 1: GL Identity ──────────────────────────────────────────────── -->
+  <div class="de-card gl-card">
+    <div class="de-card__header">
+      <div class="de-card__icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+        </svg>
+      </div>
+      <h3>GL Identity</h3>
+    </div>
+
+    <!-- GL Number (readonly) -->
+    <div class="de-field">
+      <label class="de-label" for="gl-number">GL Number</label>
+      <div class="gl-readonly-wrap">
+        <input id="gl-number" type="text" class="de-input gl-readonly-input"
+               [value]="glNumber" readonly />
+        <span class="gl-readonly-badge">Auto-generated</span>
+      </div>
+      <span class="de-field-hint">Assigned automatically — cannot be edited</span>
+    </div>
+
+    <!-- GL Name -->
+    <div class="de-field">
+      <label class="de-label" for="gl-name">
+        GL Name <span class="de-required">*</span>
+      </label>
+      <input id="gl-name" type="text" class="de-input"
+             formControlName="glName"
+             placeholder="e.g. Interest Income — FTD Standard" />
+      @if (form.get('glName')?.invalid && form.get('glName')?.touched) {
+        <span class="de-field-error">GL name is required</span>
+      }
+    </div>
+
+    <!-- GL Type -->
+    <div class="de-field">
+      <label class="de-label">
+        GL Type <span class="de-required">*</span>
+      </label>
+      <tms-select
+        [items]="glTypeOptions"
+        bindLabel="label"
+        bindValue="value"
+        formControlName="glType"
+        placeholder="Select GL type">
+      </tms-select>
+      @if (form.get('glType')?.invalid && form.get('glType')?.touched) {
+        <span class="de-field-error">GL type is required</span>
+      }
+    </div>
+
+    <!-- Product (conditional — shown only when GL Type = PRODUCT) -->
+    @if (isProductGl) {
+      <div class="de-field" @slideDown>
+        <label class="de-label">
+          Linked Product <span class="de-required">*</span>
+        </label>
+        <tms-select
+          [items]="productOptions"
+          bindLabel="label"
+          bindValue="value"
+          formControlName="productId"
+          placeholder="Select product">
+        </tms-select>
+        @if (form.get('productId')?.invalid && form.get('productId')?.touched) {
+          <span class="de-field-error">A linked product is required for Product GL</span>
+        }
+        <span class="de-field-hint">
+          GL mappings are set at product level — this links the GL to a specific product.
+        </span>
+      </div>
+    }
+  </div>
+
+  <!-- ── Card 2: GL Mapping ───────────────────────────────────────────────── -->
+  <div class="de-card gl-card">
+    <div class="de-card__header">
+      <div class="de-card__icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <line x1="8" y1="6" x2="21" y2="6"/>
+          <line x1="8" y1="12" x2="21" y2="12"/>
+          <line x1="8" y1="18" x2="21" y2="18"/>
+          <line x1="3" y1="6" x2="3.01" y2="6"/>
+          <line x1="3" y1="12" x2="3.01" y2="12"/>
+          <line x1="3" y1="18" x2="3.01" y2="18"/>
+        </svg>
+      </div>
+      <h3>Mapping &amp; Validity</h3>
+    </div>
+
+    <!-- External GL Code -->
+    <div class="de-field">
+      <label class="de-label" for="gl-ext">
+        External GL Code
+        <span class="de-field-opt">(optional)</span>
+      </label>
+      <input id="gl-ext" type="text" class="de-input"
+             formControlName="externalGl"
+             maxlength="15"
+             placeholder="Enter 15-digit code"
+             style="font-family: var(--font-mono); letter-spacing: 1px;" />
+      @if (form.get('externalGl')?.errors?.['pattern'] && form.get('externalGl')?.touched) {
+        <span class="de-field-error">External GL code must be exactly 15 numeric digits</span>
+      }
+      <span class="de-field-hint">Must be exactly 15 digits if provided</span>
+    </div>
+
+    <!-- Description -->
+    <div class="de-field">
+      <label class="de-label" for="gl-desc">
+        Description
+        <span class="de-field-opt">(optional)</span>
+      </label>
+      <textarea id="gl-desc" class="de-input"
+                formControlName="description"
+                rows="3"
+                placeholder="Brief description of this GL account's purpose">
+      </textarea>
+    </div>
+
+    <!-- Status Toggle -->
+    <div class="de-field">
+      <label class="de-label">Status</label>
+      <label class="gl-toggle">
+        <input type="checkbox" formControlName="status" />
+        <span class="gl-toggle__track"></span>
+        <span class="gl-toggle__label gl-toggle__label--{{ statusActive ? 'active' : 'inactive' }}">
+          {{ statusActive ? 'Active' : 'Inactive' }}
+        </span>
+      </label>
+      <span class="de-field-hint">
+        @if (statusActive) { GL account is available for product mapping on authorization. }
+        @else { GL account will be created but unavailable for mapping. }
+      </span>
+    </div>
+  </div>
+
+</form>
+
+
+<!-- Toast -->
+@if (toastVisible) {
+  <div class="de-toast-container">
+    <div class="de-toast" [class.de-toast--success]="toastType === 'success'">
+      @if (toastType === 'success') {
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+      } @else {
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+      }
+      {{ toastMessage }}
+    </div>
+  </div>
+}
+

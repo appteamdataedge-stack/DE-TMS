@@ -1,0 +1,343 @@
+<!-- ─── Breadcrumb ─────────────────────────────────────────────────────── -->
+<nav class="de-breadcrumb">
+  <a routerLink="/">Home</a>
+  <span class="sep">›</span>
+  <span>Money Market</span>
+  <span class="sep">›</span>
+  <span>MM Deals</span>
+  <span class="sep">›</span>
+  <span class="current">New Deal</span>
+</nav>
+
+<!-- ─── Page header ───────────────────────────────────────────────────── -->
+<div class="mm-page-header">
+  <div>
+    <h1 class="de-page-header" style="margin-bottom:0">
+      <span style="display:flex;align-items:center;gap:12px">
+        New Money Market Deal
+        <span class="de-badge de-badge--neutral mm-deal-id-badge">
+          {{ step1.get('dealId')?.value }}
+        </span>
+      </span>
+    </h1>
+    <p class="mm-page-sub">Step 1 of 3 — Identify counterparty, direction and instrument</p>
+  </div>
+</div>
+
+<!-- ─── Step bar ──────────────────────────────────────────────────────── -->
+<de-deal-step-bar [currentStep]="1"></de-deal-step-bar>
+
+<!-- ─── Form ────────────────────────────────────────────────────────────── -->
+<form [formGroup]="step1" (ngSubmit)="onNext()" autocomplete="off" class="mm-form">
+
+  <!-- ── CARD 1: Deal Identification ──────────────────────────────────── -->
+  <div class="de-card mm-card">
+    <div class="de-card__header">
+      <div class="de-card__icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+          <circle cx="12" cy="7" r="4"/>
+        </svg>
+      </div>
+      <h3>Deal Identification</h3>
+    </div>
+
+    <!-- Row 1: Date / Time -->
+    <div class="de-grid-2" style="margin-bottom:20px">
+
+      <!-- Deal Date -->
+      <div class="de-field mm-field">
+        <label>Deal Date <span class="mm-req">*</span></label>
+        <input type="date" class="de-input"
+          [class.is-invalid]="step1.get('dealDate')!.invalid && step1.get('dealDate')!.touched"
+          formControlName="dealDate" />
+        @if (step1.get('dealDate')!.invalid && step1.get('dealDate')!.touched) {
+          <span class="de-error">Deal date is required</span>
+        }
+      </div>
+
+      <!-- Deal Time -->
+      <div class="de-field mm-field">
+        <label>Deal Time <span class="mm-opt-tag">optional</span></label>
+        <input type="time" class="de-input" formControlName="dealTime" />
+      </div>
+
+    </div>
+
+    <!-- Row 2: Dealer / Counterparty -->
+    <div class="de-grid-2">
+
+      <!-- Dealer -->
+      <div class="de-field mm-field">
+        <label>Dealer <span class="mm-req">*</span></label>
+        <tms-select
+          formControlName="dealerId"
+          [items]="svc.dealers"
+          bindValue="id"
+          bindLabel="name"
+          subLabelKey="role"
+          [clearable]="false"
+          [searchable]="false"
+          placeholder="Select dealer">
+        </tms-select>
+        @if (step1.get('dealerId')!.invalid && step1.get('dealerId')!.touched) {
+          <span class="de-error">Dealer is required</span>
+        }
+      </div>
+
+      <!-- Counterparty typeahead -->
+      <div class="de-field mm-field">
+        <label>Counterparty <span class="mm-req">*</span></label>
+
+        @if (selectedCP) {
+          <!-- Chip -->
+          <div class="mm-cp-chip">
+            <span class="mm-cp-chip__id">{{ selectedCP.id }}</span>
+            <span class="mm-cp-chip__name">{{ selectedCP.name }}</span>
+            <span class="de-badge de-badge--{{ svc.cpTypeBadge(selectedCP.type) }}">{{ selectedCP.type }}</span>
+            <button type="button" class="mm-cp-chip__x" (click)="clearCP()" title="Remove">✕</button>
+          </div>
+        } @else {
+          <!-- Search input + dropdown -->
+          <div class="mm-cp-search" (click)="$event.stopPropagation()">
+            <div class="mm-cp-search__wrap">
+              <input
+                class="de-input"
+                [class.is-invalid]="step1.get('counterpartyId')!.invalid && step1.get('counterpartyId')!.touched"
+                [(ngModel)]="cpSearch"
+                [ngModelOptions]="{standalone:true}"
+                (input)="onCpInput()"
+                (focus)="onCpFocus()"
+                (keydown.escape)="cpDropdownVisible=false"
+                placeholder="Search by name or ID..." />
+              <span class="mm-cp-search__icon">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              </span>
+            </div>
+
+            @if (cpDropdownVisible && filteredCPs.length > 0) {
+              <div class="mm-cp-dropdown">
+                @for (cp of filteredCPs; track cp.id) {
+                  <div class="mm-cp-dropdown__item" (click)="selectCP(cp)">
+                    <span class="mm-cp-dropdown__id">{{ cp.id }}</span>
+                    <span class="mm-cp-dropdown__name">{{ cp.name }}</span>
+                    <span class="de-badge de-badge--{{ svc.cpTypeBadge(cp.type) }}">{{ cp.type }}</span>
+                  </div>
+                }
+              </div>
+            }
+
+            @if (cpDropdownVisible && cpSearch.length >= 2 && filteredCPs.length === 0) {
+              <div class="mm-cp-dropdown mm-cp-dropdown--empty">
+                <span>No business partner found for "{{ cpSearch }}"</span>
+              </div>
+            }
+          </div>
+        }
+
+        @if (step1.get('counterpartyId')!.errors?.['required'] && step1.get('counterpartyId')!.touched) {
+          <span class="de-error">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+            Counterparty required
+          </span>
+        }
+        @if (step1.get('counterpartyId')!.errors?.['notFound'] && step1.get('counterpartyId')!.touched) {
+          <span class="de-error">Business partner does not exist</span>
+        }
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── CARD 2: Deal Direction & Pricing Type ─────────────────────────── -->
+  <div class="de-card mm-card">
+    <div class="de-card__header">
+      <div class="de-card__icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M7 16V4m0 0L3 8m4-4 4 4M17 8v12m0 0 4-4m-4 4-4-4"/>
+        </svg>
+      </div>
+      <h3>Deal Direction &amp; Pricing Type</h3>
+    </div>
+
+    <!-- Direction selector -->
+    <div class="mm-section-label">Direction</div>
+    <div class="mm-direction-grid">
+
+      <button
+        type="button"
+        class="mm-direction-card"
+        [class.mm-direction-card--active]="direction === 'ACCEPT'"
+        (click)="setDirection('ACCEPT')">
+        <div class="mm-direction-card__icon mm-direction-card__icon--accept">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="4" x2="12" y2="20"/><polyline points="18 14 12 20 6 14"/></svg>
+        </div>
+        <div class="mm-direction-card__body">
+          <span class="mm-direction-card__title">ACCEPT</span>
+          <span class="mm-direction-card__sub">Receive funds from counterparty</span>
+          <span class="mm-direction-card__role">Your position: <strong>Borrower</strong></span>
+        </div>
+        @if (direction === 'ACCEPT') {
+          <span class="mm-direction-card__check">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+          </span>
+        }
+      </button>
+
+      <button
+        type="button"
+        class="mm-direction-card"
+        [class.mm-direction-card--active]="direction === 'PLACE'"
+        (click)="setDirection('PLACE')">
+        <div class="mm-direction-card__icon mm-direction-card__icon--place">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="20" x2="12" y2="4"/><polyline points="18 10 12 4 6 10"/></svg>
+        </div>
+        <div class="mm-direction-card__body">
+          <span class="mm-direction-card__title">PLACE</span>
+          <span class="mm-direction-card__sub">Place funds with counterparty</span>
+          <span class="mm-direction-card__role">Your position: <strong>Lender</strong></span>
+        </div>
+        @if (direction === 'PLACE') {
+          <span class="mm-direction-card__check">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+          </span>
+        }
+      </button>
+
+    </div>
+
+    <!-- Pricing type -->
+    <div class="mm-section-label" style="margin-top:20px">Pricing Type</div>
+    <div class="mm-pricing-grid">
+
+      <button
+        type="button"
+        class="mm-pricing-card"
+        [class.mm-pricing-card--active]="pricingType === 'NORMAL'"
+        (click)="setPricingType('NORMAL')">
+        <!-- flat-line icon: simple interest -->
+        <svg class="mm-pricing-card__icon" width="28" height="28" viewBox="0 0 48 20" fill="none">
+          <line x1="0" y1="10" x2="48" y2="10" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+        <span class="mm-pricing-card__title">NORMAL</span>
+        <span class="mm-pricing-card__sub">Simple interest method</span>
+      </button>
+
+      <button
+        type="button"
+        class="mm-pricing-card"
+        [class.mm-pricing-card--active]="pricingType === 'DISCOUNTING'"
+        (click)="setPricingType('DISCOUNTING')">
+        <!-- downward-curve icon: discount basis -->
+        <svg class="mm-pricing-card__icon" width="28" height="28" viewBox="0 0 48 20" fill="none">
+          <path d="M4 3 C14 3 34 17 44 17" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+          <polyline points="38 13 44 17 38 21" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span class="mm-pricing-card__title">DISCOUNTING</span>
+        <span class="mm-pricing-card__sub">Discount basis</span>
+      </button>
+
+    </div>
+
+  </div>
+
+  <!-- ── CARD 3: Instrument & Portfolio ────────────────────────────────── -->
+  <div class="de-card mm-card">
+    <div class="de-card__header">
+      <div class="de-card__icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+        </svg>
+      </div>
+      <h3>Instrument &amp; Portfolio</h3>
+    </div>
+
+    <div class="de-grid-2">
+
+      <!-- Instrument -->
+      <div class="de-field mm-field">
+        <label>Instrument <span class="mm-req">*</span></label>
+        <tms-select
+          formControlName="instrumentId"
+          [items]="svc.instruments"
+          bindValue="id"
+          bindLabel="name"
+          subLabelKey="cashflow"
+          [clearable]="false"
+          placeholder="Select instrument">
+        </tms-select>
+
+        @if (selectedInstrument) {
+          <div @slideDown class="mm-inst-strip">
+            <div class="mm-inst-strip__cell">
+              <span class="mm-inst-strip__label">Cashflow</span>
+              <span class="mm-inst-strip__val">{{ selectedInstrument.cashflow }}</span>
+            </div>
+            <div class="mm-inst-strip__divider"></div>
+            <div class="mm-inst-strip__cell">
+              <span class="mm-inst-strip__label">Compounding</span>
+              <span class="mm-inst-strip__val">{{ selectedInstrument.compounding ? 'Allowed' : 'Not Allowed' }}</span>
+            </div>
+            <div class="mm-inst-strip__divider"></div>
+            <div class="mm-inst-strip__cell">
+              <span class="mm-inst-strip__label">Pricing</span>
+              <span class="mm-inst-strip__val">{{ selectedInstrument.pricing === 'DISCOUNTING' ? 'Discounting' : 'Simple' }}</span>
+            </div>
+          </div>
+        }
+
+        @if (step1.get('instrumentId')!.invalid && step1.get('instrumentId')!.touched) {
+          <span class="de-error">Instrument is required</span>
+        }
+      </div>
+
+      <!-- Portfolio -->
+      <div class="de-field mm-field">
+        <label>Portfolio <span class="mm-req">*</span></label>
+        <tms-select
+          formControlName="portfolioId"
+          [items]="svc.portfolios"
+          bindValue="id"
+          bindLabel="name"
+          subLabelKey="bookType"
+          [clearable]="false"
+          placeholder="Select active portfolio">
+        </tms-select>
+        @if (step1.get('portfolioId')!.invalid && step1.get('portfolioId')!.touched) {
+          <span class="de-error">Portfolio is required</span>
+        }
+        <span class="de-hint">Only Active portfolios are shown</span>
+      </div>
+
+    </div>
+  </div>
+
+</form>
+
+<!-- ─── Wizard footer ────────────────────────────────────────────────────── -->
+<div class="mm-wizard-footer">
+  <button type="button" class="de-btn de-btn--ghost" routerLink="/">Cancel</button>
+  <div class="mm-wizard-footer__right">
+    <button type="button" class="de-btn de-btn--outline" (click)="saveDraft()">Save as Draft</button>
+    <button type="button" class="de-btn de-btn--primary" (click)="onNext()">
+      Next: Deposit &amp; Dates
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- ─── Toast ──────────────────────────────────────────────────────────── -->
+@if (showToast) {
+  <div class="de-toast-container">
+    <div class="de-toast"
+      [class.de-toast--success]="toastType === 'success'"
+      [class.de-toast--warning]="toastType === 'warning'">
+      @if (toastType === 'success') {
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+      } @else {
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      }
+      {{ toastMsg }}
+    </div>
+  </div>
+}

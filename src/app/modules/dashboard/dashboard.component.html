@@ -1,0 +1,334 @@
+<!-- ─── Greeting ──────────────────────────────────────────────────────────── -->
+<div class="db-greeting">
+  <div class="db-greeting__text">
+    <h1 class="db-greeting__headline">{{ greeting }}, {{ currentUserName }} <span class="db-wave">👋</span></h1>
+    <p class="db-greeting__date">{{ todayLabel }} — Money market desk overview</p>
+  </div>
+  <div class="db-greeting__actions">
+    <button class="de-btn de-btn--outline" (click)="loadLiveData()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+        <polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/>
+        <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+      </svg>
+      Refresh
+    </button>
+  </div>
+</div>
+
+<!-- ─── Row 1: KPI Strip ──────────────────────────────────────────────────── -->
+<div class="db-kpi-strip">
+  @for (kpi of kpis; track kpi.label) {
+    <div class="db-kpi-card db-kpi-card--{{ kpi.color }}">
+      <div class="db-kpi-card__icon">
+        @switch (kpi.icon) {
+          @case ('exposure') {
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+            </svg>
+          }
+          @case ('deals') {
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
+            </svg>
+          }
+          @case ('calendar') {
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/>
+              <line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/>
+            </svg>
+          }
+          @case ('rate') {
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <line x1="19" y1="5" x2="5" y2="19"/>
+              <circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/>
+            </svg>
+          }
+        }
+      </div>
+      <div class="db-kpi-card__body">
+        <div class="db-kpi-card__value">{{ kpi.value }}</div>
+        <div class="db-kpi-card__label">{{ kpi.label }}</div>
+        <div class="db-kpi-card__sub">{{ kpi.sub }}</div>
+        @if (kpi.badge) {
+          <div class="db-kpi-card__badge"
+            [class.db-kpi-card__badge--up]="kpi.up === true"
+            [class.db-kpi-card__badge--down]="kpi.up === false">
+            @if (kpi.up === true) {
+              <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="18 15 12 9 6 15"/></svg>
+            } @else if (kpi.up === false) {
+              <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="6 9 12 15 18 9"/></svg>
+            }
+            {{ kpi.badge }}
+          </div>
+        }
+      </div>
+    </div>
+  }
+</div>
+
+<!-- ─── Live KPI Strip ────────────────────────────────────────────────────── -->
+<div class="db-kpi-strip db-live-strip">
+
+  <!-- Total Deals card -->
+  <div class="db-kpi-card db-kpi-card--teal">
+    <div class="db-kpi-card__icon">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
+      </svg>
+    </div>
+    <div class="db-kpi-card__body">
+      <div class="db-kpi-card__value db-count-anim">{{ displayDealsCount }}</div>
+      <div class="db-kpi-card__label">Total Deals Submitted</div>
+      <div class="db-kpi-card__sub">This session</div>
+    </div>
+  </div>
+
+  <!-- Total Face Value card -->
+  <div class="db-kpi-card db-kpi-card--navy">
+    <div class="db-kpi-card__icon">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+      </svg>
+    </div>
+    <div class="db-kpi-card__body">
+      <div class="db-kpi-card__value db-count-anim">BDT {{ fmtAmount(displayFaceValue) }}</div>
+      <div class="db-kpi-card__label">Total Face Value</div>
+      <div class="db-kpi-card__sub">Across all submitted deals</div>
+    </div>
+  </div>
+
+  <!-- Deals by Status donut -->
+  <div class="db-kpi-card db-kpi-card--purple" style="flex-direction:column;align-items:flex-start">
+    <div class="db-kpi-card__body" style="width:100%">
+      <div class="db-kpi-card__label" style="margin-bottom:10px">Deals by Status</div>
+      @if (totalDealsCount > 0) {
+        <div class="db-donut-wrap">
+          <div class="db-donut" [style.background]="donutGradient"></div>
+          <div class="db-donut-legend">
+            @for (s of dealsByStatus; track s.label) {
+              <div class="db-donut-legend__item">
+                <span class="db-donut-legend__dot de-badge--{{ s.color }}" style="width:8px;height:8px;border-radius:50%;display:inline-block;"></span>
+                <span style="font-size:11px;color:var(--text-3)">{{ s.label }}</span>
+                <span style="font-size:11px;font-weight:700;color:var(--text);margin-left:auto">{{ s.count }}</span>
+              </div>
+            }
+          </div>
+        </div>
+      } @else {
+        <p style="font-size:12px;color:var(--text-4);margin:0">No deals submitted yet this session.</p>
+      }
+    </div>
+  </div>
+
+</div>
+
+<!-- ─── Recent Deals Table (live) ─────────────────────────────────────────── -->
+@if (recentDeals.length > 0) {
+  <div class="de-card db-section">
+    <div class="de-card__header">
+      <div class="de-card__icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+        </svg>
+      </div>
+      <h3>Recent Deals</h3>
+      <span class="db-count-pill">{{ recentDeals.length }}</span>
+      <div class="db-card-hdr-end">
+        <a routerLink="/blotter" class="de-btn de-btn--sm de-btn--outline">View All</a>
+      </div>
+    </div>
+    <div class="db-table-wrap">
+      <table class="db-table">
+        <thead>
+          <tr>
+            <th>Deal ID</th>
+            <th>Counterparty</th>
+            <th>Currency</th>
+            <th class="db-col-r">Amount</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (d of recentDeals; track d.dealId) {
+            <tr class="db-table__row">
+              <td><a class="db-deal-id" [routerLink]="['/mm-deal', d.dealId]">{{ d.dealId }}</a></td>
+              <td>{{ d.counterpartyId }}</td>
+              <td><span class="db-ccy-tag db-ccy-tag--bdt">{{ d.currency }}</span></td>
+              <td class="db-col-r db-table__amount">{{ d.currency }} {{ fmtAmount(d.principalAmount) }}</td>
+              <td><span class="de-badge de-badge--teal">{{ d.status }}</span></td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+}
+
+<!-- ─── Row 2: Active Deals ───────────────────────────────────────────────── -->
+<div class="de-card db-section">
+  <div class="de-card__header">
+    <div class="de-card__icon">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+      </svg>
+    </div>
+    <h3>Active Deals</h3>
+    <span class="db-count-pill">5</span>
+  </div>
+
+  <div class="db-table-wrap">
+    <table class="db-table">
+      <thead>
+        <tr>
+          <th>Deal ID</th>
+          <th>Counterparty</th>
+          <th>Direction</th>
+          <th>CCY</th>
+          <th class="db-col-r">Amount</th>
+          <th class="db-col-r">Rate</th>
+          <th>Maturity</th>
+          <th>Days Left</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (deal of activeDeals; track deal.id) {
+          <tr class="db-table__row">
+            <td><span class="db-deal-id">{{ deal.id }}</span></td>
+            <td class="db-table__cp">{{ deal.cp }}</td>
+            <td><span class="de-badge de-badge--{{ dirBadge(deal.dir) }}">{{ deal.dir }}</span></td>
+            <td><span class="db-ccy-tag db-ccy-tag--{{ deal.ccy.toLowerCase() }}">{{ deal.ccy }}</span></td>
+            <td class="db-col-r db-table__amount">{{ deal.amount }}</td>
+            <td class="db-col-r db-table__rate">{{ deal.rate }}%</td>
+            <td class="db-table__maturity">{{ deal.maturity }}</td>
+            <td><span class="de-badge de-badge--{{ daysBadge(deal.days) }}">{{ deal.days }}d</span></td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ─── Row 3: Maturity Chart ─────────────────────────────────────────────── -->
+<div class="de-card db-section">
+  <div class="de-card__header">
+    <div class="de-card__icon">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="4" width="18" height="18" rx="2"/>
+        <line x1="3" y1="10" x2="21" y2="10"/>
+        <line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/>
+      </svg>
+    </div>
+    <h3>Upcoming Maturities</h3>
+    <span class="db-count-pill db-count-pill--amber">3</span>
+  </div>
+
+  <div class="db-maturity-chart">
+    <!-- Scale axis -->
+    <div class="db-maturity-scale">
+      <span>Today</span>
+      <div class="db-maturity-scale__90line" title="90-day threshold">
+        <span class="db-maturity-scale__90label">90d</span>
+      </div>
+      <span class="db-maturity-scale__end">183d</span>
+    </div>
+
+    <!-- Deal rows -->
+    @for (d of maturingDeals; track d.id) {
+      <div class="db-maturity-row">
+        <div class="db-maturity-row__meta">
+          <span class="db-maturity-row__id">{{ d.id }}</span>
+          <span class="db-maturity-row__cp">{{ d.cp }}</span>
+          <span class="db-maturity-row__amount">{{ d.ccy }} {{ d.amount }}</span>
+        </div>
+        <div class="db-maturity-row__track">
+          <div class="db-maturity-row__bar db-maturity-row__bar--{{ d.color }}"
+            [style.width.%]="d.barPct">
+          </div>
+        </div>
+        <div class="db-maturity-row__end">
+          <span class="db-maturity-row__date">{{ d.maturity }}</span>
+          <span class="db-days-pill db-days-pill--{{ d.color }}">{{ d.days }}d</span>
+        </div>
+      </div>
+    }
+  </div>
+
+  <p class="db-chart-caption">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="10"/>
+      <line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+    </svg>
+    3 deals maturing in the next 90 days
+  </p>
+</div>
+
+<!-- ─── Row 4: Split 50/50 ────────────────────────────────────────────────── -->
+<div class="db-split-row">
+
+  <!-- Left: Currency Exposure -->
+  <div class="de-card db-section">
+    <div class="de-card__header">
+      <div class="de-card__icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="2" y1="12" x2="22" y2="12"/>
+          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+        </svg>
+      </div>
+      <h3>Currency Exposure</h3>
+    </div>
+
+    <div class="db-ccy-list">
+      @for (row of currencyExposure; track row.currency) {
+        <div class="db-ccy-row">
+          <div class="db-ccy-row__head">
+            <span class="db-ccy-row__code">{{ row.currency }}</span>
+            <span class="db-ccy-row__pct">{{ row.pct }}%</span>
+            <span class="db-ccy-row__amount">{{ row.amount }}</span>
+          </div>
+          <div class="db-ccy-row__track">
+            <div class="db-ccy-row__bar db-ccy-row__bar--{{ row.color }}"
+              [style.width.%]="row.pct">
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+
+    <div class="db-ccy-total">
+      <span class="db-ccy-total__label">Total (BDT equiv.)</span>
+      <span class="db-ccy-total__value">≈ BDT 53.2M</span>
+    </div>
+  </div>
+
+  <!-- Right: Recent Audit Activity -->
+  <div class="de-card db-section">
+    <div class="de-card__header">
+      <div class="de-card__icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="16" y1="13" x2="8" y2="13"/>
+          <line x1="16" y1="17" x2="8" y2="17"/>
+        </svg>
+      </div>
+      <h3>Recent Activity</h3>
+    </div>
+
+    <div class="db-timeline">
+      @for (evt of auditEvents; track evt.time + evt.text) {
+        <div class="db-timeline__item">
+          <div class="db-timeline__dot-wrap">
+            <div class="db-timeline__dot db-timeline__dot--{{ evt.dot }}"></div>
+            <div class="db-timeline__line"></div>
+          </div>
+          <div class="db-timeline__content">
+            <span class="db-timeline__text">{{ evt.text }}</span>
+            <span class="db-timeline__time">{{ evt.time }}</span>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+
+</div>

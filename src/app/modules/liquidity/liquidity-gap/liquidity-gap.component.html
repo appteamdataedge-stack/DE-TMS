@@ -1,0 +1,213 @@
+<!-- ─── Breadcrumb ─────────────────────────────────────────────────────────── -->
+<nav class="de-breadcrumb">
+  <a routerLink="/dashboard">Home</a><span class="sep">›</span>
+  <span>Liquidity</span><span class="sep">›</span>
+  <span class="current">Gap Analysis</span>
+</nav>
+
+<!-- ─── Page Header ────────────────────────────────────────────────────────── -->
+<div class="lq-header">
+  <div>
+    <h1 class="lq-header__title">Liquidity Gap Analysis</h1>
+    <p class="lq-header__sub">As of 29 Apr 2026 &nbsp;·&nbsp; Money Market Book &nbsp;·&nbsp; All Currencies</p>
+  </div>
+  <div class="lq-header__actions">
+    <a routerLink="/liquidity/stress" class="de-btn de-btn--outline">
+      Stress Testing
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+    </a>
+  </div>
+</div>
+
+<!-- ─── KPI Cards ──────────────────────────────────────────────────────────── -->
+<div class="de-grid-4 lq-kpis">
+  <div class="de-card lq-kpi">
+    <p class="lq-kpi__label">Total Inflows</p>
+    <p class="lq-kpi__val lq-kpi__val--teal">BDT {{ fmtAmt(totalInflows) }}</p>
+    <p class="lq-kpi__hint">All time buckets</p>
+  </div>
+  <div class="de-card lq-kpi">
+    <p class="lq-kpi__label">Total Outflows</p>
+    <p class="lq-kpi__val lq-kpi__val--navy">BDT {{ fmtAmt(totalOutflows) }}</p>
+    <p class="lq-kpi__hint">All time buckets</p>
+  </div>
+  <div class="de-card lq-kpi">
+    <p class="lq-kpi__label">Net Position</p>
+    <p class="lq-kpi__val"
+       [class.lq-kpi__val--teal]="netPosition >= 0"
+       [class.lq-kpi__val--red]="netPosition < 0">
+      {{ fmtM(netPosition) }}
+    </p>
+    <p class="lq-kpi__hint">Inflows minus outflows</p>
+  </div>
+  <div class="de-card lq-kpi">
+    <p class="lq-kpi__label">Bucket Alerts</p>
+    <p class="lq-kpi__val"
+       [class.lq-kpi__val--amber]="alertCount > 0"
+       [class.lq-kpi__val--teal]="alertCount === 0">
+      {{ alertCount }} bucket{{ alertCount !== 1 ? 's' : '' }}
+    </p>
+    <p class="lq-kpi__hint">Warning or breach</p>
+  </div>
+</div>
+
+<!-- ─── Gap Table ──────────────────────────────────────────────────────────── -->
+<div class="de-card lq-table-card">
+  <div class="lq-card-hd">
+    <h2 class="lq-card-hd__title">Time-Band Gap Analysis</h2>
+    <span class="lq-card-hd__sub">Click any row to see underlying deals</span>
+  </div>
+  <div class="lq-table-wrap">
+    <table class="lq-table">
+      <thead>
+        <tr>
+          <th class="lq-th--chev"></th>
+          <th>Time Bucket</th>
+          <th class="lq-col-r">Total Inflows</th>
+          <th class="lq-col-r">Total Outflows</th>
+          <th class="lq-col-r">Net Gap</th>
+          <th class="lq-col-r">Cumulative Gap</th>
+          <th class="lq-col-r">Limit</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (b of buckets; track b.id) {
+          <tr class="lq-row"
+              [class.lq-row--pos]="b.netGap > 0"
+              [class.lq-row--neg]="b.netGap < 0"
+              [class.lq-row--open]="expandedBucket === b.id"
+              (click)="toggleBucket(b.id)">
+            <td class="lq-td--chev">
+              <svg class="lq-chev" [class.lq-chev--open]="expandedBucket === b.id"
+                   width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </td>
+            <td class="lq-bucket-name">{{ b.label }}</td>
+            <td class="lq-col-r lq-in-val">BDT {{ fmtAmt(b.inflows) }}</td>
+            <td class="lq-col-r lq-out-val">BDT {{ fmtAmt(b.outflows) }}</td>
+            <td class="lq-col-r lq-net-val"
+                [class.lq-net-val--pos]="b.netGap > 0"
+                [class.lq-net-val--neg]="b.netGap < 0">
+              {{ fmtM(b.netGap) }}
+            </td>
+            <td class="lq-col-r lq-cum-val"
+                [class.lq-cum-val--pos]="b.cumulativeGap >= 0"
+                [class.lq-cum-val--neg]="b.cumulativeGap < 0">
+              {{ fmtM(b.cumulativeGap) }}
+            </td>
+            <td class="lq-col-r lq-limit-val">{{ fmtM(b.limit) }}</td>
+            <td><span class="de-badge de-badge--{{ statusBadge(b.status) }}">{{ b.status }}</span></td>
+          </tr>
+          @if (expandedBucket === b.id) {
+            <tr class="lq-drill-row">
+              <td colspan="8" class="lq-drill-cell">
+                <div @drill class="lq-drill">
+                  <p class="lq-drill__title">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="15" y2="18"/></svg>
+                    Underlying Deals — {{ b.label }}
+                    <span class="lq-drill__count">{{ b.deals.length }} flow{{ b.deals.length !== 1 ? 's' : '' }}</span>
+                  </p>
+                  <table class="lq-drill-table">
+                    <thead>
+                      <tr>
+                        <th>Deal / Reference</th>
+                        <th>Counterparty</th>
+                        <th>Instrument</th>
+                        <th>Flow Type</th>
+                        <th>CCY</th>
+                        <th class="lq-col-r">Amount</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for (d of b.deals; track d.id) {
+                        <tr>
+                          <td class="lq-drill-id">{{ d.id }}</td>
+                          <td class="lq-drill-cp">{{ d.counterparty }}</td>
+                          <td class="lq-drill-inst">{{ d.instrument }}</td>
+                          <td>
+                            <span class="de-badge de-badge--{{ d.direction === 'IN' ? 'teal' : 'red' }}">
+                              {{ d.direction === 'IN' ? 'INFLOW' : 'OUTFLOW' }}
+                            </span>
+                          </td>
+                          <td>
+                            <span class="lq-ccy lq-ccy--{{ d.currency.toLowerCase() }}">{{ d.currency }}</span>
+                          </td>
+                          <td class="lq-col-r lq-drill-amt">{{ d.currency }} {{ fmtAmt(d.amount) }}</td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              </td>
+            </tr>
+          }
+        }
+      </tbody>
+      <tfoot>
+        <tr class="lq-total-row">
+          <td></td>
+          <td class="lq-total-label">TOTAL</td>
+          <td class="lq-col-r lq-in-val"><strong>BDT {{ fmtAmt(totalInflows) }}</strong></td>
+          <td class="lq-col-r lq-out-val"><strong>BDT {{ fmtAmt(totalOutflows) }}</strong></td>
+          <td class="lq-col-r lq-net-val"
+              [class.lq-net-val--pos]="netPosition >= 0"
+              [class.lq-net-val--neg]="netPosition < 0">
+            <strong>{{ fmtM(netPosition) }}</strong>
+          </td>
+          <td colspan="3"></td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</div>
+
+<!-- ─── Liquidity Profile Chart ────────────────────────────────────────────── -->
+<div class="de-card lq-chart-card">
+  <div class="lq-card-hd">
+    <h2 class="lq-card-hd__title">Liquidity Profile</h2>
+    <div class="lq-legend">
+      <span class="lq-legend-item">
+        <span class="lq-legend-line lq-legend-line--teal"></span> Inflows
+      </span>
+      <span class="lq-legend-item">
+        <span class="lq-legend-line lq-legend-line--navy"></span> Outflows
+      </span>
+      <span class="lq-legend-item">
+        <span class="lq-legend-line lq-legend-line--purple lq-legend-line--dash"></span> Net Gap
+      </span>
+    </div>
+  </div>
+
+  <svg class="lq-chart" [attr.viewBox]="chart.vb" preserveAspectRatio="xMidYMid meet">
+    <!-- Grid lines and Y-axis labels -->
+    @for (yl of chart.yLabels; track yl.y) {
+      <line [attr.x1]="62" [attr.x2]="684" [attr.y1]="yl.y" [attr.y2]="yl.y"
+            stroke="var(--de-neutral-100)" stroke-width="1"/>
+      <text [attr.x]="58" [attr.y]="yl.y + 4" text-anchor="end" class="lq-axis-label">{{ yl.label }}</text>
+    }
+    <!-- Zero line -->
+    <line [attr.x1]="62" [attr.x2]="684" [attr.y1]="chart.zeroY" [attr.y2]="chart.zeroY"
+          stroke="var(--de-neutral-300)" stroke-width="1.5" stroke-dasharray="4,3"/>
+    <!-- X-axis labels -->
+    @for (xl of chart.xLabels; track xl.x) {
+      <text [attr.x]="xl.x" [attr.y]="208" text-anchor="middle" class="lq-axis-label">{{ xl.label }}</text>
+    }
+    <!-- Inflows line -->
+    <polyline [attr.points]="chart.inPts" fill="none"
+              stroke="var(--de-teal)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+    <!-- Outflows line -->
+    <polyline [attr.points]="chart.outPts" fill="none"
+              stroke="var(--de-navy)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+    <!-- Net Gap line -->
+    <polyline [attr.points]="chart.netPts" fill="none"
+              stroke="var(--de-purple)" stroke-width="2" stroke-dasharray="6,3"
+              stroke-linejoin="round" stroke-linecap="round"/>
+    <!-- Net Gap status dots -->
+    @for (dot of chart.netDots; track dot.x) {
+      <circle [attr.cx]="dot.x" [attr.cy]="dot.y" r="5" [attr.fill]="dot.color"
+              stroke="#fff" stroke-width="2"/>
+    }
+  </svg>
+</div>

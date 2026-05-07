@@ -1,0 +1,132 @@
+Angular Money Market app. Fix these issues ONLY.
+Do NOT change any form logic, validators, or API calls.
+
+---
+
+## FIX 1 — Info bar: show ONLY on these 8 routes
+File: src/app/core/layout/bottom-nav/bottom-nav.component.ts
+
+Same pattern as upper-footer route check.
+Show the info bar ONLY when router.url matches one of:
+/mm-deal/create
+/portfolio/create
+/partners/create
+/counterparties/create
+/instruments/create
+/gl-master/create
+/products/create
+/ssi/create
+
+Hide it on ALL other pages including dashboard, list pages, etc.
+Use *ngIf or @if (showBar) wrapping the host content.
+
+---
+
+## FIX 2 — Remove gap between navbar and info bar
+File: src/app/core/layout/bottom-nav/bottom-nav.component.scss
+
+Set top to EXACTLY the navbar height with zero gap:
+top: 64px !important;
+margin: 0 !important;
+padding-top: 0 !important;
+
+Also check the main layout content wrapper.
+Find where margin-top or padding-top is added to compensate 
+for the info bar. Make sure it is:
+padding-top: 100px (64px navbar + 36px info bar) on create pages only
+padding-top: 64px on all other pages (no info bar)
+
+---
+
+## FIX 3 — Info bar shows page-specific fields (not same for all pages)
+Each create page has its own relevant fields in the info bar.
+Update bottom-nav.component to accept an @Input() or read from 
+a shared service to display page-specific field values.
+
+Create a shared service: src/app/core/layout/infobar.service.ts
+with a BehaviorSubject:
+  infoFields$ = new BehaviorSubject<{label: string, value: string}[]>([])
+  setFields(fields: {label: string, value: string}[]) { 
+    this.infoFields$.next(fields) 
+  }
+
+In bottom-nav.component.ts inject InfobarService and subscribe to infoFields$.
+In bottom-nav.component.html render:
+<span *ngFor="let f of fields">
+  <span class="label">{{f.label}}</span>
+  <span class="value">{{f.value || '—'}}</span>
+  <span class="sep" *ngIf="!last">|</span>
+</span>
+
+In each create page component, inject InfobarService.
+Call setInfoFields in ngOnInit AND whenever form values change:
+
+MM Deal create (/mm-deal/create):
+  infobarService.setFields([
+    {label: 'DEAL DATE', value: form.get('dealDate').value},
+    {label: 'DEALER', value: form.get('dealer').value},
+    {label: 'PORTFOLIO', value: form.get('portfolio').value},
+    {label: 'COUNTERPARTY', value: form.get('counterparty').value},
+    {label: 'INSTRUMENT', value: form.get('instrument').value}
+  ])
+  Subscribe to form.valueChanges to update live.
+
+Portfolio create (/portfolio/create):
+  fields: PORTFOLIO ID | NAME | BOOK TYPE
+
+Counterparty create (/counterparties/create):
+  fields: BP ID | CATEGORY | NAME
+
+Instrument create (/instruments/create):
+  fields: INSTRUMENT ID | NAME | TYPE
+
+Partners create (/partners/create):
+  fields: BP ID | NAME | TYPE
+
+GL Master create (/gl-master/create):
+  fields: GL CODE | GL NAME | TYPE
+
+Products create (/products/create):
+  fields: PRODUCT ID | NAME | STATUS
+
+SSI create (/ssi/create):
+  fields: SSI ID | COUNTERPARTY | CURRENCY
+
+Use the exact FormControl names already in each component.
+Call infobarService.setFields([]) in ngOnDestroy of each component.
+
+---
+
+## FIX 4 — Remove inline info box from individual pages
+After adding fields to the info bar (FIX 3), find and REMOVE the 
+existing inline red-bordered info box/bar that is hardcoded inside 
+each of these create page component HTML templates:
+portfolio create, counterparty create, instrument create, 
+partners create, gl-master create, products create, ssi create,
+mm-deal create.
+Remove only the info summary box HTML element.
+Do NOT remove any form fields or other content.
+
+---
+
+## FIX 5 — Restore dropdown to working state
+Recent changes broke the dropdowns. Revert ONLY the dropdown-related 
+changes from the last 2 prompts:
+1. Remove any [disableOptionCentering]="true" that was added to 
+   mat-select elements if it is causing issues
+2. In styles.scss, remove any .cdk-overlay-pane overrides 
+   (width: auto, left: auto, transform: none) that were added recently
+3. Keep ONLY this in styles.scss for dropdowns:
+   .cdk-overlay-container { z-index: 9999 !important; }
+   .mat-mdc-select-panel { 
+     max-height: 220px !important; 
+     overflow-y: auto !important; 
+   }
+4. Do NOT touch any component TypeScript files for dropdowns
+
+---
+
+## CONSTRAINTS
+- Do NOT change any form logic, bindings, or API calls
+- Do NOT install new packages
+- Do NOT modify anything beyond what is listed above

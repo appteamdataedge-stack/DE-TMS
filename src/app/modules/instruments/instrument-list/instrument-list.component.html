@@ -1,0 +1,111 @@
+<!-- Breadcrumb -->
+<nav class="de-breadcrumb">
+  <a routerLink="/dashboard">Home</a><span class="sep">›</span>
+  <span>Configuration</span><span class="sep">›</span>
+  <span class="current">Instruments</span>
+</nav>
+
+<!-- Page Header -->
+<div class="inl-header">
+  <div>
+    <h1 class="inl-header__title">Instruments</h1>
+    <p class="inl-header__sub">Financial instrument type registry</p>
+  </div>
+  <a routerLink="/instruments/create" class="de-btn de-btn--primary">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+      <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+    </svg>
+    New Instrument
+  </a>
+</div>
+
+<!-- KPI Strip -->
+<div class="inl-kpi-strip">
+  <div class="inl-kpi-card">
+    <div class="inl-kpi-card__value">{{ kpis.total }}</div>
+    <div class="inl-kpi-card__label">Total</div>
+  </div>
+  <div class="inl-kpi-card inl-kpi-card--deposit">
+    <div class="inl-kpi-card__value">{{ kpis.deposit }}</div>
+    <div class="inl-kpi-card__label">Deposit</div>
+  </div>
+  <div class="inl-kpi-card inl-kpi-card--lending">
+    <div class="inl-kpi-card__value">{{ kpis.lending }}</div>
+    <div class="inl-kpi-card__label">Lending</div>
+  </div>
+  <div class="inl-kpi-card inl-kpi-card--security">
+    <div class="inl-kpi-card__value">{{ kpis.security }}</div>
+    <div class="inl-kpi-card__label">Security</div>
+  </div>
+</div>
+
+<!-- Filter Bar -->
+<div class="inl-filter-bar de-card">
+  <div class="inl-filter-bar__search">
+    <svg class="inl-filter-bar__search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+    </svg>
+    <input class="inl-filter-bar__input" type="text" placeholder="Search instrument ID or name…" [(ngModel)]="searchTerm" />
+  </div>
+  <div class="inl-filter-bar__selects">
+    <select class="de-input inl-filter-bar__select" [(ngModel)]="categoryFilter">
+      @for (opt of categoryOptions; track opt.value) {
+        <option [value]="opt.value">{{ opt.label }}</option>
+      }
+    </select>
+  </div>
+  <span class="inl-filter-bar__count">{{ filtered.length }} of {{ allInstruments.length }}</span>
+</div>
+
+<!-- Table -->
+<div class="de-card inl-table-card">
+  <div class="inl-table-wrap">
+    <table class="inl-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Category</th>
+          <th>Cashflow</th>
+          <th>Pricing</th>
+          <th>Compounding</th>
+        </tr>
+      </thead>
+      <tbody>
+        @if (filtered.length === 0) {
+          <tr>
+            <td colspan="6" class="inl-empty-cell">
+              <div class="inl-empty">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" class="inl-empty__icon">
+                  <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                </svg>
+                <p class="inl-empty__title">No instruments found</p>
+                <p class="inl-empty__sub">Try adjusting your search or filters</p>
+              </div>
+            </td>
+          </tr>
+        }
+        @for (inst of filtered; track inst.id) {
+          <tr class="inl-table__row">
+            <td><span class="inl-id">{{ inst.id }}</span></td>
+            <td class="inl-name">{{ inst.name }}</td>
+            <td>
+              <span class="de-badge de-badge--{{ categoryBadge(inst.category) }}">{{ inst.category }}</span>
+            </td>
+            <td class="inl-cashflow">{{ inst.cashflow }}</td>
+            <td>
+              <span class="de-badge de-badge--{{ pricingBadge(inst.pricing) }}">{{ inst.pricing }}</span>
+            </td>
+            <td>
+              @if (inst.compounding) {
+                <span class="de-badge de-badge--green">Yes</span>
+              } @else {
+                <span class="inl-no">No</span>
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>

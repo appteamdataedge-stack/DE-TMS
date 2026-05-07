@@ -1,0 +1,40 @@
+:host {
+  display: block;
+  position: sticky;
+  top: 0;
+  z-index: 900;
+  width: 100%;
+}
+
+nav.de-bottom-nav {
+  display: flex;
+  align-items: center;
+  height: 36px;
+  padding: 0 24px;
+  gap: 16px;
+  background: #EEF4FB;
+  border-bottom: 1px solid #C5D9EE;
+  font-size: 13px;
+}
+
+.de-infobar-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+.de-infobar-item__key {
+  color: #90A4AE;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-right: 4px;
+}
+
+.de-infobar-item__val {
+  color: #1565C0;
+  font-weight: 600;
+}
+
+.de-infobar-sep { color: #CFD8DC; margin: 0 4px; }

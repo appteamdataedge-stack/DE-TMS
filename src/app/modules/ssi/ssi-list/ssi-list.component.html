@@ -1,0 +1,82 @@
+<!-- Breadcrumb -->
+<nav class="de-breadcrumb">
+  <a routerLink="/dashboard">Home</a><span class="sep">›</span>
+  <span>Configuration</span><span class="sep">›</span>
+  <span class="current">SSI</span>
+</nav>
+
+<!-- Page Header -->
+<div class="ssi-header">
+  <div>
+    <h1 class="ssi-header__title">Standard Settlement Instructions</h1>
+    <p class="ssi-header__sub">Predefined settlement routing for counterparty transactions</p>
+  </div>
+  <a routerLink="/ssi/create" class="de-btn de-btn--primary">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+      <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+    </svg>
+    New SSI
+  </a>
+</div>
+
+<!-- KPI Strip -->
+<div class="ssi-kpi-strip">
+  <div class="ssi-kpi-item">
+    <span class="ssi-kpi-item__val">{{ ssiList.length }}</span>
+    <span class="ssi-kpi-item__lbl">Total</span>
+  </div>
+  <div class="ssi-kpi-item ssi-kpi-item--active">
+    <span class="ssi-kpi-item__val">{{ activeCount }}</span>
+    <span class="ssi-kpi-item__lbl">Active</span>
+  </div>
+  <div class="ssi-kpi-item">
+    <span class="ssi-kpi-item__val">{{ ssiList.length - activeCount }}</span>
+    <span class="ssi-kpi-item__lbl">Inactive</span>
+  </div>
+  <div class="ssi-kpi-item ssi-kpi-item--currency">
+    <span class="ssi-kpi-item__val">{{ currencySet }}</span>
+    <span class="ssi-kpi-item__lbl">Currencies</span>
+  </div>
+</div>
+
+<!-- Table -->
+<div class="de-card ssi-table-card">
+  <table class="ssi-table">
+    <thead>
+      <tr>
+        <th>SSI ID</th>
+        <th>Currency</th>
+        <th>Counterparty</th>
+        <th>Beneficiary Bank</th>
+        <th>SWIFT / BIC</th>
+        <th>Settlement</th>
+        <th>Correspondent Bank</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (ssi of ssiList; track ssi.id) {
+        <tr class="ssi-table__row">
+          <td><span class="ssi-table__id">{{ ssi.id }}</span></td>
+          <td><span class="de-badge de-badge--navy ssi-ccy-badge">{{ ssi.currency }}</span></td>
+          <td class="ssi-table__name">{{ ssi.counterparty }}</td>
+          <td>{{ ssi.beneficiaryBank }}</td>
+          <td><span class="ssi-table__swift">{{ ssi.beneficiarySwift }}</span></td>
+          <td>{{ ssi.settlementType }}</td>
+          <td>
+            @if (ssi.corrBank !== '—') {
+              <span class="ssi-table__corr">{{ ssi.corrBank }}</span>
+            } @else {
+              <span class="ssi-table__na">—</span>
+            }
+          </td>
+          <td>
+            <span class="de-badge {{ ssi.status === 'ACTIVE' ? 'de-badge--green' : 'de-badge--neutral' }}">
+              {{ ssi.status }}
+            </span>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>

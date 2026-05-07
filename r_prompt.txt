@@ -1,0 +1,281 @@
+Angular Money Market app (dataedge-tms). Fix these issues ONLY.
+Do NOT change any form logic, validators, or API calls.
+
+---
+
+## FIX 1 — bottom-nav and upper-footer: hide on non-create pages
+
+Open both files:
+- src/app/core/layout/bottom-nav/bottom-nav.component.ts
+- src/app/core/layout/upper-footer/upper-footer.component.ts
+
+The current route check is NOT working. Replace the logic completely.
+
+In both components, inject Router and use this exact check:
+
+private allowedRoutes = [
+  '/mm-deal/create',
+  '/portfolio/create',
+  '/partners/create',
+  '/counterparties/create',
+  '/instruments/create',
+  '/gl-master/create',
+  '/products/create',
+  '/ssi/create'
+];
+
+ngOnInit() {
+  this.checkRoute(this.router.url);
+  this.router.events.pipe(
+    filter(e => e instanceof NavigationEnd)
+  ).subscribe((e: NavigationEnd) => {
+    this.checkRoute(e.urlAfterRedirects);
+  });
+}
+
+checkRoute(url: string) {
+  this.show = this.allowedRoutes.some(r => url === r || url.startsWith(r + '?'));
+}
+
+In HTML use: <ng-container *ngIf="show"> ... </ng-container>
+wrapping ALL content inside both components.
+
+---
+
+## FIX 2 — Dropdowns not working: find root cause and fix
+
+Search the ENTIRE project for these patterns and fix each:
+
+PATTERN A — Disabled FormControls blocking dropdown click:
+Search all *.component.ts files for:
+  new FormControl({ value: anything, disabled: true })
+Change ALL of them to:
+  new FormControl(anything)
+If the field must be read-only visually, use [readonly]="true" 
+on the input instead, NOT disabled on FormControl.
+
+PATTERN B — Wrong overlay styles blocking click:
+Open styles.scss. Remove ANY of these if present:
+  pointer-events: none on .cdk-overlay-pane or .cdk-overlay-container
+  visibility: hidden on any overlay class
+  display: none on .mat-mdc-select-panel
+Replace dropdown styles with ONLY:
+.cdk-overlay-container { z-index: 9999 !important; }
+.mat-mdc-select-panel {
+  max-height: 220px !important;
+  overflow-y: auto !important;
+  pointer-events: auto !important;
+  visibility: visible !important;
+}
+
+PATTERN C — Options not loading:
+Search all *.component.ts for mat-select options arrays.
+Ensure every options array is populated in ngOnInit().
+If any array is empty [], add at least the correct static values.
+
+PATTERN D — ChangeDetection issue:
+In any component using ChangeDetectionStrategy.OnPush 
+that has a dropdown, inject ChangeDetectorRef and call
+this.cdr.markForCheck() after setting options in ngOnInit().
+
+---
+
+## FIX 3 — MM Deal create: sidebar stays fixed while page scrolls
+File: mm-deal create component HTML and SCSS
+
+The left sidebar (BASIC INFORMATION section list) must be fixed/sticky
+so it does not scroll with the page content.
+
+In the create page layout, the structure should be:
+<div class="deal-layout">
+  <div class="deal-sidebar">   <!-- sticky -->
+    ... section navigation ...
+  </div>
+  <div class="deal-content">   <!-- scrollable -->
+    ... form fields ...
+  </div>
+</div>
+
+SCSS:
+.deal-layout {
+  display: flex;
+  height: calc(100vh - 100px); /* viewport minus navbar+infobar */
+  overflow: hidden;
+}
+.deal-sidebar {
+  width: 220px;
+  min-width: 220px;
+  height: 100%;
+  overflow-y: auto;
+  position: sticky;
+  top: 0;
+  background: #FAFAFA;
+  border-right: 1px solid #EEEEEE;
+}
+.deal-content {
+  flex: 1;
+  height: 100%;
+  overflow-y: auto;
+  padding: 24px;
+  padding-bottom: 60px;
+}
+
+This makes sidebar stay fixed while only right content area scrolls.
+
+---
+
+## FIX 4 — Modern light theme: international banking grade UI
+
+Apply across the ENTIRE app. CSS/SCSS changes only.
+Do NOT change any HTML structure or TypeScript.
+
+### Color Palette
+--primary: #1565C0
+--primary-light: #E3F2FD
+--accent: #00897B
+--accent-light: #E0F2F1
+--bg-page: #F8F9FB
+--bg-card: #FFFFFF
+--text-primary: #1A237E
+--text-secondary: #546E7A
+--text-muted: #90A4AE
+--border: #E0E0E0
+--success: #2E7D32
+--warning: #F57F17
+--danger: #C62828
+
+### Global
+body, .page-container { background: var(--bg-page) !important; }
+* { font-family: 'Inter', 'Roboto', sans-serif !important; }
+
+### Navbar
+background: #FFFFFF !important;
+border-bottom: 1px solid #E0E0E0 !important;
+box-shadow: 0 1px 4px rgba(0,0,0,0.08) !important;
+color: #1A237E !important;
+
+### Sidebar
+background: #FFFFFF !important;
+border-right: 1px solid #EEEEEE !important;
+.sidebar-item:hover {
+  background: #E3F2FD !important;
+  color: #1565C0 !important;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+.sidebar-item.active {
+  background: #E3F2FD !important;
+  color: #1565C0 !important;
+  border-left: 3px solid #1565C0 !important;
+  font-weight: 600 !important;
+  border-radius: 0 8px 8px 0 !important;
+}
+.sidebar-group-header {
+  color: #90A4AE !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  letter-spacing: 1px !important;
+  text-transform: uppercase !important;
+}
+
+### Cards
+.mat-card, mat-card {
+  border-radius: 12px !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06) !important;
+  border: 1px solid #F0F0F0 !important;
+}
+
+### Tables
+.mat-mdc-header-row {
+  background: #F5F7FA !important;
+}
+.mat-mdc-header-cell {
+  color: #546E7A !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.5px !important;
+  text-transform: uppercase !important;
+}
+.mat-mdc-row:hover {
+  background: #F0F7FF !important;
+  transition: background 0.15s ease !important;
+}
+.mat-mdc-row:nth-child(even) { background: #FAFAFA; }
+
+### Buttons
+.mat-mdc-raised-button.mat-primary {
+  background: #1565C0 !important;
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.3px !important;
+  transition: all 0.2s ease !important;
+}
+.mat-mdc-raised-button.mat-primary:hover {
+  background: #0D47A1 !important;
+  box-shadow: 0 4px 12px rgba(21,101,192,0.3) !important;
+  transform: translateY(-1px) !important;
+}
+.mat-mdc-stroked-button {
+  border-radius: 8px !important;
+  font-weight: 500 !important;
+}
+
+### Form fields
+.mat-mdc-form-field {
+  --mdc-outlined-text-field-focus-outline-color: #1565C0;
+  --mdc-outlined-text-field-label-text-color: #546E7A;
+}
+.mat-mdc-form-field-label {
+  font-size: 13px !important;
+  color: #546E7A !important;
+}
+
+### Animations
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.mat-card, .page-header, .content-section {
+  animation: fadeSlideIn 0.25s ease forwards;
+}
+
+### Status badges
+.badge-active {
+  background: #E8F5E9; color: #2E7D32;
+  border-radius: 20px; padding: 2px 10px;
+  font-size: 12px; font-weight: 600;
+}
+.badge-inactive {
+  background: #FFEBEE; color: #C62828;
+  border-radius: 20px; padding: 2px 10px;
+  font-size: 12px; font-weight: 600;
+}
+.badge-draft {
+  background: #FFF8E1; color: #F57F17;
+  border-radius: 20px; padding: 2px 10px;
+  font-size: 12px; font-weight: 600;
+}
+
+### Login page
+Find the login component. Apply:
+- Page background: linear-gradient(135deg, #E3F2FD 0%, #F8F9FB 100%)
+- Login card: centered, width 420px, border-radius: 16px,
+  box-shadow: 0 8px 32px rgba(21,101,192,0.12)
+  padding: 48px
+- Logo/title at top: DataEdge TMS in #1565C0, font-size: 24px, 
+  font-weight: 700
+- Subtitle: "Treasury Management System" color: #546E7A, 
+  font-size: 13px
+- Input fields: outlined style, border-radius: 8px
+- Login button: full width, background: #1565C0, 
+  border-radius: 8px, height: 44px, font-size: 15px
+- Add subtle fade-in animation on card load
+
+---
+
+## CONSTRAINTS
+- Do NOT change any TypeScript logic beyond FormControl disabled fix
+- Do NOT install new packages
+- Do NOT change any HTML structure
+- FIX 1-3 are functional; FIX 4 is CSS/SCSS only
+- Each fix is fully independent

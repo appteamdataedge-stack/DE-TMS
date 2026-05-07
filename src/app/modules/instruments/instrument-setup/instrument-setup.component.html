@@ -1,0 +1,248 @@
+﻿
+<!-- ─── Breadcrumb ─────────────────────────────────────────────────────────── -->
+<nav class="de-breadcrumb">
+  <a routerLink="/dashboard">Home</a><span class="sep">›</span>
+  <span>Setup</span><span class="sep">›</span>
+  <span class="current">New Instrument</span>
+</nav>
+
+<!-- ─── Page Header ───────────────────────────────────────────────────────── -->
+<div class="inst-page-header">
+  <div>
+    <h1 class="inst-page-header__title">
+      New Instrument
+      <span class="de-badge de-badge--neutral inst-id-badge">{{ instrumentId }}</span>
+    </h1>
+    <p class="inst-page-header__sub">Define a tradeable instrument and submit for authorization</p>
+  </div>
+</div>
+
+<!-- ─── Form ──────────────────────────────────────────────────────────────── -->
+<form [formGroup]="form" (ngSubmit)="onSubmit()" autocomplete="off">
+
+  <!-- ── Card 1: Identity ──────────────────────────────────────────────────── -->
+  <div class="de-card inst-card">
+    <div class="de-card__header">
+      <div class="de-card__icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+        </svg>
+      </div>
+      <h3>Instrument Identity</h3>
+    </div>
+
+    <!-- Instrument Name -->
+    <div class="de-field">
+      <label class="de-label" for="inst-name">
+        Instrument Name <span class="de-required">*</span>
+      </label>
+      <input id="inst-name" type="text" class="de-input"
+             formControlName="name"
+             placeholder="e.g. Fixed Term Deposit — Standard" />
+      @if (form.get('name')?.invalid && form.get('name')?.touched) {
+        <span class="de-field-error">Instrument name is required</span>
+      }
+    </div>
+
+    <!-- Short Code + Type -->
+    <div class="inst-row-2">
+      <div class="de-field">
+        <label class="de-label" for="inst-code">
+          Short Code
+          <span class="de-field-opt">(optional)</span>
+        </label>
+        <input id="inst-code" type="text" class="de-input"
+               formControlName="shortCode"
+               placeholder="e.g. FTD-STD"
+               style="text-transform: uppercase;" />
+      </div>
+
+      <div class="de-field">
+        <label class="de-label">
+          Instrument Type <span class="de-required">*</span>
+        </label>
+        <tms-select
+          [items]="typeOptions"
+          bindLabel="label"
+          bindValue="value"
+          formControlName="instrumentType"
+          placeholder="Select instrument type">
+        </tms-select>
+        @if (form.get('instrumentType')?.invalid && form.get('instrumentType')?.touched) {
+          <span class="de-field-error">Instrument type is required</span>
+        }
+      </div>
+    </div>
+
+    <!-- Category -->
+    <div class="de-field">
+      <label class="de-label">Category</label>
+      <div class="inst-seg">
+        @for (opt of categoryOptions; track opt.value) {
+          <button type="button" class="inst-seg__btn"
+            [class.inst-seg__btn--active]="selectedCategory === opt.value"
+            (click)="setCategory(opt.value)">
+            {{ opt.label }}
+          </button>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Card 2: Pricing & Calculation ─────────────────────────────────────── -->
+  <div class="de-card inst-card">
+    <div class="de-card__header">
+      <div class="de-card__icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <line x1="19" y1="5" x2="5" y2="19"/>
+          <circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/>
+        </svg>
+      </div>
+      <h3>Pricing &amp; Calculation</h3>
+    </div>
+
+    <!-- Pricing Type -->
+    <div class="de-field">
+      <label class="de-label">Pricing Type</label>
+      <div class="inst-pricing-row">
+        <button type="button" class="inst-pricing-btn"
+          [class.inst-pricing-btn--active]="pricingType === 'NORMAL'"
+          (click)="setPricingType('NORMAL')">
+          <svg class="inst-pricing-btn__icon" width="28" height="20" viewBox="0 0 48 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+            <line x1="2" y1="12" x2="46" y2="12"/>
+          </svg>
+          <span class="inst-pricing-btn__label">Normal</span>
+          <span class="inst-pricing-btn__sub">Simple interest, no discount</span>
+        </button>
+        <button type="button" class="inst-pricing-btn"
+          [class.inst-pricing-btn--active]="pricingType === 'DISCOUNTING'"
+          (click)="setPricingType('DISCOUNTING')">
+          <svg class="inst-pricing-btn__icon" width="28" height="20" viewBox="0 0 48 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+            <path d="M2 6 Q24 6 46 18"/>
+          </svg>
+          <span class="inst-pricing-btn__label">Discounting</span>
+          <span class="inst-pricing-btn__sub">Present value / discount rate</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Cashflow -->
+    <div class="de-field">
+      <label class="de-label">Cashflow</label>
+      <div class="inst-seg">
+        <button type="button" class="inst-seg__btn"
+          [class.inst-seg__btn--active]="cashflow === 'SIMPLE'"
+          (click)="setCashflow('SIMPLE')">Simple</button>
+        <button type="button" class="inst-seg__btn"
+          [class.inst-seg__btn--active]="cashflow === 'COMPOUND'"
+          (click)="setCashflow('COMPOUND')">Compound</button>
+      </div>
+    </div>
+
+    <!-- Compounding Toggle -->
+    <div class="de-field">
+      <label class="de-label">Compounding Allowed</label>
+      <label class="inst-toggle">
+        <input type="checkbox" formControlName="compoundingAllowed" />
+        <span class="inst-toggle__track"></span>
+        <span class="inst-toggle__label">{{ compoundingAllowed ? 'Allowed' : 'Not Allowed' }}</span>
+      </label>
+    </div>
+
+    <!-- Day Count Convention -->
+    <div class="de-field">
+      <label class="de-label">Day Count Convention</label>
+      <div class="inst-daycount-grid">
+        @for (opt of dayCountOptions; track opt.value) {
+          <button type="button" class="inst-daycount-btn"
+            [class.inst-daycount-btn--active]="selectedDayCount === opt.value"
+            (click)="setDayCount(opt.value)">
+            <span class="inst-daycount-btn__label">{{ opt.label }}</span>
+            <span class="inst-daycount-btn__sub">{{ opt.sub }}</span>
+          </button>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Card 3: Tenor & Validity ──────────────────────────────────────────── -->
+  <div class="de-card inst-card">
+    <div class="de-card__header">
+      <div class="de-card__icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <rect x="3" y="4" width="18" height="18" rx="2"/>
+          <line x1="3" y1="10" x2="21" y2="10"/>
+          <line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/>
+        </svg>
+      </div>
+      <h3>Tenor &amp; Validity</h3>
+    </div>
+
+    <div class="inst-row-2">
+      <!-- Default Tenor (days) — optional -->
+      <div class="de-field">
+        <label class="de-label" for="inst-tenor">
+          Default Tenor
+          <span class="de-field-opt">(optional)</span>
+        </label>
+        <div class="inst-input-suffix-wrap">
+          <input id="inst-tenor" type="number" class="de-input inst-input-has-suffix"
+                 formControlName="defaultTenor"
+                 min="1" max="3650"
+                 placeholder="e.g. 91" />
+          <span class="inst-input-suffix">days</span>
+        </div>
+        <span class="de-field-hint">Standard maturity period for this instrument</span>
+      </div>
+
+      <!-- Effective Date -->
+      <div class="de-field">
+        <label class="de-label" for="inst-eff-date">
+          Effective Date <span class="de-required">*</span>
+        </label>
+        <input id="inst-eff-date" type="date" class="de-input"
+               formControlName="effectiveDate" />
+        @if (form.get('effectiveDate')?.invalid && form.get('effectiveDate')?.touched) {
+          <span class="de-field-error">Effective date is required</span>
+        }
+      </div>
+    </div>
+
+    <!-- Status Toggle -->
+    <div class="de-field">
+      <label class="de-label">Status</label>
+      <label class="inst-toggle">
+        <input type="checkbox" formControlName="status" />
+        <span class="inst-toggle__track"></span>
+        <span class="inst-toggle__label inst-toggle__label--{{ statusActive ? 'active' : 'inactive' }}">
+          {{ statusActive ? 'Active' : 'Inactive' }}
+        </span>
+      </label>
+      <span class="de-field-hint">
+        @if (statusActive) { Instrument is available for deal booking immediately on authorization. }
+        @else { Instrument will be created but not available for booking. }
+      </span>
+    </div>
+  </div>
+
+</form>
+
+
+<!-- ─── Toast ─────────────────────────────────────────────────────────────── -->
+@if (toastVisible) {
+  <div class="de-toast-container">
+    <div class="de-toast" [class.de-toast--success]="toastType === 'success'">
+      @if (toastType === 'success') {
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+      } @else {
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+      }
+      {{ toastMessage }}
+    </div>
+  </div>
+}
+

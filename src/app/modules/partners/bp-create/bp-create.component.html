@@ -1,0 +1,548 @@
+﻿
+<!-- ─── Breadcrumb ─────────────────────────────────────────────────────────── -->
+<nav class="de-breadcrumb">
+  <a routerLink="/dashboard">Home</a><span class="sep">›</span>
+  <span>Configuration</span><span class="sep">›</span>
+  <span>Business Partners</span><span class="sep">›</span>
+  <span class="current">New Business Partner</span>
+</nav>
+
+<!-- ─── Page Header ───────────────────────────────────────────────────────── -->
+<div class="bp-page-header">
+  <div>
+    <h1 class="de-page-header" style="margin-bottom:0">
+      <span style="display:flex;align-items:center;gap:12px">
+        New Business Partner
+        <span class="de-badge de-badge--neutral" style="font-family:var(--font-mono);font-size:12px">
+          {{ generatedBpId }}
+        </span>
+      </span>
+    </h1>
+    <p class="bp-page-sub">Select a category, fill in the required fields, and submit for approval.</p>
+  </div>
+  <div class="bp-status-row">
+    <span class="bp-status-chip" [class.bp-status-chip--active]="statusActive">
+      <span class="bp-status-chip__dot"></span>
+      {{ statusActive ? 'Active' : 'Inactive' }}
+    </span>
+    @if (isBlacklisted) {
+      <span class="bp-status-chip bp-status-chip--bl">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+        Blacklisted
+      </span>
+    }
+  </div>
+</div>
+
+<!-- ─── Category Tiles ───────────────────────────────────────────────────── -->
+<div class="bp-cat-grid">
+
+  <button type="button" class="bp-cat-tile"
+    [class.bp-cat-tile--active]="category === 'INDIVIDUAL'"
+    (click)="setCategory('INDIVIDUAL')">
+    <div class="bp-cat-tile__icon bp-cat-tile__icon--indiv">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+        <circle cx="12" cy="7" r="4"/>
+      </svg>
+    </div>
+    <div class="bp-cat-tile__body">
+      <span class="bp-cat-tile__title">Individual</span>
+      <span class="bp-cat-tile__sub">Personal / Employee</span>
+      <span class="bp-cat-tile__prefix">BP ID prefix: <strong>1xxx</strong></span>
+    </div>
+    @if (category === 'INDIVIDUAL') {
+      <span class="bp-cat-tile__check">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg>
+      </span>
+    }
+  </button>
+
+  <button type="button" class="bp-cat-tile"
+    [class.bp-cat-tile--active]="category === 'CORPORATE'"
+    (click)="setCategory('CORPORATE')">
+    <div class="bp-cat-tile__icon bp-cat-tile__icon--corp">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="2" y="7" width="20" height="14" rx="2"/>
+        <path d="M16 7V5a2 2 0 0 0-4 0v2M8 7V5a2 2 0 0 0-4 0v2"/>
+        <line x1="8" y1="12" x2="16" y2="12"/>
+      </svg>
+    </div>
+    <div class="bp-cat-tile__body">
+      <span class="bp-cat-tile__title">Corporate</span>
+      <span class="bp-cat-tile__sub">Company / Entity</span>
+      <span class="bp-cat-tile__prefix">BP ID prefix: <strong>2xxx</strong></span>
+    </div>
+    @if (category === 'CORPORATE') {
+      <span class="bp-cat-tile__check">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg>
+      </span>
+    }
+  </button>
+
+  <button type="button" class="bp-cat-tile"
+    [class.bp-cat-tile--active]="category === 'BANK'"
+    (click)="setCategory('BANK')">
+    <div class="bp-cat-tile__icon bp-cat-tile__icon--bank">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="3" y1="22" x2="21" y2="22"/>
+        <line x1="6" y1="18" x2="6" y2="11"/>
+        <line x1="10" y1="18" x2="10" y2="11"/>
+        <line x1="14" y1="18" x2="14" y2="11"/>
+        <line x1="18" y1="18" x2="18" y2="11"/>
+        <polygon points="12 2 20 7 4 7"/>
+      </svg>
+    </div>
+    <div class="bp-cat-tile__body">
+      <span class="bp-cat-tile__title">Bank</span>
+      <span class="bp-cat-tile__sub">Bank / Financial Institution</span>
+      <span class="bp-cat-tile__prefix">BP ID prefix: <strong>3xxx</strong></span>
+    </div>
+    @if (category === 'BANK') {
+      <span class="bp-cat-tile__check">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg>
+      </span>
+    }
+  </button>
+
+</div>
+
+<!-- ─── Blacklist Banner ──────────────────────────────────────────────────── -->
+@if (isBlacklisted) {
+  <div class="bp-bl-banner" @bannerSlide>
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0">
+      <circle cx="12" cy="12" r="10"/>
+      <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/>
+    </svg>
+    <div>
+      <strong>Blacklist flag is set.</strong>
+      This business partner will be restricted from deal participation. Ensure compliance approval has been obtained before submitting.
+    </div>
+  </div>
+}
+
+<!-- ══════════════════ INDIVIDUAL FORM ═══════════════════════════════════════ -->
+@if (category === 'INDIVIDUAL') {
+  <div @cardSlide>
+    <form [formGroup]="individualForm" autocomplete="off">
+
+      <!-- Card: Personal Information -->
+      <div class="de-card bp-card">
+        <div class="de-card__header">
+          <div class="de-card__icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+            </svg>
+          </div>
+          <h3>Personal Information</h3>
+        </div>
+
+        <div class="de-grid-3">
+          <div class="de-field">
+            <label>First Name <span class="bp-req">*</span></label>
+            <input type="text" class="de-input" formControlName="firstName"
+              [class.is-invalid]="individualForm.get('firstName')!.invalid && individualForm.get('firstName')!.touched"
+              placeholder="First name" />
+            @if (individualForm.get('firstName')!.invalid && individualForm.get('firstName')!.touched) {
+              <span class="de-error">First name is required</span>
+            }
+          </div>
+          <div class="de-field">
+            <label>Middle Name <span class="bp-opt">optional</span></label>
+            <input type="text" class="de-input" formControlName="middleName" placeholder="Middle name" />
+          </div>
+          <div class="de-field">
+            <label>Last Name <span class="bp-req">*</span></label>
+            <input type="text" class="de-input" formControlName="lastName"
+              [class.is-invalid]="individualForm.get('lastName')!.invalid && individualForm.get('lastName')!.touched"
+              placeholder="Last name" />
+            @if (individualForm.get('lastName')!.invalid && individualForm.get('lastName')!.touched) {
+              <span class="de-error">Last name is required</span>
+            }
+          </div>
+        </div>
+
+        <div class="de-grid-2" style="margin-top:20px">
+          <div class="de-field">
+            <label>Date of Birth <span class="bp-opt">optional</span></label>
+            <input type="date" class="de-input" formControlName="dob" [max]="today" />
+          </div>
+          <div class="de-field">
+            <label>Email Address <span class="bp-opt">optional</span></label>
+            <input type="email" class="de-input" formControlName="email" placeholder="email@domain.com"
+              [class.is-invalid]="individualForm.get('email')!.invalid && individualForm.get('email')!.touched" />
+            @if (individualForm.get('email')!.invalid && individualForm.get('email')!.touched) {
+              <span class="de-error">Enter a valid email address</span>
+            }
+          </div>
+        </div>
+
+        <div class="de-grid-2" style="margin-top:20px">
+          <div class="de-field">
+            <label>Mobile No. <span class="bp-req">*</span></label>
+            <div class="bp-phone-group" [class.bp-phone-group--invalid]="individualForm.get('mobile')!.invalid && individualForm.get('mobile')!.touched">
+              <div class="bp-phone-group__isd">
+                <tms-select formControlName="isdCode" [items]="isdOptions" bindValue="value" bindLabel="label"
+                  [clearable]="false" [searchable]="false"></tms-select>
+              </div>
+              <div class="bp-phone-group__div"></div>
+              <input type="tel" class="de-input bp-phone-group__num" formControlName="mobile" placeholder="Mobile number" />
+            </div>
+            @if (individualForm.get('mobile')!.invalid && individualForm.get('mobile')!.touched) {
+              <span class="de-error">Mobile number is required</span>
+            }
+          </div>
+        </div>
+      </div>
+
+    </form>
+  </div>
+}
+
+<!-- ══════════════════ CORPORATE FORM ════════════════════════════════════════ -->
+@if (category === 'CORPORATE') {
+  <div @cardSlide>
+    <form [formGroup]="corporateForm" autocomplete="off">
+
+      <div class="de-card bp-card">
+        <div class="de-card__header">
+          <div class="de-card__icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="7" width="20" height="14" rx="2"/>
+              <path d="M16 7V5a2 2 0 0 0-4 0v2M8 7V5a2 2 0 0 0-4 0v2"/>
+            </svg>
+          </div>
+          <h3>Entity Information</h3>
+        </div>
+
+        <div class="de-grid-2">
+          <div class="de-field">
+            <label>Entity Name <span class="bp-req">*</span></label>
+            <input type="text" class="de-input" formControlName="entityName" placeholder="Full legal name"
+              [class.is-invalid]="corporateForm.get('entityName')!.invalid && corporateForm.get('entityName')!.touched" />
+            @if (corporateForm.get('entityName')!.invalid && corporateForm.get('entityName')!.touched) {
+              <span class="de-error">Entity name is required</span>
+            }
+          </div>
+          <div class="de-field">
+            <label>Short Name <span class="bp-opt">optional</span></label>
+            <input type="text" class="de-input" formControlName="shortName" placeholder="Abbreviated name" />
+          </div>
+          <div class="de-field">
+            <label>Date of Incorporation <span class="bp-opt">optional</span></label>
+            <input type="date" class="de-input" formControlName="dateOfIncorp" [max]="today" />
+          </div>
+          <div class="de-field">
+            <label>Constitution <span class="bp-req">*</span></label>
+            <tms-select formControlName="constitution" [items]="constitutionOptions" bindValue="value" bindLabel="label"
+              [clearable]="false" placeholder="Select…"
+              [class.is-invalid]="corporateForm.get('constitution')!.invalid && corporateForm.get('constitution')!.touched">
+            </tms-select>
+            @if (corporateForm.get('constitution')!.invalid && corporateForm.get('constitution')!.touched) {
+              <span class="de-error">Constitution is required</span>
+            }
+          </div>
+          <div class="de-field">
+            <label>Contact Person <span class="bp-opt">optional</span></label>
+            <input type="text" class="de-input" formControlName="contactPerson" placeholder="Contact person name" />
+          </div>
+          <div class="de-field">
+            <label>Designation <span class="bp-opt">optional</span></label>
+            <input type="text" class="de-input" formControlName="designation" placeholder="e.g. Director" />
+          </div>
+          <div class="de-field">
+            <label>Mobile <span class="bp-opt">optional</span></label>
+            <div class="bp-phone-group">
+              <div class="bp-phone-group__isd">
+                <tms-select formControlName="isdCode" [items]="isdOptions" bindValue="value" bindLabel="label"
+                  [clearable]="false" [searchable]="false"></tms-select>
+              </div>
+              <div class="bp-phone-group__div"></div>
+              <input type="tel" class="de-input bp-phone-group__num" formControlName="mobile" placeholder="Mobile number" />
+            </div>
+          </div>
+          <div class="de-field">
+            <label>Email <span class="bp-opt">optional</span></label>
+            <input type="email" class="de-input" formControlName="email" placeholder="email@domain.com"
+              [class.is-invalid]="corporateForm.get('email')!.invalid && corporateForm.get('email')!.touched" />
+            @if (corporateForm.get('email')!.invalid && corporateForm.get('email')!.touched) {
+              <span class="de-error">Enter a valid email address</span>
+            }
+          </div>
+        </div>
+      </div>
+
+    </form>
+  </div>
+}
+
+<!-- ══════════════════ BANK FORM ══════════════════════════════════════════════ -->
+@if (category === 'BANK') {
+  <div @cardSlide>
+    <form [formGroup]="bankForm" autocomplete="off">
+
+      <div class="de-card bp-card">
+        <div class="de-card__header">
+          <div class="de-card__icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="3" y1="22" x2="21" y2="22"/>
+              <line x1="6" y1="18" x2="6" y2="11"/>
+              <line x1="10" y1="18" x2="10" y2="11"/>
+              <line x1="14" y1="18" x2="14" y2="11"/>
+              <line x1="18" y1="18" x2="18" y2="11"/>
+              <polygon points="12 2 20 7 4 7"/>
+            </svg>
+          </div>
+          <h3>Bank Information</h3>
+        </div>
+
+        <div class="de-grid-2">
+          <div class="de-field">
+            <label>Bank Name <span class="bp-req">*</span></label>
+            <input type="text" class="de-input" formControlName="bankName" placeholder="Full bank name"
+              [class.is-invalid]="bankForm.get('bankName')!.invalid && bankForm.get('bankName')!.touched" />
+            @if (bankForm.get('bankName')!.invalid && bankForm.get('bankName')!.touched) {
+              <span class="de-error">Bank name is required</span>
+            }
+          </div>
+          <div class="de-field">
+            <label>Branch Name <span class="bp-opt">optional</span></label>
+            <input type="text" class="de-input" formControlName="branchName" placeholder="Branch or head office" />
+          </div>
+          <div class="de-field">
+            <label>Short Name <span class="bp-opt">optional</span></label>
+            <input type="text" class="de-input" formControlName="shortName" placeholder="e.g. SONALI" />
+          </div>
+          <div class="de-field">
+            <label>Country <span class="bp-req">*</span></label>
+            <tms-select formControlName="country" [items]="countryOptions" bindValue="value" bindLabel="label"
+              [clearable]="false" placeholder="Select country"
+              [class.is-invalid]="bankForm.get('country')!.invalid && bankForm.get('country')!.touched">
+            </tms-select>
+            @if (bankForm.get('country')!.invalid && bankForm.get('country')!.touched) {
+              <span class="de-error">Country is required</span>
+            }
+          </div>
+          <div class="de-field">
+            <label>SWIFT Code <span class="bp-opt">optional</span></label>
+            <input type="text" class="de-input" formControlName="swiftCode" placeholder="e.g. SONABDDH"
+              style="text-transform:uppercase"
+              [class.is-invalid]="bankForm.get('swiftCode')!.invalid && bankForm.get('swiftCode')!.touched" />
+            @if (bankForm.get('swiftCode')!.errors?.['swiftFormat'] && bankForm.get('swiftCode')!.touched) {
+              <span class="de-error">Invalid SWIFT format (e.g. SONABDDH or SONABDDH001)</span>
+            }
+            <span class="de-hint">Format: 6 alpha + 2 alphanumeric + optional 3 alphanumeric</span>
+          </div>
+          <div class="de-field">
+            <label>Routing No. <span class="bp-opt">optional</span></label>
+            <input type="text" class="de-input" formControlName="routingNo" placeholder="National routing number" />
+          </div>
+          <div class="de-field">
+            <label>Contact Person <span class="bp-opt">optional</span></label>
+            <input type="text" class="de-input" formControlName="contactPerson" placeholder="Contact person name" />
+          </div>
+          <div class="de-field">
+            <label>Designation <span class="bp-opt">optional</span></label>
+            <input type="text" class="de-input" formControlName="designation" placeholder="e.g. Relationship Manager" />
+          </div>
+          <div class="de-field" style="grid-column:1/-1">
+            <label>Mobile <span class="bp-opt">optional</span></label>
+            <div class="bp-phone-group" style="max-width:360px">
+              <div class="bp-phone-group__isd">
+                <tms-select formControlName="isdCode" [items]="isdOptions" bindValue="value" bindLabel="label"
+                  [clearable]="false" [searchable]="false"></tms-select>
+              </div>
+              <div class="bp-phone-group__div"></div>
+              <input type="tel" class="de-input bp-phone-group__num" formControlName="mobile" placeholder="Mobile number" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </form>
+  </div>
+}
+
+<!-- ─── Addresses (multi-record, common) ─────────────────────────────────── -->
+<div class="de-card bp-card">
+  <div class="de-card__header">
+    <div class="de-card__icon">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+        <circle cx="12" cy="10" r="3"/>
+      </svg>
+    </div>
+    <h3>Addresses</h3>
+    <span class="de-badge de-badge--neutral" style="margin-left:auto;font-family:var(--font-mono)">
+      {{ addresses.length }} address{{ addresses.length !== 1 ? 'es' : '' }}
+    </span>
+  </div>
+
+  @for (addr of addresses; track $index) {
+    <div class="bp-addr-record" [class.bp-addr-record--first]="$index === 0">
+      <div class="bp-addr-record__hdr">
+        <span class="bp-addr-record__num">Address {{ $index + 1 }}</span>
+        @if (addresses.length > 1) {
+          <button type="button" class="bp-addr-remove" (click)="removeAddress($index)">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+            Remove
+          </button>
+        }
+      </div>
+      <div class="de-grid-2">
+        <div class="de-field">
+          <label>Address Type</label>
+          <tms-select [(ngModel)]="addr.type" [items]="addressTypeOptions" bindValue="value" bindLabel="label"
+            [clearable]="false" [searchable]="false"></tms-select>
+        </div>
+        <div class="de-field">
+          <label>House / Plot No. <span class="bp-opt">optional</span></label>
+          <input type="text" class="de-input" [(ngModel)]="addr.housePlot" placeholder="House or plot number" />
+        </div>
+        <div class="de-field">
+          <label>Road No. / Address Line 1 <span class="bp-req">*</span></label>
+          <input type="text" class="de-input" [(ngModel)]="addr.road" placeholder="Road no. or address line 1" />
+        </div>
+        <div class="de-field">
+          <label>Address Line 2 <span class="bp-opt">optional</span></label>
+          <input type="text" class="de-input" [(ngModel)]="addr.line2" placeholder="Additional address details" />
+        </div>
+        <div class="de-field">
+          <label>City <span class="bp-req">*</span></label>
+          <input type="text" class="de-input" [(ngModel)]="addr.city" placeholder="City" />
+        </div>
+        <div class="de-field">
+          <label>Zip / Pin Code <span class="bp-opt">optional</span></label>
+          <input type="text" class="de-input" [(ngModel)]="addr.zipPin" placeholder="Postal code" />
+        </div>
+        <div class="de-field">
+          <label>State <span class="bp-opt">optional</span></label>
+          <input type="text" class="de-input" [(ngModel)]="addr.state" placeholder="State / Province" />
+        </div>
+        <div class="de-field">
+          <label>Country <span class="bp-req">*</span></label>
+          <tms-select [(ngModel)]="addr.country" [items]="countryOptions" bindValue="value" bindLabel="label"
+            [clearable]="false" placeholder="Select country"></tms-select>
+        </div>
+      </div>
+    </div>
+  }
+
+  <div class="bp-addr-add-row">
+    <button type="button" class="de-btn de-btn--outline de-btn--sm" (click)="addAddress()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
+      Add Address
+    </button>
+  </div>
+</div>
+
+<!-- ─── Common Fields ────────────────────────────────────────────────────── -->
+<form [formGroup]="commonForm" autocomplete="off">
+  <div class="de-card bp-card">
+    <div class="de-card__header">
+      <div class="de-card__icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>
+      </div>
+      <h3>General &amp; Control</h3>
+    </div>
+
+    <div class="de-grid-2">
+
+      <div class="de-field">
+        <label>BP ID</label>
+        <input type="text" class="de-input" [value]="generatedBpId" readonly
+          style="font-family:var(--font-mono);background:var(--de-neutral-50)" />
+        <span class="de-hint">Auto-generated. Prefix determined by category.</span>
+      </div>
+
+      <div class="de-field">
+        <label>Effective Date <span class="bp-req">*</span></label>
+        <input type="date" class="de-input" formControlName="effectiveDate"
+          [class.is-invalid]="commonForm.get('effectiveDate')!.invalid && commonForm.get('effectiveDate')!.touched" />
+        @if (commonForm.get('effectiveDate')!.invalid && commonForm.get('effectiveDate')!.touched) {
+          <span class="de-error">Effective date is required</span>
+        }
+      </div>
+
+      <div class="de-field">
+        <label>BP Status</label>
+        <div class="bp-toggle-row">
+          <button type="button" class="mm-toggle" [class.mm-toggle--on]="statusActive"
+            (click)="commonForm.patchValue({ status: !statusActive })">
+            <span class="mm-toggle__track"></span>
+            <span class="mm-toggle__thumb"></span>
+          </button>
+          <span class="mm-toggle-label">{{ statusActive ? 'Active' : 'Inactive' }}</span>
+        </div>
+      </div>
+
+      <div class="de-field">
+        <label>Blacklisted</label>
+        <div class="bp-toggle-row">
+          <button type="button" class="mm-toggle" [class.mm-toggle--on]="isBlacklisted"
+            (click)="commonForm.patchValue({ blacklisted: !isBlacklisted })">
+            <span class="mm-toggle__track" [style.background]="isBlacklisted ? 'var(--de-red)' : null"></span>
+            <span class="mm-toggle__thumb"></span>
+          </button>
+          <span class="mm-toggle-label" [style.color]="isBlacklisted ? 'var(--de-red)' : null">
+            {{ isBlacklisted ? 'Yes — Blacklisted' : 'No' }}
+          </span>
+        </div>
+      </div>
+
+      <div class="de-field" style="grid-column:1/-1">
+        <label>Remarks <span class="bp-opt">optional</span></label>
+        <textarea class="de-input" formControlName="remarks" rows="3"
+          placeholder="Internal notes or compliance comments…"></textarea>
+      </div>
+
+    </div>
+
+    <!-- Currency Scope -->
+    <div class="bp-section-label" style="margin-top:20px">Currency Scope</div>
+    <div class="bp-seg-row">
+      <button type="button" class="bp-seg-btn" [class.bp-seg-btn--active]="currencyScope === 'ALL'"
+        (click)="commonForm.patchValue({ currencyScope: 'ALL' })">All Currencies</button>
+      <button type="button" class="bp-seg-btn" [class.bp-seg-btn--active]="currencyScope === 'SELECTED'"
+        (click)="commonForm.patchValue({ currencyScope: 'SELECTED' })">Selected</button>
+    </div>
+    @if (currencyScope === 'SELECTED') {
+      <div class="bp-ccy-chips" style="margin-top:10px">
+        @for (c of currencyScopeOptions; track c) {
+          <button type="button" class="bp-ccy-chip"
+            [class.bp-ccy-chip--active]="selectedCurrencies.includes(c)"
+            (click)="toggleCurrency(c)">{{ c }}</button>
+        }
+      </div>
+    }
+
+    <!-- Maker-Checker note -->
+    <div class="bp-mk-note">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0">
+        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+      Submission triggers the Maker-Checker workflow. The record will be active only after authorization.
+      Audit trail is logged automatically.
+    </div>
+  </div>
+</form>
+
+
+<!-- ─── Toast ────────────────────────────────────────────────────────────── -->
+@if (toastVisible) {
+  <div class="de-toast-container">
+    <div class="de-toast de-toast--success">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <polyline points="20 6 9 17 4 12"/>
+      </svg>
+      {{ toastMessage }}
+    </div>
+  </div>
+}
+

@@ -1,0 +1,142 @@
+Angular Money Market app (dataedge-tms). Fix these 3 issues ONLY.
+Do NOT change any logic, API calls, or other files.
+
+---
+
+## FIX 1 — User Management: Create User and Create Group buttons not working
+
+Find: src/app/features/user-management/ component files.
+
+Check these causes and fix:
+A — Button has type="submit" inside a form but form has no (ngSubmit) handler.
+    Add (ngSubmit)="createUser()" on the form tag, OR
+    change button to type="button" with (click)="createUser()"
+
+B — The createUser() / createGroup() method exists but is empty or has a 
+    return/guard blocking execution. Remove the guard or implement the logic.
+
+C — Button is disabled due to form invalid state even when fields are filled.
+    Check [disabled]="form.invalid" — if form has extra validators failing,
+    either fix validators or remove the disabled binding temporarily.
+
+D — Router or modal not opening: if clicking should open a dialog/modal,
+    check that MatDialog or the modal component is properly injected and called.
+
+Fix whichever cause applies. After fix:
+- Clicking "Create User" must open the user creation form/dialog
+- Clicking "Create Group" must open the group creation form/dialog
+- Saving must add the new record to the list
+
+---
+
+## FIX 2 — app-upper-footer: position above de-footer, inside shell
+
+FROM DOM the shell structure is:
+<div class="shell-aside">...</div>
+<div class="shell-main">
+  <div class="shell-nav">...</div>
+  <de-bottom-nav *ngIf="showInfoBar"></de-bottom-nav>
+  <div class="shell-inside">...</div>
+  <de-footer>...</de-footer>
+</div>
+
+Change shell.component.html to place app-upper-footer 
+BETWEEN shell-inside and de-footer:
+
+<div class="shell-main">
+  <div class="shell-nav">...</div>
+  <de-bottom-nav *ngIf="showInfoBar"></de-bottom-nav>
+  <div class="shell-inside">...</div>
+  <app-upper-footer *ngIf="showFooter"></app-upper-footer>  ← here
+  <de-footer></de-footer>
+</div>
+
+In upper-footer.component.scss change position from fixed to:
+:host { display: block; width: 100%; }
+.uf {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 52px;
+  padding: 0 24px;
+  background: #FFFFFF;
+  border-top: 1px solid #E0E0E0;
+  border-bottom: 1px solid #E0E0E0;
+  box-shadow: 0 -2px 8px rgba(0,0,0,0.06);
+}
+.uf__message {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 12px; color: #757575;
+}
+.uf__actions { display: flex; gap: 8px; align-items: center; }
+.uf__cancel {
+  padding: 6px 16px; border: 1px solid #B0BEC5;
+  border-radius: 6px; background: transparent;
+  color: #546E7A; cursor: pointer; font-size: 13px;
+}
+.uf__draft {
+  padding: 6px 16px; border: 1px solid #1565C0;
+  border-radius: 6px; background: transparent;
+  color: #1565C0; cursor: pointer; font-size: 13px;
+}
+.uf__submit {
+  padding: 6px 16px; border: none; border-radius: 6px;
+  background: #1565C0; color: #FFFFFF;
+  cursor: pointer; font-size: 13px;
+  display: flex; align-items: center; gap: 6px;
+}
+
+Remove padding-bottom: 60px from shell-inside since footer is no longer fixed.
+
+---
+
+## FIX 3 — tms-select dropdown list cut off / partially visible
+
+The dropdown .tms-panel is clipped by a parent container with 
+overflow: hidden or overflow: auto.
+
+STEP A — In tms-select.component.scss ensure:
+:host { position: relative; display: block; }
+.tms-panel {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  z-index: 9999;
+  max-height: 220px;
+  overflow-y: auto;
+  background: #FFFFFF;
+  border: 1px solid #E0E0E0;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  margin-top: 2px;
+}
+
+STEP B — Find parent containers that clip the dropdown.
+Search ALL component SCSS files for:
+  overflow: hidden
+  overflow: auto  
+  overflow: scroll
+on these classes: .de-card, .dc-main, .dc-panel, .shell-inside,
+.de-grid-2, .mm-field, .de-field, .dc-layout, .dc-sidebar
+
+For each found, change overflow to:
+  overflow: visible
+BUT only if that element does not need scroll for its own content.
+If it needs scroll, add instead:
+  overflow: visible
+  position: relative
+
+STEP C — In styles.scss add:
+.tms-panel {
+  z-index: 9999 !important;
+}
+
+---
+
+## CONSTRAINTS
+- Only touch: user-management component, shell.component.html,
+  upper-footer component SCSS, tms-select component SCSS,
+  and component SCSS files where overflow:hidden is found
+- Do NOT change any form logic, bindings, or API calls
+- Do NOT install new packages

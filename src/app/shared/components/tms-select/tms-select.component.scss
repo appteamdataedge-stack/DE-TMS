@@ -1,0 +1,249 @@
+// ── Host ──────────────────────────────────────────────────────────────────
+
+:host {
+  display: block !important;
+  position: relative !important;
+}
+
+// ── Trigger ───────────────────────────────────────────────────────────────
+
+.tms-trigger {
+  display: flex;
+  align-items: center;
+  min-height: 38px;
+  padding: 5px 10px;
+  background: #fff;
+  border: 1px solid var(--de-neutral-200);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  gap: 6px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  font-size: 13px;
+  color: var(--de-neutral-800);
+  user-select: none;
+
+  &:hover:not(.tms-trigger--disabled) {
+    border-color: var(--de-neutral-400);
+  }
+
+  &--open {
+    border-color: var(--de-teal);
+    box-shadow: 0 0 0 3px var(--de-teal-light);
+    outline: none;
+  }
+
+  &--disabled {
+    background: var(--de-neutral-50);
+    opacity: 0.6;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+}
+
+.tms-trigger__content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+
+.tms-trigger__icons {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+// ── Value / Placeholder ───────────────────────────────────────────────────
+
+.tms-placeholder {
+  color: var(--de-neutral-400);
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tms-value {
+  font-size: 13px;
+  color: var(--de-neutral-800);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+// ── Tags (multi-select chips inside trigger) ──────────────────────────────
+
+.tms-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.tms-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  background: var(--de-teal-light);
+  color: var(--de-teal-dark);
+  border-radius: 100px;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.tms-tag__x {
+  display: flex;
+  align-items: center;
+  background: none;
+  border: none;
+  padding: 0 0 0 2px;
+  cursor: pointer;
+  color: var(--de-teal-dark);
+  opacity: 0.65;
+  line-height: 1;
+
+  &:hover { opacity: 1; }
+}
+
+// ── Trigger Icons ─────────────────────────────────────────────────────────
+
+.tms-clear {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  padding: 3px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  color: var(--de-neutral-400);
+  line-height: 1;
+
+  &:hover { color: var(--de-neutral-700); }
+}
+
+.tms-chevron {
+  color: var(--de-neutral-400);
+  transition: transform 0.15s ease;
+  flex-shrink: 0;
+
+  &--open {
+    transform: rotate(180deg);
+    color: var(--de-teal);
+  }
+}
+
+// ── Floating Panel ────────────────────────────────────────────────────────
+
+.tms-panel {
+  position: fixed !important;
+  z-index: 99999 !important;
+  background: #FFFFFF !important;
+  border: 1px solid #E0E0E0 !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.14) !important;
+  max-height: 220px !important;
+  overflow-y: auto !important;
+  min-width: 200px !important;
+}
+
+// ── Search ────────────────────────────────────────────────────────────────
+
+.tms-search {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--de-neutral-100);
+}
+
+.tms-search__icon {
+  color: var(--de-neutral-400);
+  flex-shrink: 0;
+}
+
+.tms-search__input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 13px;
+  color: var(--de-neutral-800);
+  background: transparent;
+  font-family: var(--font-ui);
+
+  &::placeholder { color: var(--de-neutral-400); }
+}
+
+// ── Options ───────────────────────────────────────────────────────────────
+
+.tms-options {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.tms-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 9px 12px;
+  cursor: pointer;
+  transition: background 0.1s;
+
+  &:hover { background: var(--de-neutral-50); }
+
+  &--selected {
+    background: #EBF9F7;
+
+    .tms-option__label {
+      color: var(--de-teal-dark);
+      font-weight: 600;
+    }
+  }
+
+  &:not(:last-child) {
+    border-bottom: 1px solid var(--de-neutral-50);
+  }
+}
+
+.tms-option__body {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.tms-option__label {
+  font-size: 13px;
+  color: var(--de-neutral-800);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tms-option__sub {
+  font-size: 11px;
+  color: var(--de-neutral-500);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tms-option__check {
+  color: var(--de-teal);
+  flex-shrink: 0;
+}
+
+// ── Empty ─────────────────────────────────────────────────────────────────
+
+.tms-empty {
+  padding: 16px 12px;
+  font-size: 13px;
+  color: var(--de-neutral-400);
+  text-align: center;
+}

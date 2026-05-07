@@ -1,0 +1,296 @@
+﻿
+<!-- Breadcrumb -->
+<nav class="de-breadcrumb">
+  <a routerLink="/dashboard">Home</a><span class="sep">›</span>
+  <a routerLink="/ssi">SSI</a><span class="sep">›</span>
+  <span class="current">New SSI</span>
+</nav>
+
+<!-- Page Header -->
+<div class="ssi-page-header">
+  <div>
+    <h1 class="ssi-page-header__title">
+      New Settlement Instruction
+      <span class="de-badge de-badge--neutral ssi-id-badge">{{ ssiId }}</span>
+    </h1>
+    <p class="ssi-page-header__sub">Define a standard settlement instruction and submit for authorization</p>
+  </div>
+</div>
+
+<!-- Form -->
+<form [formGroup]="form" (ngSubmit)="onSubmit()" autocomplete="off">
+
+  <!-- ── Card 1: SSI Identity ──────────────────────────────────────────────── -->
+  <div class="de-card ssi-form-card">
+    <div class="de-card__header">
+      <div class="de-card__icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <rect x="1" y="4" width="22" height="16" rx="2"/>
+          <line x1="1" y1="10" x2="23" y2="10"/>
+        </svg>
+      </div>
+      <h3>SSI Identity</h3>
+    </div>
+
+    <!-- SSI ID (readonly) -->
+    <div class="de-field">
+      <label class="de-label" for="ssi-id">SSI Reference</label>
+      <div class="ssi-readonly-wrap">
+        <input id="ssi-id" type="text" class="de-input ssi-readonly-input"
+               [value]="ssiId" readonly />
+        <span class="ssi-readonly-badge">Auto-generated</span>
+      </div>
+    </div>
+
+    <!-- Currency + Settlement Type -->
+    <div class="ssi-row-2">
+      <div class="de-field">
+        <label class="de-label">
+          Currency <span class="de-required">*</span>
+        </label>
+        <tms-select
+          [items]="currencyOptions"
+          bindLabel="label"
+          bindValue="value"
+          formControlName="currency"
+          placeholder="Select currency">
+        </tms-select>
+        @if (form.get('currency')?.invalid && form.get('currency')?.touched) {
+          <span class="de-field-error">Currency is required</span>
+        }
+      </div>
+
+      <div class="de-field">
+        <label class="de-label">Settlement Type</label>
+        <div class="ssi-seg">
+          @for (opt of settlementOptions; track opt.value) {
+            <button type="button" class="ssi-seg__btn"
+              [class.ssi-seg__btn--active]="selectedSettlement === opt.value"
+              (click)="setSettlement(opt.value)">
+              {{ opt.label }}
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Card 2: Beneficiary Details ──────────────────────────────────────── -->
+  <div class="de-card ssi-form-card">
+    <div class="de-card__header">
+      <div class="de-card__icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+        </svg>
+      </div>
+      <h3>Beneficiary Details</h3>
+    </div>
+
+    <!-- Counterparty -->
+    <div class="de-field">
+      <label class="de-label">
+        Counterparty <span class="de-required">*</span>
+      </label>
+      <tms-select
+        [items]="counterpartyOptions"
+        bindLabel="label"
+        bindValue="value"
+        formControlName="counterpartyId"
+        placeholder="Select counterparty">
+      </tms-select>
+      @if (form.get('counterpartyId')?.invalid && form.get('counterpartyId')?.touched) {
+        <span class="de-field-error">Counterparty is required</span>
+      }
+    </div>
+
+    <!-- Account Number -->
+    <div class="de-field">
+      <label class="de-label" for="ssi-account">
+        Beneficiary Account Number <span class="de-required">*</span>
+      </label>
+      <input id="ssi-account" type="text" class="de-input"
+             formControlName="accountNumber"
+             placeholder="e.g. 0010100012345"
+             style="font-family: var(--font-mono); letter-spacing: 0.5px;" />
+      @if (form.get('accountNumber')?.invalid && form.get('accountNumber')?.touched) {
+        <span class="de-field-error">Account number is required</span>
+      }
+    </div>
+
+    <!-- Bank Name + SWIFT -->
+    <div class="ssi-row-2">
+      <div class="de-field">
+        <label class="de-label" for="ssi-bene-bank">
+          Beneficiary Bank Name <span class="de-required">*</span>
+        </label>
+        <input id="ssi-bene-bank" type="text" class="de-input"
+               formControlName="beneficiaryBankName"
+               placeholder="e.g. HSBC Bangladesh" />
+        @if (form.get('beneficiaryBankName')?.invalid && form.get('beneficiaryBankName')?.touched) {
+          <span class="de-field-error">Beneficiary bank name is required</span>
+        }
+      </div>
+
+      <div class="de-field">
+        <label class="de-label" for="ssi-bene-swift">
+          Beneficiary SWIFT / BIC <span class="de-required">*</span>
+        </label>
+        <input id="ssi-bene-swift" type="text" class="de-input"
+               formControlName="beneficiarySwift"
+               maxlength="11"
+               placeholder="e.g. HSBCBDDH"
+               style="font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 1px;" />
+
+        @if (beneficiarySwiftCtrl?.errors?.['required'] && beneficiarySwiftCtrl?.touched) {
+          <span class="de-field-error">SWIFT / BIC is required</span>
+        }
+        @if (beneficiarySwiftCtrl?.errors?.['pattern'] && beneficiarySwiftCtrl?.touched) {
+          <span class="de-field-error">
+            Invalid SWIFT / BIC format — must be 8 or 11 characters (e.g. HSBCBDDH)
+          </span>
+        }
+        <span class="de-field-hint">Format: 4 bank · 2 country · 2 location · 3 branch (optional)</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Card 3: Correspondent Bank ───────────────────────────────────────── -->
+  <div class="de-card ssi-form-card">
+    <div class="de-card__header">
+      <div class="de-card__icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <line x1="12" y1="5" x2="12" y2="19"/>
+          <polyline points="19 12 12 19 5 12"/>
+        </svg>
+      </div>
+      <h3>
+        Correspondent Bank
+        <span class="ssi-optional-tag">Optional</span>
+      </h3>
+    </div>
+
+    <!-- Banks-only notice -->
+    <div class="ssi-banks-notice">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+        <polyline points="9 22 9 12 15 12 15 22"/>
+      </svg>
+      Search filters to <strong>Banks only</strong> — NBFIs and corporates are excluded as correspondent banks
+    </div>
+
+    <!-- Correspondent Bank Selector (banks only) -->
+    <div class="de-field">
+      <label class="de-label">
+        Select Correspondent Bank
+        <span class="de-field-opt">(optional)</span>
+      </label>
+      <tms-select
+        [items]="correspondentBanks"
+        bindLabel="label"
+        bindValue="value"
+        formControlName="corrBankId"
+        placeholder="Search banks only…">
+      </tms-select>
+      <span class="de-field-hint">
+        Only registered bank counterparties are available — {{ correspondentBanks.length }} banks eligible
+      </span>
+    </div>
+
+    <!-- Auto-fill strip: name + SWIFT (appears after selection) -->
+    @if (hasCorrBank && selectedCorrBank) {
+      <div class="corr-strip" @stripIn>
+        <div class="corr-strip__prop">
+          <span class="corr-strip__lbl">Bank Name</span>
+          <span class="corr-strip__val">{{ selectedCorrBank.label }}</span>
+        </div>
+        <div class="corr-strip__prop">
+          <span class="corr-strip__lbl">SWIFT / BIC</span>
+          <span class="corr-strip__val corr-strip__val--swift">{{ selectedCorrBank.swift }}</span>
+        </div>
+        <div class="corr-strip__prop">
+          <span class="corr-strip__lbl">Country</span>
+          <span class="corr-strip__val">{{ selectedCorrBank.country }}</span>
+        </div>
+        <div class="corr-strip__readonly-note">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          </svg>
+          Auto-filled from BP registry — read only
+        </div>
+        <button type="button" class="corr-strip__clear" (click)="clearCorrBank()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+          Clear
+        </button>
+      </div>
+    }
+  </div>
+
+  <!-- ── Card 4: Notes & Status ────────────────────────────────────────────── -->
+  <div class="de-card ssi-form-card">
+    <div class="de-card__header">
+      <div class="de-card__icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+          <line x1="10" y1="9" x2="8" y2="9"/>
+        </svg>
+      </div>
+      <h3>Notes &amp; Validity</h3>
+    </div>
+
+    <div class="de-field">
+      <label class="de-label" for="ssi-notes">
+        Additional Instructions
+        <span class="de-field-opt">(optional)</span>
+      </label>
+      <textarea id="ssi-notes" class="de-input"
+                formControlName="notes"
+                rows="3"
+                placeholder="e.g. Use this SSI for all USD wire transfers to HSBC BD">
+      </textarea>
+    </div>
+
+    <!-- Status Toggle -->
+    <div class="de-field">
+      <label class="de-label">Status</label>
+      <label class="ssi-toggle">
+        <input type="checkbox" formControlName="status" />
+        <span class="ssi-toggle__track"></span>
+        <span class="ssi-toggle__label ssi-toggle__label--{{ statusActive ? 'active' : 'inactive' }}">
+          {{ statusActive ? 'Active' : 'Inactive' }}
+        </span>
+      </label>
+      <span class="de-field-hint">
+        @if (statusActive) { SSI is available for automatic settlement routing on authorization. }
+        @else { SSI will be created but not applied to deal settlement. }
+      </span>
+    </div>
+  </div>
+
+</form>
+
+
+<!-- Toast -->
+@if (toastVisible) {
+  <div class="de-toast-container">
+    <div class="de-toast" [class.de-toast--success]="toastType === 'success'">
+      @if (toastType === 'success') {
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+      } @else {
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+      }
+      {{ toastMessage }}
+    </div>
+  </div>
+}
+

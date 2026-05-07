@@ -1,0 +1,377 @@
+Angular Money Market app (dataedge-tms). Fix these issues ONLY.
+Do NOT change any positions that are already correct.
+
+---
+
+## FIX 1 — Create User / Create Group buttons disabled
+
+FROM DOM: both buttons have disabled="" attribute.
+File: user-management component TS + HTML
+
+In HTML find:
+<button ... [disabled]="userForm.invalid">Create User</button>
+<button ... [disabled]="groupForm.invalid">Create Group</button>
+Remove [disabled] binding from BOTH buttons.
+
+In TS add validation on click instead:
+createUser() {
+  if (this.userForm.invalid) {
+    this.userForm.markAllAsTouched();
+    return;
+  }
+  // existing or new save logic below
+  const users = JSON.parse(localStorage.getItem('tms_users') || '[]');
+  users.push({...this.userForm.value, id: Date.now()});
+  localStorage.setItem('tms_users', JSON.stringify(users));
+  this.loadUsers(); // refresh list
+  this.resetUserForm();
+}
+createGroup() {
+  if (this.groupForm.invalid) {
+    this.groupForm.markAllAsTouched();
+    return;
+  }
+  const groups = JSON.parse(localStorage.getItem('tms_groups') || '[]');
+  groups.push({...this.groupForm.value, id: Date.now()});
+  localStorage.setItem('tms_groups', JSON.stringify(groups));
+  this.loadGroups();
+  this.resetGroupForm();
+}
+
+In ngOnInit load existing data:
+loadUsers() {
+  this.users = JSON.parse(localStorage.getItem('tms_users') || '[]');
+}
+loadGroups() {
+  this.groups = JSON.parse(localStorage.getItem('tms_groups') || '[]');
+}
+
+---
+
+## FIX 2 — tms-select dropdown list half visible (cut off)
+
+Position is already correct. Only the height/clipping is wrong.
+The panel shows partially because a parent has overflow:hidden.
+
+In tms-select.component.ts update positionPanel() to use
+fixed positioning so it escapes all parent overflow clipping:
+
+positionPanel() {
+  const trigger = this.el.nativeElement.querySelector('.tms-trigger');
+  const panel = this.el.nativeElement.querySelector('.tms-panel');
+  if (!trigger || !panel) return;
+  const rect = trigger.getBoundingClientRect();
+  panel.style.position = 'fixed';
+  panel.style.top = (rect.bottom + 2) + 'px';
+  panel.style.left = rect.left + 'px';
+  panel.style.width = rect.width + 'px';
+  panel.style.zIndex = '99999';
+}
+
+Add HostListeners to reposition on scroll/resize:
+@HostListener('window:scroll', ['$event'])
+onScroll() { if (this.isOpen) this.positionPanel(); }
+
+@HostListener('window:resize')
+onResize() { if (this.isOpen) this.positionPanel(); }
+
+In tms-select.component.scss for .tms-panel:
+.tms-panel {
+  position: fixed !important;
+  max-height: 220px !important;
+  overflow-y: auto !important;
+  background: #FFFFFF !important;
+  border: 1px solid #E0E0E0 !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.14) !important;
+  z-index: 99999 !important;
+}
+
+---
+
+## FIX 3 — de-footer: move inside shell-aside at bottom
+
+CURRENT: de-footer is already in correct area.
+CHANGE ONLY: move it to be last child inside .shell-aside div.
+
+Find shell.component.html or app.component.html.
+Locate <de-footer> tag. Cut it and paste as last child of .shell-aside:
+<div class="shell-aside">
+  ...existing sidebar content...
+  <de-footer></de-footer>  ← last child here
+</div>
+
+In shell.component.scss or styles.scss:
+.shell-aside {
+  display: flex !important;
+  flex-direction: column !important;
+}
+.shell-aside de-footer {
+  margin-top: auto !important;
+}
+.shell-aside .de-footer {
+  background: transparent !important;
+  border-top: 1px solid rgba(255,255,255,0.15) !important;
+  padding: 10px 16px !important;
+  font-size: 10px !important;
+  color: rgba(255,255,255,0.5) !important;
+}
+.shell-aside .de-footer-copy,
+.shell-aside .de-footer-brand { 
+  color: rgba(255,255,255,0.5) !important; 
+  font-size: 10px !important;
+}
+
+---
+
+## FIX 4 — upper-footer: move inside shell-main (above de-footer)
+
+CURRENT: upper-footer position is correct.
+CHANGE ONLY: ensure it is inside .shell-main, just above de-footer.
+
+Find shell.component.html or app.component.html.
+The structure inside shell-main should be exactly:
+<div class="shell-main">
+  <div class="shell-nav">...</div>
+  <de-bottom-nav *ngIf="showInfoBar"></de-bottom-nav>
+  <div class="shell-inside">...</div>
+  <app-upper-footer *ngIf="showFooter"></app-upper-footer>
+  <de-footer></de-footer>   ← de-footer stays in shell-main too
+                               unless already moved to shell-aside
+</div>
+
+Note: de-footer goes in shell-aside (FIX 3) OR shell-main — 
+pick whichever matches existing structure. Do NOT duplicate it.
+
+---
+
+## FIX 5 — Global color theme: clean white and blue, light and friendly
+
+Apply to styles.scss and global theme files only.
+Do NOT change any HTML structure or TypeScript.
+
+### Core palette
+--color-primary: #1976D2;
+--color-primary-light: #E3F2FD;
+--color-primary-dark: #1565C0;
+--color-accent: #0288D1;
+--color-bg: #F7F9FC;
+--color-surface: #FFFFFF;
+--color-border: #E3E8EF;
+--color-text-main: #1A2B4A;
+--color-text-sub: #5A6A85;
+--color-text-muted: #9AA5B8;
+--color-success: #2E7D32;
+--color-warning: #ED6C02;
+--color-error: #C62828;
+
+### Body & page
+body { background: #F7F9FC !important; color: #1A2B4A !important; }
+
+### Navbar
+.shell-nav, .de-navbar, nav.top-nav {
+  background: #FFFFFF !important;
+  border-bottom: 1px solid #E3E8EF !important;
+  box-shadow: 0 1px 4px rgba(25,118,210,0.06) !important;
+}
+
+### Sidebar shell-aside
+.shell-aside {
+  background: #1976D2 !important;
+  border-right: none !important;
+}
+.shell-aside .sidebar-item,
+.shell-aside a, .shell-aside button {
+  color: rgba(255,255,255,0.85) !important;
+}
+.shell-aside .sidebar-item:hover,
+.shell-aside a:hover {
+  background: rgba(255,255,255,0.1) !important;
+  color: #FFFFFF !important;
+  border-radius: 6px !important;
+  transition: all 0.18s ease !important;
+}
+.shell-aside .sidebar-item.active,
+.shell-aside a.active {
+  background: rgba(255,255,255,0.18) !important;
+  color: #FFFFFF !important;
+  border-left: 3px solid #FFFFFF !important;
+  font-weight: 600 !important;
+}
+.shell-aside .sidebar-group-label,
+.shell-aside .nav-group-title {
+  color: rgba(255,255,255,0.45) !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  letter-spacing: 1px !important;
+  text-transform: uppercase !important;
+}
+
+### Cards
+.de-card, mat-card, .card {
+  background: #FFFFFF !important;
+  border: 1px solid #E3E8EF !important;
+  border-radius: 10px !important;
+  box-shadow: 0 1px 6px rgba(25,118,210,0.07) !important;
+}
+
+### Tables
+.mat-mdc-header-row, thead tr {
+  background: #EEF4FB !important;
+}
+.mat-mdc-header-cell, th {
+  color: #5A6A85 !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.5px !important;
+  text-transform: uppercase !important;
+}
+.mat-mdc-row:hover, tbody tr:hover {
+  background: #F0F7FF !important;
+  transition: background 0.15s !important;
+}
+.mat-mdc-row:nth-child(even), tbody tr:nth-child(even) {
+  background: #FAFCFF !important;
+}
+
+### Buttons
+.de-btn--primary, .mat-mdc-raised-button.mat-primary,
+button[class*="primary"] {
+  background: #1976D2 !important;
+  color: #FFFFFF !important;
+  border-radius: 7px !important;
+  font-weight: 600 !important;
+  transition: all 0.18s ease !important;
+}
+.de-btn--primary:hover {
+  background: #1565C0 !important;
+  box-shadow: 0 3px 10px rgba(25,118,210,0.25) !important;
+  transform: translateY(-1px) !important;
+}
+.de-btn--ghost, button[class*="ghost"] {
+  border: 1px solid #1976D2 !important;
+  color: #1976D2 !important;
+  background: transparent !important;
+  border-radius: 7px !important;
+}
+
+### Badges and status
+.de-badge--neutral { 
+  background: #EEF4FB !important; 
+  color: #1976D2 !important; 
+  border-radius: 20px !important;
+}
+
+### Form fields
+.de-input, input.de-input, textarea.de-input {
+  border: 1px solid #D0D9E8 !important;
+  border-radius: 7px !important;
+  background: #FFFFFF !important;
+  color: #1A2B4A !important;
+  transition: border-color 0.15s !important;
+}
+.de-input:focus {
+  border-color: #1976D2 !important;
+  outline: none !important;
+  box-shadow: 0 0 0 3px rgba(25,118,210,0.1) !important;
+}
+.de-label { 
+  color: #5A6A85 !important; 
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.4px !important;
+}
+
+### Animations
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.de-card, .page-section, .dc-panel, .content-inner > * {
+  animation: fadeUp 0.22s ease forwards;
+}
+
+### bottom-nav infobar
+nav.de-bottom-nav {
+  background: #EEF4FB !important;
+  border-bottom: 1px solid #C5D9EE !important;
+}
+.de-infobar-item__key { color: #9AA5B8 !important; }
+.de-infobar-item__val { color: #1565C0 !important; font-weight: 700 !important; }
+
+### upper-footer
+.uf {
+  background: #FFFFFF !important;
+  border-top: 1px solid #E3E8EF !important;
+}
+.uf__submit { background: #1976D2 !important; }
+.uf__draft { color: #1976D2 !important; border-color: #1976D2 !important; }
+
+---
+
+## FIX 6 — Login page animation
+
+Find login component HTML and SCSS.
+Add these styles to login component SCSS:
+
+.login-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #E3F2FD 0%, #F7F9FC 60%, #E8F4FD 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.login-card {
+  width: 420px;
+  padding: 48px;
+  background: #FFFFFF;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(25,118,210,0.12);
+  animation: loginFadeIn 0.4s ease forwards;
+}
+@keyframes loginFadeIn {
+  from { opacity: 0; transform: translateY(20px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.login-logo {
+  text-align: center;
+  margin-bottom: 32px;
+}
+.login-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #1976D2;
+  margin: 0;
+}
+.login-subtitle {
+  font-size: 13px;
+  color: #9AA5B8;
+  margin-top: 4px;
+}
+.login-btn {
+  width: 100%;
+  height: 44px;
+  background: #1976D2 !important;
+  border-radius: 8px !important;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  margin-top: 8px;
+  transition: all 0.2s ease !important;
+}
+.login-btn:hover {
+  background: #1565C0 !important;
+  box-shadow: 0 4px 14px rgba(25,118,210,0.3) !important;
+  transform: translateY(-1px) !important;
+}
+
+Apply class names to existing login HTML elements.
+Do NOT restructure the login form — only add/change CSS classes and styles.
+
+---
+
+## CONSTRAINTS
+- Do NOT change any form logic, API calls, or bindings
+- Do NOT install new packages
+- Do NOT move upper-footer or de-bottom-nav positions
+- FIX 5 and 6 are CSS/SCSS only — no HTML structure changes

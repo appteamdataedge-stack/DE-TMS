@@ -1,0 +1,401 @@
+// ── Hero Card ───────────────────────────────────────────────────────────────
+
+.dd-hero {
+  margin-bottom: 0;
+
+  &__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+
+  &__head-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  &__type-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--de-neutral-500);
+  }
+
+  &__counterparty {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--de-navy);
+    margin: 0 0 8px;
+  }
+
+  &__amount {
+    font-size: 32px;
+    font-weight: 800;
+    color: var(--de-navy);
+    font-family: var(--font-mono);
+    letter-spacing: -0.5px;
+    margin-bottom: 20px;
+  }
+
+  &__divider {
+    height: 1px;
+    background: var(--de-neutral-200);
+    margin-bottom: 20px;
+  }
+
+  &__metrics {
+    display: flex;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 0;
+  }
+
+  &__metric {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding-right: 24px;
+  }
+
+  &__metric-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.7px;
+    color: var(--de-neutral-400);
+  }
+
+  &__metric-value {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--de-navy);
+
+    &--mono {
+      font-family: var(--font-mono);
+      font-size: 12px;
+    }
+  }
+
+  &__metric-sep {
+    width: 1px;
+    background: var(--de-neutral-200);
+    align-self: stretch;
+    margin-right: 24px;
+  }
+}
+
+.dd-id-badge {
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+.dd-status-badge {
+  font-size: 12px;
+  padding: 4px 10px;
+}
+
+// ── Tabs ────────────────────────────────────────────────────────────────────
+
+.dd-tabs {
+  display: flex;
+  border-bottom: 2px solid var(--de-neutral-200);
+  margin: 20px 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
+}
+
+.dd-tab {
+  flex-shrink: 0;
+  padding: 11px 20px;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--de-neutral-500);
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.12s, border-color 0.12s;
+
+  &:hover:not(.dd-tab--active) { color: var(--de-navy); }
+
+  &--active {
+    color: var(--de-teal-dark);
+    border-bottom-color: var(--de-teal);
+    font-weight: 600;
+  }
+}
+
+// ── Tab Content ─────────────────────────────────────────────────────────────
+
+.dd-tab-content { margin-bottom: 0; }
+
+// ── Summary: 2-col grid ─────────────────────────────────────────────────────
+
+.dd-summary-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.dd-info-card {
+  .de-card__header { margin-bottom: 4px; }
+}
+
+// ── Definition list ─────────────────────────────────────────────────────────
+
+.dd-dl {
+  display: flex;
+  flex-direction: column;
+
+  &__row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--de-neutral-100);
+    gap: 12px;
+
+    &:last-child { border-bottom: none; }
+
+    dt {
+      font-size: 13px;
+      color: var(--de-neutral-500);
+      font-weight: 500;
+      flex-shrink: 0;
+      min-width: 116px;
+    }
+
+    dd {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--de-navy);
+      text-align: right;
+      margin: 0;
+    }
+  }
+
+  &__val--mono  { font-family: var(--font-mono); font-size: 12px !important; }
+  &__val--accent { color: var(--de-teal-dark) !important; }
+}
+
+// ── Table shared ────────────────────────────────────────────────────────────
+
+.dd-table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.dd-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  min-width: 560px;
+
+  th {
+    padding: 10px 12px;
+    background: var(--de-neutral-50);
+    color: var(--de-neutral-500);
+    font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    text-align: left;
+    border-bottom: 1px solid var(--de-neutral-200);
+    white-space: nowrap;
+  }
+
+  td {
+    padding: 12px;
+    border-bottom: 1px solid var(--de-neutral-100);
+    color: var(--de-neutral-700);
+    vertical-align: middle;
+  }
+
+  tbody tr:last-child td { border-bottom: none; }
+
+  &__total-row td {
+    background: var(--de-neutral-50);
+    border-top: 2px solid var(--de-neutral-200);
+    border-bottom: none !important;
+  }
+}
+
+.dd-th--num { width: 44px; text-align: center; }
+.dd-th--r   { text-align: right !important; }
+.dd-td--num { text-align: center; color: var(--de-neutral-400); font-size: 12px; }
+.dd-td--r   { text-align: right !important; }
+.dd-amount  { font-family: var(--font-mono); font-size: 13px; }
+.dd-date    { white-space: nowrap; }
+.dd-gl-code { font-family: var(--font-mono); font-size: 12px; color: var(--de-neutral-500); }
+
+// Cashflow last row — emerald-50 background
+.dd-cashflow-row--last td {
+  background: var(--de-teal-bg) !important;
+}
+
+// ── Cashflow total line ──────────────────────────────────────────────────────
+
+.dd-cashflow-total {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 16px;
+  padding: 14px 12px 4px;
+  border-top: 1px solid var(--de-neutral-200);
+
+  &__label {
+    font-size: 13px;
+    color: var(--de-neutral-500);
+    font-weight: 500;
+  }
+
+  &__amount {
+    font-family: var(--font-mono);
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--de-navy);
+  }
+}
+
+// ── Section date ─────────────────────────────────────────────────────────────
+
+.dd-section-date {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--de-neutral-400);
+  margin-left: 4px;
+}
+
+// ── Lifecycle tab (compact timeline) ─────────────────────────────────────────
+
+.dd-lifecycle-card {
+  padding: 0;
+  .de-card__header { padding: 16px 20px 12px; }
+}
+
+.dd-lc-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 20px;
+  border-top: 1px solid var(--de-neutral-100);
+  transition: background 0.1s;
+
+  &:hover { background: var(--de-neutral-50); }
+}
+
+.dd-lc-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.dd-lc-time {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--de-neutral-400);
+  white-space: nowrap;
+  flex-shrink: 0;
+  min-width: 144px;
+}
+
+.dd-lc-desc {
+  font-size: 13px;
+  color: var(--de-neutral-700);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dd-lc-user {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--de-neutral-500);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.dd-lc-empty {
+  padding: 32px 20px;
+  text-align: center;
+  color: var(--de-neutral-400);
+  font-size: 13px;
+}
+
+// ── Sticky footer bar ────────────────────────────────────────────────────────
+
+.dd-footer-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 0;
+  margin-top: 28px;
+  border-top: 1px solid var(--de-neutral-200);
+  background: #fff;
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+
+  &__right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+}
+
+// ── Action button colour variants ─────────────────────────────────────────────
+
+.dd-btn--amber {
+  border-color: var(--de-amber) !important;
+  color: var(--de-amber-dark) !important;
+  &:hover { background: var(--de-amber-light) !important; }
+}
+
+.dd-btn--danger {
+  color: var(--de-red) !important;
+  &:hover { background: var(--de-red-light) !important; }
+}
+
+// ── Responsive ───────────────────────────────────────────────────────────────
+
+@media (max-width: 900px) {
+  .dd-summary-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 768px) {
+  .dd-hero__amount      { font-size: 24px; }
+  .dd-hero__metric-sep  { display: none; }
+  .dd-hero__metric      { padding-right: 20px; padding-bottom: 8px; }
+
+  .dd-footer-bar {
+    position: relative; // don't overlay bottom-nav on mobile
+    flex-wrap: wrap;
+
+    &__right { margin-left: auto; }
+  }
+}
+
+@media (max-width: 480px) {
+  .dd-hero__amount { font-size: 20px; }
+  .dd-hero__metrics { gap: 4px; }
+
+  .dd-footer-bar {
+    flex-direction: column;
+    align-items: stretch;
+
+    &__right { flex-direction: column; }
+
+    .de-btn { justify-content: center; }
+  }
+}

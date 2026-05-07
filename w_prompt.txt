@@ -1,0 +1,173 @@
+Angular Money Market app (dataedge-tms). Fix these 4 issues ONLY.
+Do NOT change any logic, API calls, or other files.
+
+---
+
+## FIX 1 — Create User / Create Group button disabled
+
+FROM DOM: button has disabled="" attribute.
+This means the form is invalid on page load.
+
+Find: src/app/features/user-management/user-management.component.ts
+(or the component that contains um-panel__footer)
+
+STEP A — Find the FormGroup for create user and create group forms.
+For EVERY FormControl that has Validators.required,
+check if it has a default value. If not, it makes button disabled immediately.
+
+STEP B — Remove [disabled] binding from both Create buttons:
+Find in the HTML:
+  <button ... [disabled]="userForm.invalid">Create User</button>
+  <button ... [disabled]="groupForm.invalid">Create Group</button>
+Remove the [disabled] binding completely from both buttons.
+Instead validate on click inside the handler method:
+  createUser() {
+    if (this.userForm.invalid) {
+      this.userForm.markAllAsTouched();
+      return;
+    }
+    // existing save logic
+  }
+  createGroup() {
+    if (this.groupForm.invalid) {
+      this.groupForm.markAllAsTouched();
+      return;
+    }
+    // existing save logic
+  }
+
+STEP C — If createUser() or createGroup() methods are empty or missing,
+implement them to save data to localStorage as fallback:
+  const users = JSON.parse(localStorage.getItem('tms_users') || '[]');
+  users.push(this.userForm.value);
+  localStorage.setItem('tms_users', JSON.stringify(users));
+  // refresh list, close panel, reset form
+
+---
+
+## FIX 2 — tms-select dropdown list cut off (clipped by parent overflow)
+
+FROM DOM: .tms-panel is inside .ssi-row-2 > .de-field > tms-select
+The panel is clipped because a parent has overflow hidden/auto.
+
+STEP A — In tms-select.component.scss:
+:host {
+  position: relative !important;
+  display: block !important;
+}
+.tms-panel {
+  position: fixed !important;  /* use fixed to escape any overflow:hidden parent */
+  z-index: 99999 !important;
+  background: #FFFFFF !important;
+  border: 1px solid #E0E0E0 !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.14) !important;
+  max-height: 220px !important;
+  overflow-y: auto !important;
+  min-width: 200px !important;
+}
+
+STEP B — In tms-select.component.ts find positionPanel() or the method
+that sets panel style. Update it to calculate fixed position:
+
+positionPanel() {
+  const trigger = this.el.nativeElement.querySelector('.tms-trigger');
+  const panel = this.el.nativeElement.querySelector('.tms-panel');
+  if (!trigger || !panel) return;
+  const rect = trigger.getBoundingClientRect();
+  panel.style.top = (rect.bottom + 2) + 'px';
+  panel.style.left = rect.left + 'px';
+  panel.style.width = rect.width + 'px';
+}
+
+Call positionPanel() when isOpen becomes true.
+Also call it on window scroll and window resize:
+  @HostListener('window:scroll') onScroll() { 
+    if (this.isOpen) this.positionPanel(); 
+  }
+  @HostListener('window:resize') onResize() { 
+    if (this.isOpen) this.positionPanel(); 
+  }
+
+---
+
+## FIX 3 — de-bottom-nav: sticky when page scrolls
+
+FROM DOM: <de-bottom-nav> is in app.component.html (already correct position).
+The nav scrolls with page instead of staying fixed.
+
+Find: src/app/core/layout/bottom-nav/bottom-nav.component.scss
+Replace ALL styles:
+
+:host {
+  display: block;
+  position: sticky;
+  top: 0;
+  z-index: 900;
+  width: 100%;
+}
+nav.de-bottom-nav {
+  display: flex;
+  align-items: center;
+  height: 36px;
+  padding: 0 24px;
+  gap: 16px;
+  background: #EEF4FB;
+  border-bottom: 1px solid #C5D9EE;
+  font-size: 13px;
+}
+.de-infobar-item__key {
+  color: #90A4AE;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-right: 4px;
+}
+.de-infobar-item__val {
+  color: #1565C0;
+  font-weight: 600;
+}
+.de-infobar-sep { color: #CFD8DC; margin: 0 4px; }
+
+Also check app.component.html or shell.component.html.
+Find the parent container of <de-bottom-nav>.
+Make sure that parent does NOT have overflow:hidden or overflow:auto.
+If it does, change to overflow: visible for that container only.
+
+---
+
+## FIX 4 — de-footer: move inside shell-aside
+
+Find shell.component.html (or app.component.html where shell is defined).
+Current structure has <de-footer> inside shell-main or at root level.
+
+Move <de-footer> so it is the LAST child inside .shell-aside:
+<div class="shell-aside">
+  ... sidebar nav items ...
+  <de-footer></de-footer>   ← move here, last item
+</div>
+
+In shell.component.scss or styles.scss ensure:
+.shell-aside {
+  display: flex;
+  flex-direction: column;
+}
+.shell-aside de-footer {
+  margin-top: auto;  /* pushes footer to bottom of sidebar */
+}
+de-footer .de-footer, de-footer footer {
+  background: transparent !important;
+  border-top: 1px solid rgba(255,255,255,0.1) !important;
+  padding: 12px 16px !important;
+  font-size: 11px !important;
+}
+
+---
+
+## CONSTRAINTS
+- Only touch: user-management component TS+HTML,
+  tms-select component TS+SCSS,
+  bottom-nav component SCSS,
+  shell/app component HTML+SCSS
+- Do NOT change any existing form validation logic beyond removing [disabled]
+- Do NOT install new packages

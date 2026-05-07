@@ -1,0 +1,185 @@
+// ── Page Header ────────────────────────────────────────────────────────────
+
+.prod-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  gap: 16px;
+
+  &__title {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--de-navy);
+    margin: 0 0 4px;
+  }
+
+  &__sub {
+    font-size: 13px;
+    color: var(--de-neutral-500);
+    margin: 0;
+  }
+}
+
+// ── KPI Strip ──────────────────────────────────────────────────────────────
+
+.prod-kpi-strip {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.prod-kpi-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  background: #fff;
+  border: 1px solid var(--de-neutral-200);
+  border-radius: var(--radius-md);
+  padding: 14px 24px;
+  min-width: 90px;
+  box-shadow: var(--shadow-sm);
+
+  &__val {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--de-navy);
+    font-family: var(--font-mono);
+  }
+
+  &__lbl {
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: var(--de-neutral-500);
+  }
+
+  &--active { border-color: var(--de-teal); .prod-kpi-item__val { color: var(--de-teal-dark); } }
+}
+
+// ── 2-col Product Grid ─────────────────────────────────────────────────────
+
+.prod-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+// ── Product Card ───────────────────────────────────────────────────────────
+
+.prod-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px;
+  transition: box-shadow 0.15s, border-color 0.15s;
+  cursor: default;
+
+  &:hover {
+    border-color: var(--de-neutral-300);
+    box-shadow: var(--shadow-md);
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  &__icon {
+    width: 32px;
+    height: 32px;
+    background: var(--de-teal-light);
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--de-teal-dark);
+    flex-shrink: 0;
+  }
+
+  &__meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  &__id {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--de-neutral-500);
+  }
+
+  &__name {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--de-navy);
+    margin: 0;
+  }
+
+  &__props {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 16px;
+    padding-top: 12px;
+    border-top: 1px solid var(--de-neutral-100);
+  }
+
+  &__prop {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  &__prop-lbl {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--de-neutral-400);
+  }
+
+  &__prop-val {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--de-neutral-700);
+  }
+}
+
+// ── Responsive ─────────────────────────────────────────────────────────────
+
+@media (max-width: 768px) {
+  .prod-grid   { grid-template-columns: 1fr; }
+  .prod-header { flex-direction: column; }
+}
+
+// ── Card Actions (FIX 5) ──────────────────────────────────────────────────
+
+.prod-card__actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--de-neutral-100);
+}
+
+.prod-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  border: 1px solid var(--de-neutral-200);
+  border-radius: var(--radius-sm);
+  background: #fff;
+  color: var(--de-neutral-600);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .12s, color .12s, border-color .12s;
+
+  &:hover { background: var(--primary-50); color: var(--primary); border-color: var(--primary); }
+  &--danger:hover { background: #FFF0F0; color: var(--de-red); border-color: var(--de-red); }
+}

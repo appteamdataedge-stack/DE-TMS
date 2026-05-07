@@ -1,0 +1,209 @@
+<!-- Breadcrumb -->
+<nav class="de-breadcrumb">
+  <a routerLink="/dashboard">Home</a><span class="sep">›</span>
+  <span>System Admin</span><span class="sep">›</span>
+  <span class="current">UDF Maintenance</span>
+</nav>
+
+<!-- Page Header -->
+<div class="udf-header">
+  <div>
+    <h1 class="udf-header__title">UDF Maintenance</h1>
+    <p class="udf-header__sub">Manage user-defined fields across all system screens</p>
+  </div>
+  <button class="de-btn de-btn--primary" (click)="openCreatePanel()">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+      <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+    </svg>
+    New UDF
+  </button>
+</div>
+
+<!-- KPI Strip -->
+<div class="udf-kpi-strip">
+  <div class="udf-kpi-item">
+    <span class="udf-kpi-item__val">{{ udfs.length }}</span>
+    <span class="udf-kpi-item__lbl">Total</span>
+  </div>
+  <div class="udf-kpi-item udf-kpi-item--active">
+    <span class="udf-kpi-item__val">{{ activeCount }}</span>
+    <span class="udf-kpi-item__lbl">Active</span>
+  </div>
+  <div class="udf-kpi-item">
+    <span class="udf-kpi-item__val">{{ udfs.length - activeCount }}</span>
+    <span class="udf-kpi-item__lbl">Inactive</span>
+  </div>
+</div>
+
+<!-- UDF Card Grid -->
+<div class="udf-grid">
+  @for (udf of udfs; track udf.id) {
+    <div class="udf-card de-card">
+      <!-- Card Header -->
+      <div class="udf-card__header">
+        <span class="udf-card__id">{{ udf.id }}</span>
+        <span class="de-badge {{ fieldTypeBadge[udf.fieldType] }}">{{ udf.fieldType }}</span>
+      </div>
+
+      <h3 class="udf-card__name">{{ udf.name }}</h3>
+
+      <!-- Properties -->
+      <div class="udf-card__props">
+        <div class="udf-card__prop">
+          <span class="udf-card__prop-lbl">Screen</span>
+          <span class="udf-card__prop-val">{{ screenLabel[udf.screen] }}</span>
+        </div>
+        <div class="udf-card__prop">
+          <span class="udf-card__prop-lbl">Required</span>
+          <span class="udf-card__prop-val {{ udf.required ? 'udf-card__prop-val--yes' : 'udf-card__prop-val--no' }}">
+            {{ udf.required ? 'Yes' : 'No' }}
+          </span>
+        </div>
+        @if (udf.maxLength) {
+          <div class="udf-card__prop">
+            <span class="udf-card__prop-lbl">Max Length</span>
+            <span class="udf-card__prop-val udf-card__prop-val--mono">{{ udf.maxLength }}</span>
+          </div>
+        }
+        <div class="udf-card__prop">
+          <span class="udf-card__prop-lbl">Status</span>
+          <span class="de-badge {{ udf.status === 'ACTIVE' ? 'de-badge--green' : 'de-badge--neutral' }}">
+            {{ udf.status }}
+          </span>
+        </div>
+      </div>
+    </div>
+  }
+</div>
+
+<!-- ── Create UDF Backdrop ──────────────────────────────────────────────────── -->
+@if (createPanelOpen) {
+  <div class="udf-backdrop" @backdropFade (click)="closeCreatePanel()"></div>
+
+  <!-- Create UDF Slide-over Panel -->
+  <aside class="udf-create-panel" @slideOver>
+    <div class="udf-create-panel__header">
+      <div>
+        <h2 class="udf-create-panel__title">New UDF</h2>
+        <p class="udf-create-panel__sub">Define a user-defined field for a screen</p>
+      </div>
+      <button class="udf-create-panel__close" (click)="closeCreatePanel()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="udf-create-panel__body">
+      <form [formGroup]="form" autocomplete="off">
+
+        <!-- UDF Name -->
+        <div class="de-field">
+          <label class="de-label" for="udf-name">
+            UDF Name <span class="de-required">*</span>
+          </label>
+          <input id="udf-name" type="text" class="de-input"
+                 formControlName="name"
+                 placeholder="e.g. Regulatory Category" />
+          @if (form.get('name')?.invalid && form.get('name')?.touched) {
+            <span class="de-field-error">UDF name is required</span>
+          }
+        </div>
+
+        <!-- Field Type -->
+        <div class="de-field">
+          <label class="de-label">
+            Field Type <span class="de-required">*</span>
+          </label>
+          <tms-select
+            [items]="fieldTypeOptions"
+            bindLabel="label"
+            bindValue="value"
+            formControlName="fieldType"
+            placeholder="Select field type">
+          </tms-select>
+          @if (form.get('fieldType')?.invalid && form.get('fieldType')?.touched) {
+            <span class="de-field-error">Field type is required</span>
+          }
+        </div>
+
+        <!-- Max Length (only for TEXT) -->
+        @if (isTextField) {
+          <div class="de-field" @slideDown>
+            <label class="de-label" for="udf-maxlen">
+              Max Length
+              <span class="de-field-opt">(optional)</span>
+            </label>
+            <input id="udf-maxlen" type="number" class="de-input"
+                   formControlName="maxLength"
+                   min="1" max="500"
+                   placeholder="e.g. 50" />
+            <span class="de-field-hint">Maximum number of characters allowed (1–500)</span>
+          </div>
+        }
+
+        <!-- Screen -->
+        <div class="de-field">
+          <label class="de-label">
+            Screen <span class="de-required">*</span>
+          </label>
+          <tms-select
+            [items]="screenOptions"
+            bindLabel="label"
+            bindValue="value"
+            formControlName="screen"
+            placeholder="Select screen">
+          </tms-select>
+          @if (form.get('screen')?.invalid && form.get('screen')?.touched) {
+            <span class="de-field-error">Screen is required</span>
+          }
+        </div>
+
+        <!-- Required Toggle -->
+        <div class="de-field">
+          <label class="de-label">Required</label>
+          <label class="udf-toggle">
+            <input type="checkbox" formControlName="required" />
+            <span class="udf-toggle__track"></span>
+            <span class="udf-toggle__label">{{ isRequired ? 'Yes — mandatory field' : 'No — optional field' }}</span>
+          </label>
+        </div>
+
+        <!-- Status Toggle -->
+        <div class="de-field">
+          <label class="de-label">Status</label>
+          <label class="udf-toggle">
+            <input type="checkbox" formControlName="status" />
+            <span class="udf-toggle__track"></span>
+            <span class="udf-toggle__label udf-toggle__label--{{ statusActive ? 'active' : 'inactive' }}">
+              {{ statusActive ? 'Active' : 'Inactive' }}
+            </span>
+          </label>
+        </div>
+
+      </form>
+    </div>
+
+    <div class="udf-create-panel__footer">
+      <button class="de-btn de-btn--ghost" (click)="closeCreatePanel()">Cancel</button>
+      <button class="de-btn de-btn--primary" (click)="onSubmit()">
+        Create UDF
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+        </svg>
+      </button>
+    </div>
+  </aside>
+}
+
+<!-- Toast -->
+@if (toastVisible) {
+  <div class="de-toast-container">
+    <div class="de-toast de-toast--success">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+        <polyline points="20 6 9 17 4 12"/>
+      </svg>
+      {{ toastMessage }}
+    </div>
+  </div>
+}

@@ -1,0 +1,344 @@
+﻿
+<!-- Breadcrumb -->
+<nav class="de-breadcrumb">
+  <a routerLink="/dashboard">Home</a><span class="sep">›</span>
+  <a routerLink="/counterparties">Counterparties</a><span class="sep">›</span>
+  <span class="current">New Counterparty</span>
+</nav>
+
+<!-- Page Header -->
+<div class="cp-create-header">
+  <div>
+    <h1 class="cp-create-header__title">
+      New Counterparty
+      <span class="de-badge de-badge--neutral cp-bp-badge">{{ bpId }}</span>
+    </h1>
+    <p class="cp-create-header__sub">Register a new business partner and submit for authorization</p>
+  </div>
+</div>
+
+<!-- Form -->
+<form [formGroup]="form" (ngSubmit)="onSubmit()" autocomplete="off">
+
+  <!-- ── Card 1: Identity ──────────────────────────────────────────────────── -->
+  <div class="de-card cp-form-card">
+    <div class="de-card__header">
+      <div class="de-card__icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+          <circle cx="12" cy="7" r="4"/>
+        </svg>
+      </div>
+      <h3>Business Partner Identity</h3>
+    </div>
+
+    <!-- BP ID (readonly) -->
+    <div class="de-field">
+      <label class="de-label" for="cp-bpid">BP ID</label>
+      <div class="cp-readonly-wrap">
+        <input id="cp-bpid" type="text" class="de-input cp-readonly-input"
+               [value]="bpId" readonly />
+        <span class="cp-readonly-badge">Auto-generated</span>
+      </div>
+    </div>
+
+    <!-- Full Legal Name -->
+    <div class="de-field">
+      <label class="de-label" for="cp-name">
+        Full Legal Name <span class="de-required">*</span>
+      </label>
+      <input id="cp-name" type="text" class="de-input"
+             formControlName="name"
+             placeholder="e.g. Dutch-Bangla Bank Limited" />
+      @if (form.get('name')?.invalid && form.get('name')?.touched) {
+        <span class="de-field-error">Full legal name is required</span>
+      }
+    </div>
+
+    <!-- Short Name -->
+    <div class="de-field">
+      <label class="de-label" for="cp-short">
+        Short Name
+        <span class="de-field-opt">(optional)</span>
+      </label>
+      <input id="cp-short" type="text" class="de-input"
+             formControlName="shortName"
+             placeholder="e.g. DBBL" />
+    </div>
+
+    <!-- Category (segmented) -->
+    <div class="de-field">
+      <label class="de-label">Category <span class="de-required">*</span></label>
+      <div class="cp-seg">
+        @for (opt of categoryOptions; track opt.value) {
+          <button type="button" class="cp-seg__btn"
+            [class.cp-seg__btn--active]="selectedCategory === opt.value"
+            (click)="setCategory(opt.value)">
+            {{ opt.label }}
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- Type + Country -->
+    <div class="cp-row-2">
+      <div class="de-field">
+        <label class="de-label">
+          Institution Type <span class="de-required">*</span>
+        </label>
+        <tms-select
+          [items]="typeOptions"
+          bindLabel="label"
+          bindValue="value"
+          formControlName="type"
+          placeholder="Select type">
+        </tms-select>
+        @if (form.get('type')?.invalid && form.get('type')?.touched) {
+          <span class="de-field-error">Institution type is required</span>
+        }
+      </div>
+
+      <div class="de-field">
+        <label class="de-label">
+          Country <span class="de-required">*</span>
+        </label>
+        <tms-select
+          [items]="countryOptions"
+          bindLabel="label"
+          bindValue="value"
+          formControlName="country"
+          placeholder="Select country">
+        </tms-select>
+        @if (form.get('country')?.invalid && form.get('country')?.touched) {
+          <span class="de-field-error">Country is required</span>
+        }
+      </div>
+    </div>
+
+    <!-- SWIFT + Sector -->
+    <div class="cp-row-2">
+      <div class="de-field">
+        <label class="de-label" for="cp-swift">
+          SWIFT / BIC
+          <span class="de-field-opt">(optional)</span>
+        </label>
+        <input id="cp-swift" type="text" class="de-input"
+               formControlName="swift"
+               maxlength="11"
+               placeholder="e.g. DBBLBDDH"
+               style="font-family: var(--font-mono); text-transform: uppercase;" />
+        @if (form.get('swift')?.errors?.['minlength'] || form.get('swift')?.errors?.['maxlength']) {
+          <span class="de-field-error">SWIFT must be 8 or 11 characters</span>
+        }
+      </div>
+
+      <div class="de-field">
+        <label class="de-label">Sector <span class="de-field-opt">(optional)</span></label>
+        <tms-select
+          [items]="sectorOptions"
+          bindLabel="label"
+          bindValue="value"
+          formControlName="sector"
+          placeholder="Select sector">
+        </tms-select>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Card 2: Credit ───────────────────────────────────────────────────── -->
+  <div class="de-card cp-form-card">
+    <div class="de-card__header">
+      <div class="de-card__icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <rect x="1" y="4" width="22" height="16" rx="2"/>
+          <line x1="1" y1="10" x2="23" y2="10"/>
+        </svg>
+      </div>
+      <h3>Credit &amp; Risk</h3>
+    </div>
+
+    <div class="cp-row-2">
+      <div class="de-field">
+        <label class="de-label">Credit Rating <span class="de-field-opt">(optional)</span></label>
+        <tms-select
+          [items]="creditRatingOptions"
+          bindLabel="label"
+          bindValue="value"
+          formControlName="creditRating"
+          placeholder="Select rating">
+        </tms-select>
+      </div>
+
+      <div class="de-field">
+        <label class="de-label" for="cp-limit">
+          Credit Limit
+          <span class="de-field-opt">(optional)</span>
+        </label>
+        <input id="cp-limit" type="number" class="de-input"
+               formControlName="creditLimit"
+               min="0"
+               placeholder="e.g. 50000000" />
+        <span class="de-field-hint">In base currency (BDT)</span>
+      </div>
+    </div>
+
+    <!-- Blacklist Toggle -->
+    <div class="de-field">
+      <label class="de-label">Blacklist Status</label>
+      <label class="cp-toggle cp-toggle--danger">
+        <input type="checkbox" formControlName="blacklisted" />
+        <span class="cp-toggle__track cp-toggle__track--danger"></span>
+        <span class="cp-toggle__label cp-toggle__label--{{ isBlacklisted ? 'blacklisted' : 'clear' }}">
+          {{ isBlacklisted ? 'Blacklisted' : 'Not Blacklisted' }}
+        </span>
+      </label>
+
+      <!-- Rose warning banner -->
+      @if (isBlacklisted) {
+        <div class="cp-blacklist-warning" @slideDown>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+            <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+          </svg>
+          <div>
+            <strong>Blacklist Warning</strong>
+            <p>This counterparty will be blacklisted. All linked active deals will be flagged for review. A blacklisted BP cannot be selected for new transactions until reinstated.</p>
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Status Toggle -->
+    <div class="de-field">
+      <label class="de-label">Status</label>
+      <label class="cp-toggle">
+        <input type="checkbox" formControlName="status" />
+        <span class="cp-toggle__track"></span>
+        <span class="cp-toggle__label cp-toggle__label--{{ statusActive ? 'active' : 'inactive' }}">
+          {{ statusActive ? 'Active' : 'Inactive' }}
+        </span>
+      </label>
+    </div>
+  </div>
+
+  <!-- ── Card 3: Contact ──────────────────────────────────────────────────── -->
+  <div class="de-card cp-form-card">
+    <div class="de-card__header">
+      <div class="de-card__icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.77a16 16 0 0 0 6.29 6.29l1.84-1.84a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
+        </svg>
+      </div>
+      <h3>Contact Information</h3>
+    </div>
+
+    <div class="cp-row-2">
+      <div class="de-field">
+        <label class="de-label" for="cp-contact">
+          Contact Person
+          <span class="de-field-opt">(optional)</span>
+        </label>
+        <input id="cp-contact" type="text" class="de-input"
+               formControlName="contactName"
+               placeholder="e.g. Mr. Kamal Hossain" />
+      </div>
+
+      <div class="de-field">
+        <label class="de-label" for="cp-phone">
+          Phone
+          <span class="de-field-opt">(optional)</span>
+        </label>
+        <input id="cp-phone" type="tel" class="de-input"
+               formControlName="phone"
+               placeholder="e.g. +880-2-XXXXXXX" />
+      </div>
+    </div>
+
+    <div class="de-field">
+      <label class="de-label" for="cp-email">
+        Email
+        <span class="de-field-opt">(optional)</span>
+      </label>
+      <input id="cp-email" type="email" class="de-input"
+             formControlName="email"
+             placeholder="e.g. treasury@example.com" />
+      @if (form.get('email')?.errors?.['email'] && form.get('email')?.touched) {
+        <span class="de-field-error">Enter a valid email address</span>
+      }
+    </div>
+  </div>
+
+  <!-- ── UDF Section ───────────────────────────────────────────────────────── -->
+  <div class="de-card cp-form-card cp-udf-card">
+    <div class="de-card__header">
+      <div class="de-card__icon cp-udf-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+        </svg>
+      </div>
+      <h3>
+        Additional Information
+        <span class="cp-udf-tag">User Defined Fields</span>
+      </h3>
+    </div>
+
+    <!-- Info Banner -->
+    <div class="cp-udf-banner">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+      These fields are configurable via <strong>UDF Maintenance</strong> under System Admin.
+    </div>
+
+    <!-- UDF 1: Regulatory Category (Text) -->
+    <div class="de-field">
+      <label class="de-label" for="udf-reg-cat">
+        Regulatory Category
+        <span class="de-field-opt">(optional)</span>
+        <span class="cp-udf-type-badge">TEXT</span>
+      </label>
+      <input id="udf-reg-cat" type="text" class="de-input"
+             formControlName="udfRegulatoryCategory"
+             placeholder="e.g. Domestic — Tier 1" />
+      <span class="de-field-hint">UDF · BP Screen</span>
+    </div>
+
+    <!-- UDF 2: Locally Incorporated (Boolean) -->
+    <div class="de-field">
+      <label class="de-label">
+        Locally Incorporated
+        <span class="de-field-opt">(optional)</span>
+        <span class="cp-udf-type-badge cp-udf-type-badge--bool">BOOLEAN</span>
+      </label>
+      <label class="cp-toggle">
+        <input type="checkbox" formControlName="udfLocallyIncorporated" />
+        <span class="cp-toggle__track"></span>
+        <span class="cp-toggle__label">
+          {{ locallyIncorporated ? 'Yes' : 'No' }}
+        </span>
+      </label>
+      <span class="de-field-hint">UDF · BP Screen</span>
+    </div>
+  </div>
+
+</form>
+
+
+<!-- Toast -->
+@if (toastVisible) {
+  <div class="de-toast-container">
+    <div class="de-toast" [class.de-toast--success]="toastType === 'success'">
+      @if (toastType === 'success') {
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+      } @else {
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+      }
+      {{ toastMessage }}
+    </div>
+  </div>
+}
+

@@ -1,0 +1,270 @@
+// ── Page Header ─────────────────────────────────────────────────────────────
+
+.at-page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+
+  &__title {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--de-navy);
+    margin: 0 0 4px;
+  }
+
+  &__sub {
+    font-size: 13px;
+    color: var(--de-neutral-500);
+    margin: 0;
+  }
+}
+
+// ── Filter Card ──────────────────────────────────────────────────────────────
+
+.at-filter-card {
+  margin-bottom: 16px;
+  padding: 16px 20px;
+}
+
+.at-filters {
+  display: grid;
+  grid-template-columns: 160px 160px 1fr 140px 140px auto;
+  gap: 12px;
+  align-items: end;
+}
+
+.at-filter-clear .de-btn {
+  width: 100%;
+}
+
+// Native select — matches de-input look
+.at-select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2' stroke-linecap='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 32px !important;
+  cursor: pointer;
+}
+
+// ── Toolbar ──────────────────────────────────────────────────────────────────
+
+.at-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  gap: 12px;
+}
+
+.at-count {
+  font-size: 13px;
+  color: var(--de-neutral-500);
+  font-weight: 500;
+}
+
+.at-view-toggle {
+  display: inline-flex;
+  border: 1px solid var(--de-neutral-200);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.at-view-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  background: #fff;
+  border: none;
+  border-right: 1px solid var(--de-neutral-200);
+  color: var(--de-neutral-600);
+  cursor: pointer;
+  transition: background 0.1s, color 0.1s;
+
+  &:last-child { border-right: none; }
+
+  &:hover:not(.at-view-btn--active) { background: var(--de-neutral-50); }
+
+  &--active {
+    background: var(--de-navy);
+    color: #fff;
+  }
+}
+
+// ── Table ────────────────────────────────────────────────────────────────────
+
+.at-table-card { padding: 0; overflow: clip; }
+
+.at-table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.at-table {
+  width: 100%;
+  min-width: 900px;
+  border-collapse: collapse;
+  font-size: 13px;
+
+  th {
+    padding: 10px 14px;
+    background: var(--de-neutral-50);
+    color: var(--de-neutral-500);
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    text-align: left;
+    border-bottom: 1px solid var(--de-neutral-200);
+    white-space: nowrap;
+  }
+
+  td {
+    padding: 11px 14px;
+    border-bottom: 1px solid var(--de-neutral-100);
+    color: var(--de-neutral-700);
+    vertical-align: middle;
+  }
+
+  &__row {
+    &:last-child td { border-bottom: none; }
+    &:hover td { background: var(--de-neutral-50); }
+  }
+}
+
+.at-empty-cell {
+  text-align: center;
+  color: var(--de-neutral-400);
+  padding: 40px !important;
+  font-size: 13px;
+}
+
+// ── Table cell types ─────────────────────────────────────────────────────────
+
+.at-mono   { font-family: var(--font-mono); font-size: 12px; }
+.at-nowrap { white-space: nowrap; }
+.at-id     { color: var(--de-neutral-500); }
+.at-ref    { color: var(--de-teal-dark); font-weight: 600; }
+.at-ip     { color: var(--de-neutral-400); font-size: 11px; }
+.at-desc   { color: var(--de-neutral-700); max-width: 300px; }
+
+.at-user {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+
+  &__name { font-size: 13px; font-weight: 600; color: var(--de-navy); }
+  &__role { font-size: 11px; color: var(--de-neutral-400); }
+}
+
+// Module chips
+.at-module {
+  display: inline-flex;
+  padding: 2px 8px;
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+
+  &--MM_DEAL    { background: rgba(13,27,42,.08);  color: var(--de-navy); }
+  &--PORTFOLIO  { background: var(--de-teal-light); color: var(--de-teal-dark); }
+  &--INSTRUMENT { background: var(--de-purple-light); color: var(--de-purple); }
+}
+
+// ── Timeline ─────────────────────────────────────────────────────────────────
+
+.at-tl-card {
+  padding: 0;
+}
+
+.at-tl-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 20px;
+  border-bottom: 1px solid var(--de-neutral-100);
+  transition: background 0.1s;
+
+  &:last-child { border-bottom: none; }
+  &:hover      { background: var(--de-neutral-50); }
+}
+
+.at-tl-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.at-tl-time {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--de-neutral-400);
+  white-space: nowrap;
+  flex-shrink: 0;
+  min-width: 148px;
+}
+
+.at-tl-badge {
+  flex-shrink: 0;
+}
+
+.at-tl-desc {
+  font-size: 13px;
+  color: var(--de-neutral-700);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.at-tl-user {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--de-neutral-500);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.at-empty-msg {
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--de-neutral-400);
+  font-size: 13px;
+}
+
+// ── Responsive ───────────────────────────────────────────────────────────────
+
+@media (max-width: 1100px) {
+  .at-filters {
+    grid-template-columns: 1fr 1fr 1fr auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .at-filters {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .at-filter-clear { grid-column: 1 / -1; }
+
+  .at-tl-desc { white-space: normal; }
+  .at-tl-user { display: none; } // too cramped on mobile, user is in description
+}
+
+@media (max-width: 480px) {
+  .at-filters { grid-template-columns: 1fr; }
+  .at-filter-clear { grid-column: auto; }
+
+  .at-tl-time { min-width: unset; font-size: 11px; }
+  .at-tl-row  { flex-wrap: wrap; gap: 8px; }
+}

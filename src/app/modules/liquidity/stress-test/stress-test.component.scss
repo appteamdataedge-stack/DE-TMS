@@ -1,0 +1,571 @@
+// ── Page Header ────────────────────────────────────────────────────────────
+.st-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  gap: 16px;
+
+  &__title {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--de-navy);
+    margin: 0 0 4px;
+  }
+
+  &__sub {
+    font-size: 13px;
+    color: var(--de-neutral-500);
+    margin: 0;
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+}
+
+// ── Spinner (inside Run button) ────────────────────────────────────────────
+.st-spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255,255,255,0.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: st-spin 0.6s linear infinite;
+}
+
+@keyframes st-spin { to { transform: rotate(360deg); } }
+
+// ── Two-Column Layout ──────────────────────────────────────────────────────
+.st-layout {
+  display: grid;
+  grid-template-columns: 272px 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+// ── Parameters Panel ───────────────────────────────────────────────────────
+.st-params {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
+  &__title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--de-navy);
+    margin: 0;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--de-neutral-100);
+  }
+
+  &__divider {
+    height: 1px;
+    background: var(--de-neutral-100);
+    margin: 0;
+  }
+}
+
+.st-param-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.st-param-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--de-neutral-500);
+}
+
+// ── Scenario Preset Buttons ────────────────────────────────────────────────
+.st-scenario-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.st-scenario-btn {
+  padding: 8px 4px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  border: 1px solid var(--de-neutral-200);
+  border-radius: var(--radius-sm);
+  background: #fff;
+  color: var(--de-neutral-600);
+  cursor: pointer;
+  transition: all 0.15s;
+  text-align: center;
+
+  &:hover:not(.st-scenario-btn--active) {
+    border-color: var(--de-neutral-400);
+    color: var(--de-navy);
+  }
+
+  &--active {
+    background: var(--de-navy);
+    border-color: var(--de-navy);
+    color: #fff;
+  }
+
+  &--moderate.st-scenario-btn--active { background: var(--de-amber-dark); border-color: var(--de-amber-dark); }
+  &--severe.st-scenario-btn--active   { background: #c2410c;              border-color: #c2410c; }
+  &--cat.st-scenario-btn--active      { background: var(--de-red);        border-color: var(--de-red); }
+}
+
+// ── Sliders ────────────────────────────────────────────────────────────────
+.st-slider-hd {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.st-slider-val {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--de-navy);
+}
+
+.st-range {
+  width: 100%;
+  appearance: none;
+  height: 4px;
+  background: var(--de-neutral-200);
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+
+  &::-webkit-slider-thumb {
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--de-navy);
+    border: 2px solid #fff;
+    box-shadow: 0 0 0 2px rgba(13,27,42,.25);
+    cursor: pointer;
+    transition: transform 0.1s;
+
+    &:hover { transform: scale(1.15); }
+  }
+
+  &::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--de-navy);
+    border: 2px solid #fff;
+    cursor: pointer;
+  }
+}
+
+.st-slider-scale {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: var(--de-neutral-400);
+}
+
+// ── FX Toggle ──────────────────────────────────────────────────────────────
+.st-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--de-neutral-600);
+  padding: 0;
+
+  &__track {
+    position: relative;
+    display: inline-block;
+    width: 40px;
+    height: 22px;
+    background: var(--de-neutral-300);
+    border-radius: 100px;
+    transition: background 0.2s;
+    flex-shrink: 0;
+  }
+
+  &__thumb {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 16px;
+    height: 16px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform 0.2s;
+    box-shadow: 0 1px 3px rgba(0,0,0,.2);
+  }
+
+  &--on .st-toggle__track { background: var(--de-teal); }
+  &--on .st-toggle__thumb { transform: translateX(18px); }
+  &--on { color: var(--de-navy); font-weight: 500; }
+}
+
+// ── Limits List ────────────────────────────────────────────────────────────
+.st-limits {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 12px;
+    color: var(--de-neutral-600);
+
+    svg { color: var(--de-teal); flex-shrink: 0; }
+  }
+}
+
+// ── Results Column ─────────────────────────────────────────────────────────
+.st-results {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+// ── KPI Cards ─────────────────────────────────────────────────────────────
+.st-kpi-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.st-kpi {
+  padding: 18px;
+  transition: opacity 0.1s;
+
+  &--running { opacity: 0.75; }
+
+  &__icon {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 12px;
+
+    &--teal  { background: var(--de-teal-light);   color: var(--de-teal-dark); }
+    &--amber { background: var(--de-amber-light);  color: var(--de-amber-dark); }
+    &--red   { background: var(--de-red-light);    color: var(--de-red); }
+  }
+
+  &__label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--de-neutral-500);
+    margin: 0 0 6px;
+  }
+
+  &__val {
+    font-size: 24px;
+    font-weight: 700;
+    font-family: var(--font-mono);
+    margin: 0 0 4px;
+    color: var(--de-neutral-800);
+    line-height: 1.1;
+
+    &--teal  { color: var(--de-teal-dark); }
+    &--amber { color: var(--de-amber-dark); }
+    &--red   { color: var(--de-red); }
+  }
+
+  &__hint {
+    font-size: 11px;
+    color: var(--de-neutral-400);
+    margin: 0;
+  }
+}
+
+// ── Comparison Table Card ──────────────────────────────────────────────────
+.st-table-card { padding: 0; overflow: clip; }
+
+.st-table-hd {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px 14px;
+  border-bottom: 1px solid var(--de-neutral-100);
+  gap: 12px;
+
+  &__title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--de-navy);
+    margin: 0;
+  }
+}
+
+// ── Diff Toggle Checkbox ───────────────────────────────────────────────────
+.st-diff-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--de-neutral-600);
+  user-select: none;
+
+  input { display: none; }
+
+  &__box {
+    width: 16px;
+    height: 16px;
+    border: 1.5px solid var(--de-neutral-300);
+    border-radius: 3px;
+    background: #fff;
+    flex-shrink: 0;
+    transition: all 0.15s;
+    position: relative;
+  }
+
+  input:checked + .st-diff-toggle__box {
+    background: var(--de-navy);
+    border-color: var(--de-navy);
+
+    &::after {
+      content: '';
+      position: absolute;
+      left: 4px;
+      top: 1.5px;
+      width: 5px;
+      height: 9px;
+      border: 2px solid #fff;
+      border-top: none;
+      border-left: none;
+      transform: rotate(45deg);
+    }
+  }
+}
+
+// ── Comparison Table ───────────────────────────────────────────────────────
+.st-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+
+  thead tr {
+    background: var(--de-neutral-50);
+    border-bottom: 1px solid var(--de-neutral-200);
+  }
+
+  th {
+    padding: 10px 16px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: var(--de-neutral-500);
+    text-align: left;
+  }
+
+  td {
+    padding: 10px 16px;
+    color: var(--de-neutral-800);
+    border-bottom: 1px solid var(--de-neutral-100);
+    vertical-align: middle;
+  }
+}
+
+.st-col-r { text-align: right !important; }
+
+.st-row {
+  &--breach td { background: rgba(220, 38, 38, 0.04); }
+  &--warn   td { background: rgba(245, 166, 35, 0.04); }
+}
+
+.st-bucket-name { font-weight: 600; color: var(--de-navy); }
+
+.st-gap-val {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--de-neutral-600);
+
+  &--pos { color: var(--de-teal-dark); font-weight: 600; }
+  &--neg { color: var(--de-red);       font-weight: 600; }
+}
+
+.st-diff-val {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+
+  &--worse  { color: var(--de-red); }
+  &--better { color: var(--de-teal-dark); }
+}
+
+.st-unchanged { color: var(--de-neutral-300); }
+
+.st-empty-cell {
+  padding: 32px 20px !important;
+  text-align: center;
+  color: var(--de-neutral-400);
+  font-size: 13px;
+  border-bottom: none !important;
+}
+
+// ── Chart Card ─────────────────────────────────────────────────────────────
+.st-chart-card { padding: 0; }
+
+.st-chart-hd {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px 14px;
+  border-bottom: 1px solid var(--de-neutral-100);
+  gap: 12px;
+
+  &__title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--de-navy);
+    margin: 0;
+  }
+}
+
+.st-chart-legend {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.st-leg-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--de-neutral-600);
+}
+
+.st-leg-line {
+  display: inline-block;
+  width: 24px;
+  height: 2.5px;
+  border-radius: 2px;
+
+  &--navy { background: var(--de-navy); }
+  &--red  { background: var(--de-red);  }
+  &--amber { background: transparent; border-top: 2px dashed var(--de-amber); height: 0; }
+  &--dash { background: transparent; border-top: 2px dashed; height: 0; }
+  &--navy.st-leg-line--dash { border-top-color: var(--de-navy); }
+}
+
+.st-chart {
+  display: block;
+  width: 100%;
+  height: 200px;
+  padding: 8px 16px;
+}
+
+.st-axis-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  fill: var(--de-neutral-400);
+}
+
+.st-breach-label {
+  font-size: 9px;
+  fill: var(--de-amber-dark);
+  font-weight: 700;
+}
+
+.st-breach-dot-label {
+  font-size: 9px;
+  font-weight: 700;
+  fill: var(--de-red);
+  font-family: var(--font-mono);
+}
+
+// ── Remediation Panel ──────────────────────────────────────────────────────
+.st-remediation {
+  border-left: 3px solid var(--de-red);
+
+  &__hd {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+
+    h2 {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--de-navy);
+      margin: 0;
+      flex: 1;
+    }
+  }
+
+  &__sub {
+    font-size: 13px;
+    color: var(--de-neutral-600);
+    margin: 0 0 20px;
+    line-height: 1.5;
+  }
+
+  &__actions {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+}
+
+.st-action {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+
+  &__icon {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--de-red-light);
+    color: var(--de-red);
+    font-size: 12px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  &__title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--de-navy);
+    margin: 0 0 3px;
+  }
+
+  &__desc {
+    font-size: 12px;
+    color: var(--de-neutral-600);
+    margin: 0;
+    line-height: 1.5;
+  }
+}
+
+// ── Responsive ─────────────────────────────────────────────────────────────
+@media (max-width: 1100px) {
+  .st-layout { grid-template-columns: 1fr; }
+  .st-kpi-row { grid-template-columns: repeat(2, 1fr); }
+}

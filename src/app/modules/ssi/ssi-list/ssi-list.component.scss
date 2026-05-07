@@ -1,0 +1,131 @@
+// ── Page Header ────────────────────────────────────────────────────────────
+
+.ssi-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  gap: 16px;
+
+  &__title {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--de-navy);
+    margin: 0 0 4px;
+  }
+
+  &__sub {
+    font-size: 13px;
+    color: var(--de-neutral-500);
+    margin: 0;
+  }
+}
+
+// ── KPI Strip ──────────────────────────────────────────────────────────────
+
+.ssi-kpi-strip {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.ssi-kpi-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  background: #fff;
+  border: 1px solid var(--de-neutral-200);
+  border-radius: var(--radius-md);
+  padding: 14px 28px;
+  min-width: 90px;
+  box-shadow: var(--shadow-sm);
+
+  &__val {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--de-navy);
+    font-family: var(--font-mono);
+  }
+
+  &__lbl {
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: var(--de-neutral-500);
+  }
+
+  &--active   { border-color: var(--de-teal);   .ssi-kpi-item__val { color: var(--de-teal-dark); } }
+  &--currency { border-color: var(--de-purple);  .ssi-kpi-item__val { color: var(--de-purple); } }
+}
+
+// ── Table Card ─────────────────────────────────────────────────────────────
+
+.ssi-table-card {
+  padding: 0;
+  overflow: hidden;
+}
+
+.ssi-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+
+  th {
+    padding: 12px 14px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--de-neutral-500);
+    background: var(--de-neutral-50);
+    border-bottom: 1px solid var(--de-neutral-200);
+    white-space: nowrap;
+  }
+
+  &__row {
+    border-bottom: 1px solid var(--de-neutral-100);
+    transition: background 0.1s;
+
+    &:last-child { border-bottom: none; }
+    &:hover { background: var(--de-neutral-50); }
+
+    td { padding: 13px 14px; vertical-align: middle; }
+  }
+
+  &__id {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--de-navy);
+    white-space: nowrap;
+  }
+
+  &__swift {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--de-teal-dark);
+    letter-spacing: 0.5px;
+  }
+
+  &__name { font-weight: 500; color: var(--de-neutral-800); }
+
+  &__corr { color: var(--de-neutral-600); font-size: 12px; }
+
+  &__na { color: var(--de-neutral-300); }
+}
+
+.ssi-ccy-badge {
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+// ── Responsive ─────────────────────────────────────────────────────────────
+
+@media (max-width: 768px) {
+  .ssi-header { flex-direction: column; }
+  .ssi-kpi-strip { flex-wrap: wrap; }
+}

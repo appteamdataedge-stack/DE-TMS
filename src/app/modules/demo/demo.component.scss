@@ -1,0 +1,390 @@
+// ── Color tokens (reuse audit/dashboard patterns) ──────────────────────────
+$dm-violet:       #7C3AED;
+$dm-violet-light: #F3EFFE;
+
+// ── Page Header ───────────────────────────────────────────────────────────
+
+.dm-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+
+  &__title {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--de-navy);
+    margin: 0 0 6px;
+  }
+
+  &__sub {
+    font-size: 14px;
+    color: var(--de-neutral-500);
+    margin: 0;
+    max-width: 560px;
+    line-height: 1.5;
+  }
+}
+
+.dm-reset-btn {
+  flex-shrink: 0;
+  font-size: 12px;
+  padding: 6px 14px;
+}
+
+// ── Progress Card ─────────────────────────────────────────────────────────
+
+.dm-progress-card {
+  padding: 20px 24px;
+  margin-bottom: 24px;
+
+  &__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+
+  &__fraction {
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  &__done {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--de-navy);
+    font-family: var(--font-mono);
+  }
+
+  &__total {
+    color: var(--de-neutral-500);
+    font-weight: 500;
+  }
+}
+
+.dm-all-done-badge {
+  font-size: 11px;
+  padding: 3px 10px;
+}
+
+.dm-progress-track {
+  height: 8px;
+  background: var(--de-neutral-100);
+  border-radius: 100px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.dm-progress-fill {
+  height: 100%;
+  background: var(--de-teal);
+  border-radius: 100px;
+  transition: width 0.4s ease;
+}
+
+.dm-progress-steps {
+  display: flex;
+  gap: 8px;
+}
+
+.dm-progress-step {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--de-neutral-100);
+  color: var(--de-neutral-400);
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, color 0.2s;
+
+  &--done {
+    background: var(--de-teal);
+    color: #fff;
+  }
+}
+
+// ── Scenario Grid ─────────────────────────────────────────────────────────
+
+.dm-scenarios {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+// ── Scenario Card ─────────────────────────────────────────────────────────
+
+.dm-card {
+  display: flex;
+  padding: 0;
+  overflow: hidden;
+  transition: opacity 0.2s, box-shadow 0.15s;
+
+  &:hover { box-shadow: var(--shadow-md); }
+
+  &--complete {
+    opacity: 0.72;
+  }
+
+  // Left colour bar
+  &__left-bar {
+    width: 5px;
+    flex-shrink: 0;
+    border-radius: var(--radius-lg) 0 0 var(--radius-lg);
+  }
+
+  &__body {
+    flex: 1;
+    padding: 20px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-width: 0;
+  }
+
+  &__header {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  &__meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  &__label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    color: var(--de-neutral-500);
+  }
+
+  &__title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--de-navy);
+    margin: 0;
+    line-height: 1.3;
+  }
+
+  &__desc {
+    font-size: 13px;
+    color: var(--de-neutral-600);
+    margin: 0;
+    line-height: 1.6;
+    max-width: 720px;
+  }
+
+  &__footer {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  // Color variants — left bar colour
+  &--teal   .dm-card__left-bar { background: var(--de-teal); }
+  &--navy   .dm-card__left-bar { background: var(--de-navy); }
+  &--green  .dm-card__left-bar { background: var(--de-green); }
+  &--amber  .dm-card__left-bar { background: var(--de-amber); }
+  &--violet .dm-card__left-bar { background: $dm-violet; }
+}
+
+// ── Completed badge inside card ───────────────────────────────────────────
+
+.dm-done-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--de-green);
+  background: var(--de-green-light);
+  padding: 2px 8px;
+  border-radius: 100px;
+
+  svg { flex-shrink: 0; }
+}
+
+// ── Steps List ────────────────────────────────────────────────────────────
+
+.dm-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  &__item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    font-size: 13px;
+    color: var(--de-neutral-700);
+    line-height: 1.5;
+  }
+
+  &__num {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--de-neutral-100);
+    color: var(--de-neutral-600);
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+}
+
+// ── Start Button ──────────────────────────────────────────────────────────
+
+.dm-start-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13px;
+  text-decoration: none;
+}
+
+// ── Mark Complete Checkbox ────────────────────────────────────────────────
+
+.dm-check-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--de-neutral-600);
+
+  &:hover .dm-check-box { border-color: var(--de-teal); }
+}
+
+.dm-check-input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.dm-check-box {
+  width: 18px;
+  height: 18px;
+  border: 1.5px solid var(--de-neutral-300);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: #fff;
+  transition: border-color 0.15s, background 0.15s;
+  color: #fff;
+
+  .dm-check-input:checked + & {
+    background: var(--de-teal);
+    border-color: var(--de-teal);
+  }
+}
+
+.dm-check-text {
+  line-height: 1;
+}
+
+// ── Quick Reference Card ──────────────────────────────────────────────────
+
+.dm-ref-card {
+  background: var(--de-navy);
+  border-radius: var(--radius-lg);
+  padding: 28px 32px;
+  color: #fff;
+  margin-bottom: 32px;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 24px;
+    color: rgba(255,255,255,.7);
+  }
+
+  &__title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #fff;
+    margin: 0;
+  }
+}
+
+.dm-ref-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+}
+
+.dm-ref-section {
+  &__heading {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .6px;
+    color: var(--de-teal);
+    margin: 0 0 10px;
+  }
+}
+
+.dm-ref-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+
+  &__item {
+    font-size: 12.5px;
+    color: rgba(255,255,255,.75);
+    line-height: 1.5;
+    padding-left: 12px;
+    position: relative;
+
+    &::before {
+      content: '›';
+      position: absolute;
+      left: 0;
+      color: rgba(255,255,255,.35);
+    }
+  }
+}
+
+// ── Responsive ────────────────────────────────────────────────────────────
+
+@media (max-width: 1100px) {
+  .dm-ref-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 768px) {
+  .dm-header { flex-direction: column; align-items: flex-start; }
+  .dm-ref-card { padding: 20px; }
+  .dm-ref-grid { grid-template-columns: 1fr; gap: 20px; }
+  .dm-card__body { padding: 16px; }
+  .dm-card__footer { gap: 12px; }
+}
+
+@media (max-width: 480px) {
+  .dm-progress-steps { gap: 5px; }
+  .dm-progress-step { width: 24px; height: 24px; font-size: 11px; }
+}

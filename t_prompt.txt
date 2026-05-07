@@ -1,0 +1,236 @@
+Angular Money Market app (dataedge-tms). Fix 3 issues ONLY.
+Do NOT change any logic, API calls, or other files.
+
+---
+
+## FIX 1 — tms-select dropdown panel wrong position
+
+Find: src/app/shared/components/tms-select/tms-select.component.ts
+and tms-select.component.scss
+
+FROM DOM: the .tms-panel uses inline style top/left calculated from 
+document coordinates. This is wrong when page is scrolled.
+
+In tms-select.component.ts find the method that calculates and sets
+the panel position (likely called positionPanel() or similar, 
+sets style.top and style.left on the panel element).
+
+REPLACE the position calculation with this logic:
+- The .tms-panel must be positioned relative to its parent .tms-trigger
+- Remove any absolute document-level coordinate calculation
+- In tms-select.component.scss set:
+  :host {
+    position: relative !important;
+    display: block !important;
+  }
+  .tms-panel {
+    position: absolute !important;
+    top: 100% !important;
+    left: 0 !important;
+    width: 100% !important;
+    z-index: 9999 !important;
+    background: #FFFFFF !important;
+    border: 1px solid #E0E0E0 !important;
+    border-radius: 8px !important;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.12) !important;
+    max-height: 220px !important;
+    overflow-y: auto !important;
+    margin-top: 2px !important;
+  }
+
+In tms-select.component.ts:
+- Find positionPanel() or any method setting style.top / style.left
+- Remove or comment out ALL inline style assignments for top and left
+- The panel position is now handled purely by CSS (top:100%, left:0)
+- Keep the isOpen toggle logic untouched
+
+---
+
+## FIX 2 — de-bottom-nav: move to shell, fix position
+
+CURRENT PROBLEM: <de-bottom-nav> is inside each create page component.
+It must be moved to the shell layout so it sits outside page content,
+directly below the navbar, spanning the same width as the breadcrumb area.
+
+STEP A — Find shell component:
+Search for "shell-nav" and "shell-inside" class in the project.
+The file is likely: src/app/core/layout/shell/shell.component.html
+
+In shell.component.html find the structure:
+<div class="shell-nav">...</div>
+<div class="shell-inside">...</div>
+
+Add <de-bottom-nav> BETWEEN shell-nav and shell-inside:
+<div class="shell-nav">...</div>
+<de-bottom-nav></de-bottom-nav>      ← add here
+<div class="shell-inside">...</div>
+
+STEP B — Remove <de-bottom-nav> from ALL individual create page HTMLs:
+- mm-deal create component HTML
+- portfolio create component HTML
+- partners create component HTML
+- counterparties create component HTML
+- instruments create component HTML
+- gl-master create component HTML
+- products create component HTML
+- ssi create component HTML
+
+STEP C — Fix de-bottom-nav positioning in SCSS:
+File: src/app/core/layout/bottom-nav/bottom-nav.component.scss
+
+The bar must NOT be fixed/absolute. It must flow naturally 
+in the document between shell-nav and shell-inside.
+Replace ALL existing styles with:
+
+:host {
+  display: block;
+  width: 100%;
+  height: 36px;
+  background: #EEF4FB;
+  border-bottom: 1px solid #C5D9EE;
+}
+nav.de-bottom-nav {
+  display: flex;
+  align-items: center;
+  height: 36px;
+  padding: 0 24px;
+  gap: 16px;
+  font-size: 13px;
+  color: #1565C0;
+}
+.de-infobar-item__key {
+  color: #90A4AE;
+  font-size: 11px;
+  font-weight: 600;
+  margin-right: 4px;
+  text-transform: uppercase;
+}
+.de-infobar-item__val {
+  color: #1565C0;
+  font-weight: 600;
+}
+.de-infobar-sep { color: #CFD8DC; }
+
+STEP D — In de-bottom-nav.component.ts:
+Remove any route checking / show-hide logic.
+The component always renders — visibility is controlled by 
+whether it is present in the DOM (shell adds it only on create pages
+via *ngIf on router.url — see below).
+
+In shell.component.ts inject Router and add:
+showInfoBar = false;
+private createRoutes = [
+  '/mm-deal/create', '/portfolio/create', '/partners/create',
+  '/counterparties/create', '/instruments/create',
+  '/gl-master/create', '/products/create', '/ssi/create'
+];
+ngOnInit() {
+  this.checkRoute(this.router.url);
+  this.router.events.pipe(
+    filter(e => e instanceof NavigationEnd)
+  ).subscribe((e: NavigationEnd) => this.checkRoute(e.urlAfterRedirects));
+}
+checkRoute(url: string) {
+  this.showInfoBar = this.createRoutes.some(r => url.startsWith(r));
+}
+
+In shell.component.html use *ngIf:
+<de-bottom-nav *ngIf="showInfoBar"></de-bottom-nav>
+
+---
+
+## FIX 3 — app-upper-footer: move to shell, fix position
+
+Same approach as FIX 2.
+
+STEP A — In shell.component.html add app-upper-footer AFTER shell-inside:
+<div class="shell-nav">...</div>
+<de-bottom-nav *ngIf="showInfoBar"></de-bottom-nav>
+<div class="shell-inside">...</div>
+<app-upper-footer *ngIf="showFooter"></app-upper-footer>  ← add here
+
+STEP B — Add showFooter to shell.component.ts using same createRoutes array:
+showFooter = false;
+// inside checkRoute():
+this.showFooter = this.createRoutes.some(r => url.startsWith(r));
+
+STEP C — Remove <app-upper-footer> from ALL individual create page HTMLs
+(same 8 pages listed in FIX 2 STEP B).
+
+STEP D — Fix app-upper-footer positioning in SCSS:
+File: src/app/core/layout/upper-footer/upper-footer.component.scss
+
+Replace ALL existing styles:
+:host {
+  display: block;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1100;
+  height: 52px;
+}
+.uf {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 52px;
+  padding: 0 24px;
+  background: #FFFFFF;
+  border-top: 1px solid #E0E0E0;
+  box-shadow: 0 -2px 8px rgba(0,0,0,0.07);
+}
+.uf__message {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #757575;
+}
+.uf__actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.uf__cancel {
+  padding: 6px 16px;
+  border: 1px solid #B0BEC5;
+  border-radius: 6px;
+  background: transparent;
+  color: #546E7A;
+  cursor: pointer;
+  font-size: 13px;
+}
+.uf__draft {
+  padding: 6px 16px;
+  border: 1px solid #1565C0;
+  border-radius: 6px;
+  background: transparent;
+  color: #1565C0;
+  cursor: pointer;
+  font-size: 13px;
+}
+.uf__submit {
+  padding: 6px 16px;
+  border: none;
+  border-radius: 6px;
+  background: #1565C0;
+  color: #FFFFFF;
+  cursor: pointer;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+Also add padding-bottom: 60px to .shell-inside in shell component SCSS
+so footer does not overlap last page content.
+
+---
+
+## CONSTRAINTS
+- ONLY touch: tms-select component files, shell component files,
+  bottom-nav component files, upper-footer component files,
+  and the 8 create page HTML files (remove tags only)
+- Do NOT change any form logic, bindings, API calls
+- Do NOT install new packages

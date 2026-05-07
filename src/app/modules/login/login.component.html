@@ -1,0 +1,127 @@
+<div class="lp">
+
+  <!-- ── Left brand panel ─────────────────────────────────────────────────── -->
+  <div class="lp__left">
+    <div class="lp__texture" aria-hidden="true"></div>
+
+    <div class="lp__left-inner">
+      <!-- Logo -->
+      <div class="lp__logo">
+        <div class="lp__logo-mark">DE</div>
+        <div class="lp__logo-text">
+          <span class="lp__brand-name">DataEdge</span>
+          <span class="lp__brand-sub">Treasury Management</span>
+        </div>
+      </div>
+
+      <!-- Tagline -->
+      <div class="lp__tagline">
+        <div class="lp__tag-line">Treasury</div>
+        <div class="lp__tag-line">Management</div>
+        <div class="lp__tag-line lp__tag-line--accent">System</div>
+      </div>
+
+      <p class="lp__subtitle">Powering Bangladesh's capital markets</p>
+
+      <!-- Feature badges -->
+      
+    </div>
+  </div>
+
+  <!-- ── Right form panel ─────────────────────────────────────────────────── -->
+  <div class="lp__right login-page">
+    <div class="lp__card login-card">
+
+      <!-- Header -->
+      <div class="lp__card-header login-logo">
+        <p class="lp__welcome login-subtitle">Welcome back</p>
+        <h1 class="lp__heading login-title">Sign in to DataEdge TMS</h1>
+      </div>
+
+      <!-- Error alert -->
+      @if (error) {
+        <div class="lp__alert">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          Invalid username or password
+        </div>
+      }
+
+      <!-- Login form -->
+      <form class="lp__form" [class.lp__form--shake]="shaking" (ngSubmit)="onSubmit()" #f="ngForm">
+
+        <div class="lp__field">
+          <label class="lp__label" for="lp-user">Username</label>
+          <input
+            id="lp-user"
+            class="lp__input"
+            type="text"
+            [(ngModel)]="username"
+            name="username"
+            required
+            autocomplete="username"
+            placeholder="e.g. dealer1"
+            [class.lp__input--error]="error">
+        </div>
+
+        <div class="lp__field">
+          <label class="lp__label" for="lp-pw">Password</label>
+          <div class="lp__pw-wrap">
+            <input
+              id="lp-pw"
+              class="lp__input"
+              [type]="showPw ? 'text' : 'password'"
+              [(ngModel)]="password"
+              name="password"
+              required
+              autocomplete="current-password"
+              placeholder="••••••••"
+              [class.lp__input--error]="error">
+            <button type="button" class="lp__eye" (click)="showPw = !showPw" tabindex="-1" aria-label="Toggle password visibility">
+              @if (showPw) {
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                  <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+                  <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+                  <line x1="1" y1="1" x2="23" y2="23"/>
+                </svg>
+              } @else {
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+              }
+            </button>
+          </div>
+        </div>
+
+        <button type="submit" class="lp__submit login-btn" [disabled]="loading || !username || !password">
+          @if (loading) {
+            <span class="lp__spinner"></span>
+            Signing in…
+          } @else {
+            Sign In
+          }
+        </button>
+      </form>
+
+      <!-- Demo accounts -->
+      <div class="lp__demo">
+        <div class="lp__demo-divider">
+          <span>Demo Accounts</span>
+        </div>
+        <div class="lp__demo-grid">
+          @for (d of demos; track d.username) {
+            <button type="button" class="lp__demo-btn" (click)="fillDemo(d)">
+              {{ d.label }}
+            </button>
+          }
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>

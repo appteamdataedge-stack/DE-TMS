@@ -1,0 +1,155 @@
+Angular Money Market app (dataedge-tms). Apply these fixes ONLY.
+Do NOT change any form logic, validators, or API calls.
+
+---
+
+## FIX 1 — Remove bottom-nav and upper-footer from list/view pages
+These components must be HIDDEN on ALL the following routes:
+/dashboard, /demo, /blotter, /mm-deals, /liquidity/gap,
+/liquidity/stress, /portfolio, /partners, /bp-role-assignment,
+/counterparties, /instruments, /gl-master, /products, /ssi,
+/auth-inbox, /reports/audit, /udf-maintenance, /user-management
+
+In both bottom-nav.component.ts and upper-footer.component.ts,
+update the allowedRoutes array to ONLY include:
+'/mm-deal/create', '/portfolio/create', '/partners/create',
+'/counterparties/create', '/instruments/create',
+'/gl-master/create', '/products/create', '/ssi/create'
+
+Any route NOT in this list = showBar/showFooter = false.
+Use router.url.startsWith() check for each route.
+
+---
+
+## FIX 2 — Fix ALL dropdowns not working across entire app
+The root cause is likely one of these — check and fix all:
+
+In styles.scss REMOVE any of these if present (they break dropdowns):
+- .cdk-overlay-pane { width: auto; left: auto; transform: none }
+- Any transform or position override on .cdk-overlay-pane
+
+REPLACE with only this in styles.scss:
+.cdk-overlay-container {
+  z-index: 9999 !important;
+}
+.mat-mdc-select-panel {
+  max-height: 220px !important;
+  overflow-y: auto !important;
+}
+.mat-mdc-select-panel::-webkit-scrollbar { width: 6px; }
+.mat-mdc-select-panel::-webkit-scrollbar-thumb {
+  background: #B0BEC5; border-radius: 3px;
+}
+
+In every component TypeScript file across the entire project:
+- Find any FormControl initialized as: 
+  new FormControl({value: x, disabled: true})
+  Change to: new FormControl(x)
+  (disabled FormControls prevent dropdown interaction)
+- Ensure options arrays for ALL dropdowns are initialized 
+  in ngOnInit(), not in constructor or ngAfterViewInit
+
+Do NOT add disableOptionCentering or panelClass to any mat-select.
+
+---
+
+## FIX 3 — Portfolio page: remove Product field
+File: portfolio create/edit component HTML and TS
+Find and remove the Product field/FormControl from portfolio form.
+Do NOT touch any other portfolio fields.
+
+---
+
+## FIX 4 — Products page: update fields to match spec
+File: products create/edit component
+
+Replace existing form fields with exactly these:
+1. PRODUCT_ID — text input, auto-generated, read-only, alphanumeric
+2. PRODUCT_NAME — text input, required
+3. DEAL_TYPE — dropdown/toggle: options ['Call', 'Time'], required
+4. DIRECTION — radio buttons: options ['Accept', 'Place'], required
+5. RATE_TYPE — toggle switch or radio: options ['Fixed', 'Floating'], required
+6. STATUS — toggle switch: Active / Inactive, default Active
+7. EFFECTIVE_DATE — date picker, required, default today
+
+Keep existing save/submit logic. Only update the form fields and template.
+Use toggle switch for STATUS and RATE_TYPE (mat-slide-toggle).
+Use radio buttons (mat-radio-group) for DIRECTION.
+Use mat-select dropdown for DEAL_TYPE.
+
+---
+
+## FIX 5 — Global UI redesign: modern, attractive, animated
+Apply these design improvements across the ENTIRE app:
+
+### Colors & Theme
+- Primary: #1A237E (deep indigo)
+- Accent: #00BFA5 (teal)
+- Sidebar background: linear-gradient(180deg, #1A237E 0%, #283593 100%)
+- Sidebar text/icons: #FFFFFF, active item: #00BFA5 left border + 
+  rgba(0,191,165,0.15) background
+- Navbar: #1A237E background, white text
+- Page background: #F5F7FA
+- Cards: #FFFFFF, border-radius: 12px, 
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08)
+
+### Typography
+- All labels: uppercase, letter-spacing: 0.5px, font-size: 11px, 
+  color: #607D8B
+- All values/inputs: font-size: 14px, color: #1A237E
+
+### Buttons
+- Primary button: background #1A237E, color white, 
+  border-radius: 8px, padding: 8px 24px
+- Accent button: background #00BFA5, color white, border-radius: 8px
+- Hover: translateY(-1px) + box-shadow increase transition 0.2s
+
+### Animations — add to styles.scss
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.mat-card, .content-panel, .page-container {
+  animation: fadeSlideIn 0.3s ease forwards;
+}
+@keyframes countUp {
+  from { opacity: 0; transform: scale(0.8); }
+  to   { opacity: 1; transform: scale(1); }
+}
+.stat-card-value { animation: countUp 0.4s ease forwards; }
+
+### Tables
+- Header row: background #E8EAF6, color #1A237E, font-weight: 600
+- Alternate rows: white / #FAFAFA
+- Row hover: background #E3F2FD transition 0.15s
+- Border-radius on table container: 12px
+- Remove harsh borders, use subtle box-shadow on table card
+
+### Form fields
+- Use outline appearance on ALL mat-form-field consistently
+- Focus color: #1A237E
+- Border-radius: 8px on all inputs
+
+### Dashboard
+- Stat cards: gradient background per card
+  Card 1: linear-gradient(135deg, #1A237E, #3949AB)
+  Card 2: linear-gradient(135deg, #00695C, #00BFA5)
+  Card 3: linear-gradient(135deg, #4527A0, #7C4DFF)
+  Card 4: linear-gradient(135deg, #BF360C, #FF6E40)
+  All stat card text: white
+- Add subtle pulse animation on Live badge in navbar
+
+### Sidebar
+- Add smooth slide transition when expanding/collapsing groups
+- Active route item: left border 3px solid #00BFA5 + 
+  background rgba(0,191,165,0.12)
+- Hover: background rgba(255,255,255,0.08) transition 0.2s
+
+---
+
+## CONSTRAINTS
+- Do NOT change any form logic, API calls, validators, or bindings
+- Do NOT install new packages
+- Apply FIX 1–4 precisely; FIX 5 is styling only — 
+  no structural HTML changes
+- Each fix is independent

@@ -1,0 +1,103 @@
+Angular Money Market app (dataedge-tms). Fix these 2 issues ONLY.
+Do NOT change any other logic or files.
+
+---
+
+## FIX 1 — Remove de-bottom-nav and app-upper-footer from non-create pages
+
+From inspecting the DOM, these two tags appear on every page:
+<de-bottom-nav>
+<app-upper-footer>
+
+They are included in the main layout template. Find the layout component
+that contains both these tags (check these files in order):
+- src/app/core/layout/main-layout/main-layout.component.html
+- src/app/core/layout/shell/shell.component.html
+- src/app/app.component.html
+
+When found, REMOVE both tags completely from the layout template.
+
+Then add them ONLY inside each of these specific page components directly:
+- src/app/features/mm-deal/create/ (mm-deal create component HTML)
+- src/app/features/portfolio/create/ (portfolio create component HTML)
+- src/app/features/partners/create/
+- src/app/features/counterparties/create/
+- src/app/features/instruments/create/
+- src/app/features/gl-master/create/
+- src/app/features/products/create/
+- src/app/features/ssi/create/
+
+Add both tags at the bottom of each of these create component HTML files:
+<de-bottom-nav></de-bottom-nav>
+<app-upper-footer></app-upper-footer>
+
+This way they only exist on create pages, nowhere else.
+Remove the allowedRoutes / show logic from both component TS files
+since it is no longer needed — just always show when present.
+
+---
+
+## FIX 2 — Fix custom tms-select dropdown not opening
+
+From DOM inspection, the app uses a CUSTOM component <tms-select>
+NOT Angular Material mat-select.
+Find this component:
+search for "tms-select" or "TmsSelectComponent" in the project.
+Likely at: src/app/shared/components/tms-select/ or similar.
+
+The dropdown panel is not appearing when clicked.
+Check tms-select.component.ts for the click/toggle handler:
+Find the method that toggles isOpen or showDropdown boolean.
+Common issues to check and fix:
+
+ISSUE A — Click event stopped by parent:
+In tms-select.component.html find the trigger div (.tms-trigger).
+Make sure it has: (click)="toggleDropdown($event)"
+And in toggleDropdown: add $event.stopPropagation()
+
+ISSUE B — Dropdown panel hidden by CSS:
+In tms-select.component.scss find the dropdown panel class.
+Make sure when isOpen=true the panel has:
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  z-index: 9999 !important;
+  position: absolute !important;
+  top: 100% !important;
+  left: 0 !important;
+  min-width: 100% !important;
+  background: #FFFFFF !important;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12) !important;
+  border-radius: 8px !important;
+  max-height: 220px !important;
+  overflow-y: auto !important;
+
+ISSUE C — Global CSS overriding tms-select panel:
+In styles.scss check if any rule hides .tms-select or 
+.tms-dropdown or .tms-panel. Remove any such rule.
+
+ISSUE D — Click outside closing immediately:
+If there is a document click listener closing the dropdown,
+make sure the trigger click calls $event.stopPropagation()
+so it does not immediately re-close after opening.
+
+ISSUE E — z-index blocked by parent:
+Find any parent container of tms-select that has:
+  overflow: hidden or overflow: scroll
+Add position: relative and z-index: 1 to those containers
+so the dropdown panel can overflow correctly.
+
+After fixing, test that:
+- Clicking the tms-select trigger opens the dropdown panel
+- Options list is visible and scrollable
+- Clicking an option selects it and closes the panel
+- Clicking outside closes the panel
+
+---
+
+## CONSTRAINTS
+- ONLY touch: main layout HTML, 8 create page HTMLs,
+  bottom-nav TS, upper-footer TS, tms-select component files,
+  and styles.scss
+- Do NOT change any form logic, API calls, or other components
+- Do NOT install new packages

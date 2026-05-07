@@ -1,0 +1,435 @@
+// ─── Page header ──────────────────────────────────────────────────────────────
+
+.mm-page-sub { font-size: 13px; color: var(--de-neutral-500); margin: 4px 0 0; }
+
+// ─── Step 1 summary strip ─────────────────────────────────────────────────────
+
+.mm-s1-strip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 10px 16px;
+  background: var(--de-neutral-50);
+  border: 1px solid var(--de-neutral-200);
+  border-radius: var(--radius-md);
+  margin-bottom: 24px;
+  font-size: 13px;
+
+  &__label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .6px;
+    color: var(--de-neutral-400);
+    margin-right: 4px;
+  }
+
+  &__edit {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-left: auto;
+    font-size: 12px;
+    color: var(--de-teal);
+    text-decoration: none;
+    &:hover { text-decoration: underline; }
+  }
+}
+
+.mm-s1-chip {
+  background: #fff;
+  border: 1px solid var(--de-neutral-200);
+  border-radius: 100px;
+  padding: 2px 10px;
+  font-size: 12px;
+  color: var(--de-neutral-700);
+  font-weight: 500;
+}
+
+// ─── Form ─────────────────────────────────────────────────────────────────────
+
+.mm-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding-bottom: 88px;
+}
+
+.mm-card .de-grid-2 { row-gap: 20px; }
+
+// ─── Deposit Type cards ───────────────────────────────────────────────────────
+
+.mm-dtype-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.mm-dtype-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 20px;
+  background: var(--de-neutral-50);
+  border: 2px solid var(--de-neutral-200);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  text-align: left;
+  transition: all .15s;
+  position: relative;
+  width: 100%;
+
+  &:hover { border-color: var(--de-neutral-300); background: #fff; }
+
+  &--active {
+    border-color: var(--de-teal);
+    background: var(--de-teal-light);
+  }
+
+  &__icon {
+    width: 48px; height: 48px;
+    border-radius: var(--radius-md);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+
+    &--term {
+      background: rgba(15,163,131,.1); color: var(--de-teal);
+      .mm-dtype-card--active & { background: var(--de-teal); color: #fff; }
+    }
+    &--call {
+      background: rgba(13,27,42,.08); color: var(--de-navy);
+      .mm-dtype-card--active & { background: var(--de-navy); color: #fff; }
+    }
+  }
+
+  &__body {
+    display: flex; flex-direction: column; gap: 2px; flex: 1;
+  }
+
+  &__title {
+    font-size: 15px; font-weight: 700;
+    font-family: var(--font-mono); letter-spacing: .5px; color: var(--de-navy);
+  }
+
+  &__sub  { font-size: 12px; font-weight: 500; color: var(--de-neutral-700); }
+  &__desc { font-size: 11px; color: var(--de-neutral-500); margin-top: 2px; }
+
+  &__check {
+    position: absolute; top: 12px; right: 12px;
+    width: 20px; height: 20px; background: var(--de-teal);
+    border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff;
+  }
+}
+
+// ─── Combined amount+currency input ──────────────────────────────────────────
+
+.mm-amount-group {
+  display: flex;
+  border: 1px solid var(--de-neutral-300);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  transition: border-color .15s, box-shadow .15s;
+
+  &:focus-within {
+    border-color: var(--de-teal);
+    box-shadow: 0 0 0 3px rgba(15,163,131,.12);
+  }
+
+  &--invalid { border-color: var(--de-red); }
+
+  &__ccy {
+    width: 120px;
+    flex-shrink: 0;
+    background: var(--de-neutral-50);
+
+    // Strip tms-select trigger border (outer group provides the border)
+    ::ng-deep .tms-trigger {
+      border: none !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+      background: transparent !important;
+      min-height: 40px;
+    }
+
+    // Panel can be wider than the narrow trigger
+    ::ng-deep .tms-panel {
+      min-width: 200px;
+    }
+  }
+
+  &__divider {
+    width: 1px;
+    background: var(--de-neutral-200);
+    flex-shrink: 0;
+  }
+
+  &__input {
+    flex: 1;
+    .mm-amount-input {
+      border: none !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+      height: 40px;
+      font-family: var(--font-mono);
+      font-size: 14px;
+      font-weight: 500;
+
+      &:focus { box-shadow: none !important; }
+    }
+  }
+}
+
+.mm-ccy-label {
+  font-size: 13px; font-weight: 600; font-family: var(--font-mono);
+  display: flex; align-items: center; gap: 5px;
+}
+
+.mm-ccy-option {
+  display: flex; align-items: center; gap: 8px;
+  &__code { font-family: var(--font-mono); font-weight: 600; font-size: 13px; }
+  &__name { font-size: 12px; color: var(--de-neutral-500); }
+}
+
+.mm-amount-display {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--de-teal);
+  margin-top: 4px;
+}
+
+// ─── Period buttons ───────────────────────────────────────────────────────────
+
+.mm-period-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+  flex-wrap: wrap;
+
+  &__label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    color: var(--de-neutral-400);
+    margin-right: 4px;
+    white-space: nowrap;
+  }
+}
+
+.mm-period-btn {
+  padding: 5px 12px;
+  border: 1px solid var(--de-neutral-300);
+  border-radius: var(--radius-md);
+  background: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  color: var(--de-neutral-600);
+  cursor: pointer;
+  transition: all .12s;
+
+  &:hover { border-color: var(--de-teal); color: var(--de-teal); background: var(--de-teal-light); }
+
+  &--active {
+    border-color: var(--de-teal);
+    background: var(--de-teal);
+    color: #fff;
+  }
+}
+
+// ─── Days badge ───────────────────────────────────────────────────────────────
+
+.mm-days-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--de-teal-dark);
+  background: var(--de-teal-light);
+  padding: 2px 8px;
+  border-radius: 100px;
+  margin-top: 4px;
+}
+
+// ─── Compounding tiles ────────────────────────────────────────────────────────
+
+.mm-card--relative { position: relative; overflow: hidden; }
+
+.mm-compound-grid { gap: 14px; }
+
+.mm-compound-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 16px;
+  background: var(--de-neutral-50);
+  border: 2px solid var(--de-neutral-200);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  text-align: left;
+  transition: all .15s;
+  width: 100%;
+
+  &:hover:not(:disabled) { border-color: var(--de-neutral-400); background: #fff; }
+  &:disabled { opacity: .4; cursor: not-allowed; }
+
+  &--active-navy { border-color: var(--de-navy); background: rgba(13,27,42,.04); }
+  &--active-teal { border-color: var(--de-teal); background: var(--de-teal-light); }
+
+  &__icon { color: var(--de-neutral-400); .mm-compound-tile--active-navy &, .mm-compound-tile--active-teal & { color: var(--de-navy); } }
+  &__label { font-size: 13px; font-weight: 700; color: var(--de-navy); }
+  &__sub   { font-size: 11px; color: var(--de-neutral-500); line-height: 1.4; }
+}
+
+// ─── CALL overlay ─────────────────────────────────────────────────────────────
+
+.mm-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(249,250,251,.88);
+  backdrop-filter: blur(1px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  pointer-events: none;
+  border-radius: var(--radius-lg);
+
+  &__badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #fff;
+    border: 1px solid var(--de-neutral-300);
+    border-radius: var(--radius-md);
+    padding: 10px 18px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--de-neutral-600);
+    box-shadow: var(--shadow-md);
+  }
+}
+
+// ─── Capitalization schedule ──────────────────────────────────────────────────
+
+.mm-sched {
+  margin-top: 20px;
+
+  &__label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    color: var(--de-neutral-400);
+    margin-bottom: 10px;
+  }
+
+  &__table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+
+    th {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .4px;
+      color: var(--de-neutral-500);
+      padding: 8px 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--de-neutral-200);
+      background: var(--de-neutral-50);
+    }
+
+    td {
+      padding: 9px 12px;
+      border-bottom: 1px solid var(--de-neutral-100);
+      color: var(--de-neutral-700);
+    }
+  }
+
+  &__n      { font-family: var(--font-mono); font-size: 12px; color: var(--de-neutral-400); width: 32px; }
+  &__date   { font-family: var(--font-mono); font-size: 12px; }
+  &__period { font-family: var(--font-mono); font-size: 12px; color: var(--de-neutral-500); }
+
+  &__row--maturity td { background: var(--de-teal-light); }
+}
+
+// ─── Dark summary card ────────────────────────────────────────────────────────
+
+.mm-summary-card {
+  background: var(--de-navy);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  box-shadow: var(--shadow-md);
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .6px;
+    color: rgba(255,255,255,.5);
+    margin-bottom: 20px;
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px 32px;
+  }
+}
+
+.mm-summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255,255,255,.06);
+
+  &:last-child { border-bottom: none; }
+  &--muted { grid-column: 1 / -1; }
+
+  &__label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    color: rgba(255,255,255,.45);
+    font-weight: 500;
+  }
+
+  &__val {
+    font-family: var(--font-mono);
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+  }
+
+  &__val--pending {
+    font-family: var(--font-ui);
+    font-size: 12px;
+    font-weight: 400;
+    color: rgba(255,255,255,.3);
+    font-style: italic;
+  }
+}
+
+// ─── Wizard footer ────────────────────────────────────────────────────────────
+
+.mm-wizard-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 0 0;
+  margin-top: 8px;
+  border-top: 1px solid var(--de-neutral-200);
+
+  &__right { display: flex; gap: 12px; align-items: center; }
+}

@@ -1,0 +1,364 @@
+﻿
+<!-- ─── Breadcrumb ─────────────────────────────────────────────────────── -->
+<nav class="de-breadcrumb">
+  <a routerLink="/">Home</a>
+  <span class="sep">›</span>
+  <a routerLink="/portfolio">Portfolios</a>
+  <span class="sep">›</span>
+  <span class="current">Create Portfolio</span>
+</nav>
+
+<!-- ─── Header row: title + info panel ─────────────────────────────────── -->
+<div class="pf-header-row">
+  <div class="de-page-header">
+    <h1>Create Portfolio</h1>
+    <p>Configure a new deal book for grouping money market transactions</p>
+  </div>
+
+  <!-- Best Practice Info Panel -->
+  <div class="pf-info-panel">
+    <button class="pf-info-panel__toggle" (click)="infoPanelOpen = !infoPanelOpen" type="button">
+      <span class="pf-info-panel__title">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        Best Practice Reminder
+      </span>
+      <svg class="pf-info-panel__chevron" [class.pf-info-panel__chevron--open]="infoPanelOpen"
+        width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="6 9 12 15 18 9"/>
+      </svg>
+    </button>
+    <div class="pf-info-panel__body" [@expandPanel]="infoPanelOpen ? 'open' : 'closed'">
+      <p>Portfolio should <strong>NOT</strong> define pricing rules or cashflow structure. Restrictions should be enforced via <strong>Product configuration</strong>. Portfolio represents ownership and reporting segmentation only.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ─── Form ────────────────────────────────────────────────────────────── -->
+<form [formGroup]="portfolioForm" (ngSubmit)="onSubmit()" autocomplete="off" class="pf-form">
+
+  <!-- ── CARD 1: Portfolio Identification ─────────────────────────────── -->
+  <div class="de-card pf-card">
+    <div class="de-card__header">
+      <div class="de-card__icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 9h18M9 21V9"/></svg>
+      </div>
+      <h3>Portfolio Identification</h3>
+    </div>
+
+    <div class="de-grid-2">
+      <!-- Portfolio ID -->
+      <div class="de-field">
+        <label>Portfolio ID</label>
+        <input class="de-input de-input--mono" formControlName="portfolioId" readonly />
+        <span class="de-hint">Auto-generated — read only</span>
+      </div>
+
+      <!-- Portfolio Name -->
+      <div class="de-field">
+        <label>Portfolio Name <span class="pf-req">*</span></label>
+        <input
+          class="de-input"
+          [class.is-invalid]="portfolioForm.get('portfolioName')!.invalid && portfolioForm.get('portfolioName')!.touched"
+          formControlName="portfolioName"
+          placeholder="e.g. Banking Book – FX Desk"
+          maxlength="60" />
+        @if (portfolioForm.get('portfolioName')!.errors?.['required'] && portfolioForm.get('portfolioName')!.touched) {
+          <span class="de-error">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+            Portfolio name is required
+          </span>
+        }
+        @if (portfolioForm.get('portfolioName')!.errors?.['maxlength'] && portfolioForm.get('portfolioName')!.touched) {
+          <span class="de-error">Maximum 60 characters</span>
+        }
+        <span class="de-hint">{{ portfolioForm.get('portfolioName')!.value?.length ?? 0 }}/60 characters</span>
+      </div>
+
+      <!-- Book Type -->
+      <div class="de-field">
+        <label>Book Type <span class="pf-req">*</span></label>
+        <tms-select
+          formControlName="bookType"
+          [items]="bookTypes"
+          bindValue="value"
+          bindLabel="label"
+          [clearable]="false"
+          [searchable]="false"
+          placeholder="Select book type">
+        </tms-select>
+      </div>
+
+      <!-- Status -->
+      <div class="de-field">
+        <label>Status</label>
+        <label class="pf-toggle">
+          <input type="checkbox" formControlName="status" />
+          <span class="pf-toggle__track"></span>
+          <span class="pf-toggle__label">
+            {{ portfolioForm.get('status')?.value ? 'Active' : 'Inactive' }}
+          </span>
+        </label>
+      </div>
+
+      <!-- Effective Date -->
+      <div class="de-field">
+        <label>Effective Date <span class="pf-req">*</span></label>
+        <input
+          type="date"
+          class="de-input"
+          [class.is-invalid]="portfolioForm.get('effectiveDate')!.invalid && portfolioForm.get('effectiveDate')!.touched"
+          formControlName="effectiveDate" />
+        @if (portfolioForm.get('effectiveDate')!.errors?.['required'] && portfolioForm.get('effectiveDate')!.touched) {
+          <span class="de-error">Effective date is required</span>
+        }
+        <span class="de-hint">Pre-filled with today's date</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── CARD 2: Scope & Restrictions ──────────────────────────────────── -->
+  <div class="de-card pf-card">
+    <div class="de-card__header">
+      <div class="de-card__icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+      </div>
+      <h3>Scope &amp; Restrictions</h3>
+    </div>
+
+    <div class="de-grid-2">
+
+      <!-- Reporting Tags -->
+      <div class="de-field">
+        <label>Reporting Tags</label>
+        <div class="pf-tag-row">
+          @for (tagId of reportingTags; track tagId) {
+            @let tag = getTagOption(tagId);
+            @if (tag) {
+              <span class="pf-tag pf-tag--{{ tag.color }}">
+                {{ tag.label }}
+                <button type="button" class="pf-tag__remove" (click)="removeTag(tagId)" title="Remove">✕</button>
+              </span>
+            }
+          }
+          @if (availableTagsForAdd.length > 0) {
+            <div class="pf-tag-add">
+              <tms-select
+                [items]="availableTagsForAdd"
+                bindLabel="label"
+                bindValue="id"
+                placeholder="+ Add tag"
+                [clearable]="false"
+                [searchable]="false"
+                [clearAfterSelect]="true"
+                (valueChange)="addTag($event)">
+              </tms-select>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Limit Group -->
+      <div class="de-field">
+        <label>Limit Group</label>
+        <div class="pf-search-input">
+          <input class="de-input" formControlName="limitGroupId" placeholder="Search limit group..." />
+          <span class="pf-search-icon">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          </span>
+        </div>
+      </div>
+
+      <!-- Dealer Restriction — full-width -->
+      <div class="de-field pf-full-col">
+        <label>Dealer Restriction</label>
+        <div class="de-seg-group">
+          <button type="button" [class.active]="dealerRestrict === 'ALL'"      (click)="setDealerRestrict('ALL')">All Dealers</button>
+          <button type="button" [class.active]="dealerRestrict === 'SELECTED'" (click)="setDealerRestrict('SELECTED')">Selected Only</button>
+        </div>
+        @if (dealerRestrict === 'SELECTED') {
+          <div @slideDown class="pf-restrict-select">
+            <tms-select
+              formControlName="selectedDealers"
+              [items]="dealers"
+              [multiple]="true"
+              bindValue="id"
+              bindLabel="name"
+              subLabelKey="role"
+              placeholder="Select dealers..."
+              [closeOnSelect]="false">
+            </tms-select>
+            @if (portfolioForm.get('selectedDealers')!.errors?.['required'] && portfolioForm.get('selectedDealers')!.touched) {
+              <span class="de-error">At least one dealer must be selected</span>
+            }
+          </div>
+        }
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── CARD 3: Counterparty Assignment ───────────────────────────────── -->
+  <div class="de-card pf-card">
+    <div class="de-card__header">
+      <div class="de-card__icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      </div>
+      <h3>Counterparty Assignment</h3>
+    </div>
+
+    <!-- Shuttle -->
+    <div class="pf-shuttle">
+      <!-- Left: Available -->
+      <div class="pf-shuttle__panel">
+        <div class="pf-shuttle__panel-header">
+          Available
+          <span class="pf-shuttle__count">{{ availableCounterparties.length }}</span>
+        </div>
+        <div class="pf-shuttle__search">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input [(ngModel)]="availableSearch" [ngModelOptions]="{standalone: true}" placeholder="Search..." />
+        </div>
+        <ul class="pf-shuttle__list">
+          @for (cp of filteredAvailable; track cp.id) {
+            <li class="pf-shuttle__item"
+              [class.pf-shuttle__item--selected]="selectedAvailableIds.includes(cp.id)"
+              (click)="toggleAvailable(cp.id, $event)">
+              <div class="pf-shuttle__item-name">{{ cp.name }}</div>
+              <span class="de-badge de-badge--{{ cpTypeBadge(cp.type) }}">{{ cp.type }}</span>
+            </li>
+          }
+          @if (filteredAvailable.length === 0) {
+            <li class="pf-shuttle__empty">No counterparties available</li>
+          }
+        </ul>
+      </div>
+
+      <!-- Center controls -->
+      <div class="pf-shuttle__controls">
+        <button type="button" class="pf-shuttle__btn" (click)="moveSelectedRight()" title="Move selected right"
+          [disabled]="selectedAvailableIds.length === 0">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+        <button type="button" class="pf-shuttle__btn" (click)="moveAllRight()" title="Move all right"
+          [disabled]="availableCounterparties.length === 0">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="5 18 11 12 5 6"/><polyline points="13 18 19 12 13 6"/></svg>
+        </button>
+        <button type="button" class="pf-shuttle__btn" (click)="moveSelectedLeft()" title="Move selected left"
+          [disabled]="selectedAssignedIds.length === 0">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <button type="button" class="pf-shuttle__btn" (click)="moveAllLeft()" title="Move all left"
+          [disabled]="assignedCounterparties.length === 0">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="19 18 13 12 19 6"/><polyline points="11 18 5 12 11 6"/></svg>
+        </button>
+      </div>
+
+      <!-- Right: Assigned -->
+      <div class="pf-shuttle__panel pf-shuttle__panel--assigned">
+        <div class="pf-shuttle__panel-header">
+          Assigned
+          <span class="pf-shuttle__count pf-shuttle__count--teal">{{ assignedCounterparties.length }}</span>
+        </div>
+        <div class="pf-shuttle__search">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input [(ngModel)]="assignedSearch" [ngModelOptions]="{standalone: true}" placeholder="Search..." />
+        </div>
+        <ul class="pf-shuttle__list">
+          @for (cp of filteredAssigned; track cp.id) {
+            <li class="pf-shuttle__item"
+              [class.pf-shuttle__item--selected]="selectedAssignedIds.includes(cp.id)"
+              (click)="toggleAssigned(cp.id, $event)">
+              <div class="pf-shuttle__item-name">{{ cp.name }}</div>
+              <span class="de-badge de-badge--{{ cpTypeBadge(cp.type) }}">{{ cp.type }}</span>
+            </li>
+          }
+          @if (filteredAssigned.length === 0) {
+            <li class="pf-shuttle__empty">No counterparties assigned</li>
+          }
+        </ul>
+      </div>
+    </div>
+
+    <!-- Preview card grid -->
+    <div class="pf-cp-grid-label">All Counterparties — Assignment Overview</div>
+    <div class="de-grid-4 pf-cp-grid">
+      @for (cp of allCounterparties; track cp.id) {
+        <div class="pf-cp-card" [class.pf-cp-card--assigned]="isAssigned(cp.id)">
+          <div class="pf-cp-card__top">
+            <span class="pf-cp-card__name">{{ cp.name }}</span>
+            @if (isAssigned(cp.id)) {
+              <span class="pf-cp-card__check" title="Assigned">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+              </span>
+            }
+          </div>
+          <span class="de-badge de-badge--{{ cpTypeBadge(cp.type) }} pf-cp-card__badge">{{ cp.type }}</span>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- ── CARD 4: Currency Scope ─────────────────────────────────────────── -->
+  <div class="de-card pf-card">
+    <div class="de-card__header">
+      <div class="de-card__icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+      </div>
+      <h3>Currency Scope</h3>
+    </div>
+
+    <div class="de-field">
+      <label>Currency Coverage</label>
+      <div class="de-seg-group">
+        <button type="button" [class.active]="currencyScope === 'ALL'"      (click)="setCurrencyScope('ALL')">All Currencies</button>
+        <button type="button" [class.active]="currencyScope === 'SELECTED'" (click)="setCurrencyScope('SELECTED')">Selected Only</button>
+      </div>
+
+      @if (currencyScope === 'SELECTED') {
+        <div @slideDown class="pf-restrict-select">
+          <tms-select
+            formControlName="selectedCurrencies"
+            [items]="currencies"
+            [multiple]="true"
+            [closeOnSelect]="false"
+            bindValue="code"
+            bindLabel="code"
+            subLabelKey="name"
+            placeholder="Search currencies...">
+          </tms-select>
+          @if (portfolioForm.get('selectedCurrencies')!.errors?.['required'] && portfolioForm.get('selectedCurrencies')!.touched) {
+            <span class="de-error">At least one currency must be selected</span>
+          }
+        </div>
+      }
+
+      @if (currencyScope === 'ALL') {
+        <span class="de-hint pf-hint-mt">All currencies accepted across money market instruments</span>
+      }
+    </div>
+  </div>
+
+</form>
+
+
+<!-- ─── Toast ─────────────────────────────────────────────────────────────── -->
+@if (showToast) {
+  <div class="de-toast-container">
+    <div class="de-toast" [class.de-toast--success]="toastType === 'success'">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        @if (toastType === 'success') {
+          <polyline points="20 6 9 17 4 12"/>
+        } @else {
+          <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+        }
+      </svg>
+      {{ toastMessage }}
+      @if (toastLink) {
+        <a [routerLink]="toastLink" class="pf-toast-link">
+          View in Authorization Inbox →
+        </a>
+      }
+    </div>
+  </div>
+}
+

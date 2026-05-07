@@ -1,0 +1,118 @@
+<!-- Breadcrumb -->
+<nav class="de-breadcrumb">
+  <a routerLink="/dashboard">Home</a><span class="sep">›</span>
+  <span>Money Market</span><span class="sep">›</span>
+  <span class="current">MM Deals</span>
+</nav>
+
+<!-- Page Header -->
+<div class="mml-header">
+  <div>
+    <h1 class="mml-header__title">MM Deals</h1>
+    <p class="mml-header__sub">All money market deal records</p>
+  </div>
+  <a routerLink="/mm-deal/create" class="de-btn de-btn--primary">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+      <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+    </svg>
+    New Deal
+  </a>
+</div>
+
+<!-- KPI Strip -->
+<div class="mml-kpi-strip">
+  <div class="mml-kpi-card">
+    <div class="mml-kpi-card__value">{{ kpis.total }}</div>
+    <div class="mml-kpi-card__label">Total</div>
+  </div>
+  <div class="mml-kpi-card mml-kpi-card--saved">
+    <div class="mml-kpi-card__value">{{ kpis.saved }}</div>
+    <div class="mml-kpi-card__label">Saved</div>
+  </div>
+  <div class="mml-kpi-card mml-kpi-card--pending">
+    <div class="mml-kpi-card__value">{{ kpis.pending }}</div>
+    <div class="mml-kpi-card__label">Pending</div>
+  </div>
+  <div class="mml-kpi-card mml-kpi-card--fv">
+    <div class="mml-kpi-card__value">{{ fmtAmount(kpis.totalFv) }}</div>
+    <div class="mml-kpi-card__label">Total Face Value</div>
+  </div>
+</div>
+
+<!-- Filter Bar -->
+<div class="mml-filter-bar de-card">
+  <div class="mml-filter-bar__search">
+    <svg class="mml-filter-bar__search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+    </svg>
+    <input class="mml-filter-bar__input" type="text" placeholder="Search deal ID, counterparty or instrument…" [(ngModel)]="searchTerm" />
+  </div>
+  <div class="mml-filter-bar__selects">
+    <select class="de-input mml-filter-bar__select" [(ngModel)]="statusFilter">
+      @for (opt of statusOptions; track opt.value) {
+        <option [value]="opt.value">{{ opt.label }}</option>
+      }
+    </select>
+  </div>
+  <span class="mml-filter-bar__count">{{ filtered.length }} of {{ allDeals.length }}</span>
+</div>
+
+<!-- Table -->
+<div class="de-card mml-table-card">
+  <div class="mml-table-wrap">
+    <table class="mml-table">
+      <thead>
+        <tr>
+          <th>Deal ID</th>
+          <th>Counterparty</th>
+          <th>Instrument</th>
+          <th class="mml-col-r">Face Value</th>
+          <th>Deal Date</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        @if (filtered.length === 0) {
+          <tr>
+            <td colspan="6" class="mml-empty-cell">
+              <div class="mml-empty">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" class="mml-empty__icon">
+                  <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2"/>
+                </svg>
+                <p class="mml-empty__title">No deals found</p>
+                <p class="mml-empty__sub">
+                  @if (searchTerm || statusFilter !== 'ALL') {
+                    Try adjusting your search or filter
+                  } @else {
+                    Create your first MM deal to get started
+                  }
+                </p>
+                @if (!searchTerm && statusFilter === 'ALL') {
+                  <a routerLink="/mm-deal/create" class="de-btn de-btn--primary de-btn--sm">
+                    New Deal
+                  </a>
+                }
+              </div>
+            </td>
+          </tr>
+        }
+        @for (deal of filtered; track deal.dealId) {
+          <tr class="mml-table__row">
+            <td>
+              <a class="mml-deal-id" [routerLink]="['/mm-deal', deal.dealId]">{{ deal.dealId }}</a>
+            </td>
+            <td class="mml-cp-name">{{ counterpartyName(deal.counterpartyId) }}</td>
+            <td>
+              <span class="de-badge de-badge--navy">{{ instrumentName(deal.instrumentId) }}</span>
+            </td>
+            <td class="mml-col-r mml-amount">{{ deal.currency }} {{ fmtAmount(deal.principalAmount) }}</td>
+            <td class="mml-date">{{ deal.dealDate }}</td>
+            <td>
+              <span class="de-badge de-badge--{{ statusBadge(deal.status) }}">{{ deal.status }}</span>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>

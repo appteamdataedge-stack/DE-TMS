@@ -1,0 +1,36 @@
+<div class="ua">
+  <div class="ua__card">
+    <!-- Lock icon -->
+    <div class="ua__icon">
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+      </svg>
+    </div>
+
+    <h1 class="ua__title">Access Restricted</h1>
+    <p class="ua__sub">You don't have permission to view this page.</p>
+
+    @if (currentUser) {
+      <div class="ua__role-row">
+        <span class="ua__role-label">Your role:</span>
+        <span class="ua__role-badge">{{ currentUser.role.replace('_', ' ') }}</span>
+      </div>
+      <p class="ua__hint">
+        Contact your administrator if you believe this is an error.
+      </p>
+    }
+
+    <div class="ua__actions">
+      <button class="ua__btn ua__btn--outline" (click)="goBack()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+          <polyline points="15 18 9 12 15 6"/>
+        </svg>
+        Go Back
+      </button>
+      <a class="ua__btn ua__btn--primary" routerLink="/dashboard">
+        Go to Dashboard
+      </a>
+    </div>
+  </div>
+</div>

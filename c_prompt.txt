@@ -1,0 +1,71 @@
+Angular Money Market app. Fix these issues only.
+Do NOT change any logic, validators, or API calls.
+
+---
+
+## FIX 1 — Sticky info bar (below navbar)
+The info bar must:
+- Position: fixed, top: 64px (exact navbar height), z-index: 998
+- Start and end at the SAME left/right position as the breadcrumb/page content area
+  (NOT full width — align with the main content, NOT under the sidebar)
+- Height: 38px
+- Background: #F0F7FF, border-bottom: 1px solid #C9E0F5
+- Text: font-size: 13px, color: #1565C0
+- Layout: flex row, align-items center, gap: 20px, padding: 0 32px
+- Format: "Deal Date 2026-05-05  |  Dealer Ahmed Rahman  |  Portfolio —  |  Counterparty —  |  Instrument —"
+- Label: normal weight #607D8B, value: bold #1565C0
+
+---
+
+## FIX 2 — Fixed footer (above page bottom)
+The footer must:
+- Position: fixed, bottom: 0, z-index: 1100
+- Start and end at the SAME left/right as main content area (NOT full width,
+  NOT under sidebar — same width alignment as info bar above)
+- Height: 52px
+- Background: #FFFFFF, border-top: 1px solid #E0E0E0
+- box-shadow: 0 -2px 8px rgba(0,0,0,0.08)
+- Left side: lock icon + "This record requires checker authorization before becoming active"
+  font-size: 12px, color: #757575
+- Right side buttons: [Cancel] stroked | [Save as Draft] stroked blue | 
+  [Submit for Approval] raised #1976D2 white
+- Add padding-bottom: 60px to page content area
+
+---
+
+## FIX 3 — Dropdown not opening / wrong position
+Some dropdowns do nothing when clicked. Fix all mat-select dropdowns:
+- Add to every mat-select: [disableOptionCentering]="true" 
+  panelClass="fix-dropdown-panel"
+- Add to styles.css:
+  .fix-dropdown-panel {
+    margin-top: 4px !important;
+    max-height: 220px !important;
+    overflow-y: auto !important;
+  }
+  .cdk-overlay-container {
+    z-index: 9999 !important;
+  }
+- For any dropdown that still does not open: check if the FormControl is 
+  disabled — if so enable it, or add TODO comment
+
+---
+
+## FIX 4 — Sidebar width: make Basic Information narrower
+In the New Deal page left sidebar:
+- Reduce sidebar panel width from current size to 220px max
+- This gives more space to the right content panel
+- BASIC INFORMATION group header: 
+  background: #E8F5E9, color: #2E7D32, font-size: 12px, font-weight: 600
+  border-radius: 6px, padding: 8px 12px
+- Active sidebar item: background: #E3F2FD, color: #1565C0, 
+  left border: 3px solid #1976D2, border-radius: 4px
+- Inactive items: color: #546E7A, font-size: 13px
+- Overall sidebar background: #FAFAFA, border-right: 1px solid #EEEEEE
+
+---
+
+## CONSTRAINTS
+- Do NOT change any form fields, bindings, or API calls
+- Do NOT install new packages
+- Do NOT modify any other page or component

@@ -1,0 +1,1449 @@
+
+<!-- ─── Breadcrumb ─────────────────────────────────────────────────────── -->
+<nav class="de-breadcrumb">
+  <a routerLink="/">Home</a><span class="sep">›</span>
+  <span>Money Market</span><span class="sep">›</span>
+  <span>MM Deals</span><span class="sep">›</span>
+  <span class="current">New Deal</span>
+</nav>
+
+<!-- ─── Page header ───────────────────────────────────────────────────── -->
+<div class="dc-page-header">
+  <div>
+    <h1 class="de-page-header" style="margin-bottom:0">
+      <span style="display:flex;align-items:center;gap:12px">
+        New Money Market Deal
+        <span class="de-badge de-badge--neutral" style="font-family:var(--font-mono);font-size:12px">
+          {{ step1.get('dealId')?.value }}
+        </span>
+      </span>
+    </h1>
+    <p class="dc-page-sub">Fill in all sections below, then submit for authorization.</p>
+  </div>
+  <!-- Live status chips -->
+  <div class="dc-status-chips">
+    <span class="dc-status-chip" [class.dc-status-chip--ok]="step1.valid">
+      <span class="dc-status-chip__dot"></span>Basics
+    </span>
+    <span class="dc-status-chip" [class.dc-status-chip--ok]="step2.valid">
+      <span class="dc-status-chip__dot"></span>Price &amp; Dates
+    </span>
+    <span class="dc-status-chip" [class.dc-status-chip--ok]="step3.valid">
+      <span class="dc-status-chip__dot"></span>Interest
+    </span>
+  </div>
+</div>
+
+<!-- ─── Main layout: sidebar + content ───────────────────────────────── -->
+<div class="dc-layout">
+
+  <!-- ══ SIDEBAR ══════════════════════════════════════════════════════════ -->
+  <aside class="dc-sidebar">
+
+    <!-- BASIC INFORMATION ───────────────────────── -->
+    <div class="dc-group">
+      <button class="dc-group-hdr" (click)="toggleGroup('basicInfo')">
+        <span class="dc-group-hdr__label">BASIC INFORMATION</span>
+        <svg class="dc-group-hdr__chev" [class.dc-group-hdr__chev--open]="basicInfoExpanded"
+          width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polyline points="6 9 12 15 18 9"/>
+        </svg>
+      </button>
+
+      @if (basicInfoExpanded) {
+        <div @groupCollapse class="dc-group-items">
+
+          <button class="dc-item" [class.dc-item--active]="activePanel === 'basics'"
+            [class.dc-item--error]="step1.invalid && step1.touched"
+            (click)="setPanel('basics')">
+            <span class="dc-item__dot" [class.dc-item__dot--valid]="step1.valid">
+              @if (step1.valid) {
+                <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg>
+              }
+            </span>
+            <span class="dc-item__label">Basics</span>
+            @if (step1.invalid && step1.touched) {
+              <span class="dc-item__err">!</span>
+            }
+          </button>
+
+          <button class="dc-item" [class.dc-item--active]="activePanel === 'deposit'"
+            [class.dc-item--error]="step2.invalid && step2.touched"
+            (click)="setPanel('deposit')">
+            <span class="dc-item__dot" [class.dc-item__dot--valid]="step2.valid">
+              @if (step2.valid) {
+                <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg>
+              }
+            </span>
+            <span class="dc-item__label">Price &amp; Dates</span>
+            @if (step2.invalid && step2.touched) {
+              <span class="dc-item__err">!</span>
+            }
+          </button>
+
+          <button class="dc-item" [class.dc-item--active]="activePanel === 'interest'"
+            [class.dc-item--error]="step3.invalid && step3.touched"
+            (click)="setPanel('interest')">
+            <span class="dc-item__dot" [class.dc-item__dot--valid]="step3.valid">
+              @if (step3.valid) {
+                <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg>
+              }
+            </span>
+            <span class="dc-item__label">Interest</span>
+            @if (step3.invalid && step3.touched) {
+              <span class="dc-item__err">!</span>
+            }
+          </button>
+
+        </div>
+      }
+    </div>
+
+    <div class="dc-group-divider"></div>
+
+    <!-- SETTLEMENT ───────────────────────────────── -->
+    <div class="dc-group">
+      <button class="dc-group-hdr" (click)="toggleGroup('settlement')">
+        <span class="dc-group-hdr__label">SETTLEMENT</span>
+        <svg class="dc-group-hdr__chev" [class.dc-group-hdr__chev--open]="settlementExpanded"
+          width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polyline points="6 9 12 15 18 9"/>
+        </svg>
+      </button>
+
+      @if (settlementExpanded) {
+        <div @groupCollapse class="dc-group-items">
+          <button class="dc-item dc-item--placeholder" [class.dc-item--active]="activePanel === 'settlement-principal'"
+            (click)="setPanel('settlement-principal')">
+            <span class="dc-item__dot dc-item__dot--ph"></span>
+            <span class="dc-item__label">Principal</span>
+          </button>
+          <button class="dc-item dc-item--placeholder" [class.dc-item--active]="activePanel === 'settlement-interest'"
+            (click)="setPanel('settlement-interest')">
+            <span class="dc-item__dot dc-item__dot--ph"></span>
+            <span class="dc-item__label">Interest</span>
+          </button>
+        </div>
+      }
+    </div>
+
+    <div class="dc-group-divider"></div>
+
+    <!-- Single-row section groups ──────────────── -->
+    @for (grp of [
+      {id:'additional', label:'ADDITIONAL', soon: false},
+      {id:'charges',    label:'CHARGES',    soon: false},
+      {id:'bdc',        label:'BDC DETAILS',soon: false},
+      {id:'messages',   label:'MESSAGES',   soon: false},
+      {id:'schedule',   label:'SCHEDULE',   soon: false}
+    ]; track grp.id) {
+      <div class="dc-group">
+        <button class="dc-group-hdr dc-group-hdr--single"
+          [class.dc-group-hdr--active]="activePanel === grp.id"
+          (click)="setPanel(grp.id)">
+          <span class="dc-group-hdr__label" [class.dc-group-hdr__label--ph]="!grp.soon">{{ grp.label }}</span>
+          @if (grp.soon) {
+            <span class="de-badge de-badge--neutral" style="font-size:9px;padding:1px 6px">Soon</span>
+          }
+        </button>
+      </div>
+    }
+
+  </aside>
+
+  <!-- ══ MAIN PANEL ═══════════════════════════════════════════════════════ -->
+  <div class="dc-main">
+
+    <!-- ── BASICS ────────────────────────────────────────────────────────── -->
+    @if (activePanel === 'basics') {
+      <div @panelFade class="dc-panel">
+
+        <div class="dc-panel-title">
+          <div class="dc-panel-title__icon">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+            </svg>
+          </div>
+          Basics
+        </div>
+
+        <!-- Required fields summary bar -->
+        @if (step1.invalid) {
+          <div class="dc-req-bar">
+            <span class="dc-req-bar__label">Required fields:</span>
+            @if (step1.get('dealDate')!.invalid) { <span class="dc-req-chip">Deal Date</span> }
+            @if (step1.get('dealerId')!.invalid) { <span class="dc-req-chip">Dealer</span> }
+            @if (step1.get('portfolioId')!.invalid) { <span class="dc-req-chip">Portfolio</span> }
+            @if (step1.get('counterpartyId')!.invalid) { <span class="dc-req-chip">Counterparty</span> }
+            @if (step1.get('instrumentId')!.invalid) { <span class="dc-req-chip">Instrument</span> }
+          </div>
+        }
+
+        <form [formGroup]="step1" autocomplete="off" class="mm-form">
+
+          <!-- CARD 1: Deal Identification — Deal Date · Time · Dealer · Portfolio -->
+          <div class="de-card mm-card">
+            <div class="de-card__header">
+              <div class="de-card__icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                </svg>
+              </div>
+              <h3>Deal Identification</h3>
+            </div>
+
+            <!-- Row 1: Deal Date | Time -->
+            <div class="de-grid-2" style="margin-bottom:20px">
+              <div class="de-field mm-field">
+                <label>Deal Date <span class="mm-req">*</span></label>
+                <input type="date" class="de-input"
+                  [class.is-invalid]="step1.get('dealDate')!.invalid && step1.get('dealDate')!.touched"
+                  formControlName="dealDate" />
+                @if (step1.get('dealDate')!.invalid && step1.get('dealDate')!.touched) {
+                  <span class="de-error">Deal date is required</span>
+                }
+              </div>
+              <div class="de-field mm-field">
+                <label>Deal Time <span class="mm-opt-tag">optional</span></label>
+                <input type="time" class="de-input" formControlName="dealTime" />
+              </div>
+            </div>
+
+            <!-- Row 2: Dealer | Portfolio -->
+            <div class="de-grid-2">
+              <div class="de-field mm-field">
+                <label>Dealer <span class="mm-req">*</span></label>
+                <tms-select formControlName="dealerId" [items]="svc.dealers" bindValue="id" bindLabel="name"
+                  subLabelKey="role" [clearable]="false" [searchable]="false" placeholder="Select dealer">
+                </tms-select>
+                @if (step1.get('dealerId')!.invalid && step1.get('dealerId')!.touched) {
+                  <span class="de-error">Dealer is required</span>
+                }
+              </div>
+              <div class="de-field mm-field">
+                <label>Portfolio <span class="mm-req">*</span></label>
+                <tms-select formControlName="portfolioId" [items]="svc.portfolios"
+                  bindValue="id" bindLabel="name" subLabelKey="bookType" [clearable]="false" placeholder="Select active portfolio">
+                </tms-select>
+                @if (step1.get('portfolioId')!.invalid && step1.get('portfolioId')!.touched) {
+                  <span class="de-error">Portfolio is required</span>
+                }
+                <span class="de-hint">Only Active portfolios are shown</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- CARD 2: Deal Type -->
+          <div class="de-card mm-card">
+            <div class="de-card__header">
+              <div class="de-card__icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M7 16V4m0 0L3 8m4-4 4 4M17 8v12m0 0 4-4m-4 4-4-4"/>
+                </svg>
+              </div>
+              <h3>Deal Type</h3>
+            </div>
+
+            <div class="mm-section-label">Deal Type</div>
+            <div class="mm-direction-grid">
+              <button type="button" class="mm-direction-card" [class.mm-direction-card--active]="direction === 'ACCEPT'" (click)="setDirection('ACCEPT')">
+                <div class="mm-direction-card__icon mm-direction-card__icon--accept">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="4" x2="12" y2="20"/><polyline points="18 14 12 20 6 14"/></svg>
+                </div>
+                <div class="mm-direction-card__body">
+                  <span class="mm-direction-card__title">ACCEPT</span>
+                  <span class="mm-direction-card__sub">Receive funds from counterparty</span>
+                  <span class="mm-direction-card__role">Your position: <strong>Borrower</strong></span>
+                </div>
+                @if (direction === 'ACCEPT') {
+                  <span class="mm-direction-card__check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>
+                }
+              </button>
+              <button type="button" class="mm-direction-card" [class.mm-direction-card--active]="direction === 'PLACE'" (click)="setDirection('PLACE')">
+                <div class="mm-direction-card__icon mm-direction-card__icon--place">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="20" x2="12" y2="4"/><polyline points="18 10 12 4 6 10"/></svg>
+                </div>
+                <div class="mm-direction-card__body">
+                  <span class="mm-direction-card__title">PLACE</span>
+                  <span class="mm-direction-card__sub">Place funds with counterparty</span>
+                  <span class="mm-direction-card__role">Your position: <strong>Lender</strong></span>
+                </div>
+                @if (direction === 'PLACE') {
+                  <span class="mm-direction-card__check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>
+                }
+              </button>
+            </div>
+          </div>
+
+          <!-- CARD 3: Deposit Type (moved from Price & Dates) -->
+          <div class="de-card mm-card">
+            <div class="de-card__header">
+              <div class="de-card__icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/>
+                </svg>
+              </div>
+              <h3>Deposit Type</h3>
+            </div>
+            <div class="mm-dtype-grid">
+              <button type="button" class="mm-dtype-card" [class.mm-dtype-card--active]="depositType === 'TERM'" (click)="step2.patchValue({depositType:'TERM'})">
+                <div class="mm-dtype-card__icon mm-dtype-card__icon--term">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg>
+                </div>
+                <div class="mm-dtype-card__body">
+                  <span class="mm-dtype-card__title">TERM</span>
+                  <span class="mm-dtype-card__sub">Fixed maturity deposit</span>
+                  <span class="mm-dtype-card__desc">Defined start and end date. Compounding available.</span>
+                </div>
+                @if (depositType === 'TERM') {
+                  <span class="mm-dtype-card__check"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>
+                }
+              </button>
+              <button type="button" class="mm-dtype-card" [class.mm-dtype-card--active]="depositType === 'CALL'" (click)="step2.patchValue({depositType:'CALL'})">
+                <div class="mm-dtype-card__icon mm-dtype-card__icon--call">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18.364 5.636A9 9 0 0 1 12 21a9 9 0 0 1-6.364-15.364"/><path d="M12 3v9"/></svg>
+                </div>
+                <div class="mm-dtype-card__body">
+                  <span class="mm-dtype-card__title">CALL</span>
+                  <span class="mm-dtype-card__sub">Open-ended call deposit</span>
+                  <span class="mm-dtype-card__desc">No fixed maturity. Callable at any time. No compounding.</span>
+                </div>
+                @if (depositType === 'CALL') {
+                  <span class="mm-dtype-card__check"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>
+                }
+              </button>
+            </div>
+          </div>
+
+          <!-- CARD 4: Counterparty &amp; Instrument -->
+          <div class="de-card mm-card">
+            <div class="de-card__header">
+              <div class="de-card__icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                </svg>
+              </div>
+              <h3>Counterparty &amp; Instrument</h3>
+            </div>
+
+            <!-- Row: Counterparty | Instrument -->
+            <div class="de-grid-2">
+              <div class="de-field mm-field">
+                <label>Counterparty <span class="mm-req">*</span></label>
+                @if (selectedCP) {
+                  <div class="mm-cp-chip">
+                    <span class="mm-cp-chip__id">{{ selectedCP.id }}</span>
+                    <span class="mm-cp-chip__name">{{ selectedCP.name }}</span>
+                    <span class="de-badge de-badge--{{ svc.cpTypeBadge(selectedCP.type) }}">{{ selectedCP.type }}</span>
+                    <button type="button" class="mm-cp-chip__x" (click)="clearCP()" title="Remove">✕</button>
+                  </div>
+                } @else {
+                  <div class="mm-cp-search" (click)="$event.stopPropagation()">
+                    <div class="mm-cp-search__wrap">
+                      <input class="de-input"
+                        [class.is-invalid]="step1.get('counterpartyId')!.invalid && step1.get('counterpartyId')!.touched"
+                        [(ngModel)]="cpSearch" [ngModelOptions]="{standalone:true}"
+                        (input)="onCpInput()" (focus)="onCpFocus()"
+                        (keydown.escape)="cpDropdownVisible=false"
+                        placeholder="Search by name or ID..." />
+                      <span class="mm-cp-search__icon">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                      </span>
+                    </div>
+                    @if (cpDropdownVisible && filteredCPs.length > 0) {
+                      <div class="mm-cp-dropdown">
+                        @for (cp of filteredCPs; track cp.id) {
+                          <div class="mm-cp-dropdown__item" (click)="selectCP(cp)">
+                            <span class="mm-cp-dropdown__id">{{ cp.id }}</span>
+                            <span class="mm-cp-dropdown__name">{{ cp.name }}</span>
+                            <span class="de-badge de-badge--{{ svc.cpTypeBadge(cp.type) }}">{{ cp.type }}</span>
+                          </div>
+                        }
+                      </div>
+                    }
+                    @if (cpDropdownVisible && cpSearch.length >= 2 && filteredCPs.length === 0) {
+                      <div class="mm-cp-dropdown mm-cp-dropdown--empty">
+                        <span>No business partner found for "{{ cpSearch }}"</span>
+                      </div>
+                    }
+                  </div>
+                }
+                @if (step1.get('counterpartyId')!.errors?.['required'] && step1.get('counterpartyId')!.touched) {
+                  <span class="de-error">Counterparty required</span>
+                }
+                @if (step1.get('counterpartyId')!.errors?.['notFound'] && step1.get('counterpartyId')!.touched) {
+                  <span class="de-error">Business partner does not exist</span>
+                }
+              </div>
+
+              <div class="de-field mm-field">
+                <label>Instrument <span class="mm-req">*</span></label>
+                <tms-select formControlName="instrumentId" [items]="svc.instruments"
+                  bindValue="id" bindLabel="name" subLabelKey="cashflow" [clearable]="false" placeholder="Select instrument">
+                </tms-select>
+                @if (selectedInstrument) {
+                  <div @slideDown class="mm-inst-strip">
+                    <div class="mm-inst-strip__cell"><span class="mm-inst-strip__label">Cashflow</span><span class="mm-inst-strip__val">{{ selectedInstrument.cashflow }}</span></div>
+                    <div class="mm-inst-strip__divider"></div>
+                    <div class="mm-inst-strip__cell"><span class="mm-inst-strip__label">Compounding</span><span class="mm-inst-strip__val">{{ selectedInstrument.compounding ? 'Allowed' : 'Not Allowed' }}</span></div>
+                    <div class="mm-inst-strip__divider"></div>
+                    <div class="mm-inst-strip__cell"><span class="mm-inst-strip__label">Pricing</span><span class="mm-inst-strip__val">{{ selectedInstrument.pricing === 'DISCOUNTING' ? 'Discounting' : 'Simple' }}</span></div>
+                  </div>
+                }
+                @if (step1.get('instrumentId')!.invalid && step1.get('instrumentId')!.touched) {
+                  <span class="de-error">Instrument is required</span>
+                }
+              </div>
+            </div>
+
+          </div>
+
+        </form>
+      </div>
+    }
+
+    <!-- ── PRICE & DATES ────────────────────────────────────────────────── -->
+    @if (activePanel === 'deposit') {
+      <div @panelFade class="dc-panel">
+
+        <div class="dc-panel-title">
+          <div class="dc-panel-title__icon">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/>
+              <line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/>
+            </svg>
+          </div>
+          Price &amp; Dates
+        </div>
+
+        <form [formGroup]="step2" autocomplete="off" class="mm-form">
+
+          <!-- CARD 1: Pricing Type (moved from Basics) -->
+          <div class="de-card mm-card">
+            <div class="de-card__header">
+              <div class="de-card__icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                </svg>
+              </div>
+              <h3>Pricing Type</h3>
+            </div>
+            <div class="mm-pricing-grid">
+              <button type="button" class="mm-pricing-card" [class.mm-pricing-card--active]="pricingType === 'NORMAL'" (click)="setPricingType('NORMAL')">
+                <svg class="mm-pricing-card__icon" width="28" height="28" viewBox="0 0 48 20" fill="none">
+                  <line x1="0" y1="10" x2="48" y2="10" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+                </svg>
+                <span class="mm-pricing-card__title">NORMAL</span>
+                <span class="mm-pricing-card__sub">Simple interest method</span>
+              </button>
+              <button type="button" class="mm-pricing-card" [class.mm-pricing-card--active]="pricingType === 'DISCOUNTING'" (click)="setPricingType('DISCOUNTING')">
+                <svg class="mm-pricing-card__icon" width="28" height="28" viewBox="0 0 48 20" fill="none">
+                  <path d="M4 3 C14 3 34 17 44 17" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                  <polyline points="38 13 44 17 38 21" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span class="mm-pricing-card__title">DISCOUNTING</span>
+                <span class="mm-pricing-card__sub">Discount basis</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- CARD 2: Face Value Amount -->
+          <div class="de-card mm-card">
+            <div class="de-card__header">
+              <div class="de-card__icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><path d="M8 14h8"/></svg>
+              </div>
+              <h3>{{ amountLabel }}</h3>
+            </div>
+            <div class="de-field">
+              <label>{{ amountLabel }} <span style="color:var(--de-red)">*</span></label>
+              <div class="mm-amount-group" [class.mm-amount-group--invalid]="step2.get('amount')!.invalid && step2.get('amount')!.touched">
+                <div class="mm-amount-group__ccy">
+                  <tms-select formControlName="currency" [items]="svc.currencies" bindValue="code" bindLabel="code"
+                    subLabelKey="name" [clearable]="false" [searchable]="false">
+                  </tms-select>
+                </div>
+                <div class="mm-amount-group__divider"></div>
+                <div class="mm-amount-group__input">
+                  <input class="de-input mm-amount-input" [(ngModel)]="rawAmount" [ngModelOptions]="{standalone:true}"
+                    (input)="onAmountInput()" (blur)="onAmountBlur()" placeholder="e.g. 10M, 500K, 1B" inputmode="decimal" />
+                </div>
+              </div>
+              @if (formattedDisplay) { <span class="mm-amount-display">{{ formattedDisplay }}</span> }
+              @if (step2.get('amount')!.errors?.['required'] && step2.get('amount')!.touched) { <span class="de-error">Face value amount is required</span> }
+              @if (step2.get('amount')!.errors?.['min'] && step2.get('amount')!.touched) { <span class="de-error">Amount must be greater than zero</span> }
+              @if (step2.get('amount')!.errors?.['invalidFormat'] && step2.get('amount')!.touched) { <span class="de-error">Invalid format. Use numbers or shorthand (10M, 500K, 1B)</span> }
+              <span class="de-hint">Shorthand supported: 10M → 10,000,000 · 500K → 500,000 · 1B → 1,000,000,000</span>
+            </div>
+          </div>
+
+          <!-- CARD 3: Value Date & Tenor -->
+          <div class="de-card mm-card">
+            <div class="de-card__header">
+              <div class="de-card__icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg>
+              </div>
+              <h3>Value Date &amp; Tenor</h3>
+            </div>
+            <div class="de-grid-2">
+              <div class="de-field">
+                <label>Value Date <span style="color:var(--de-red)">*</span></label>
+                <input type="date" class="de-input"
+                  [class.is-invalid]="step2.get('valueDate')!.invalid && step2.get('valueDate')!.touched"
+                  formControlName="valueDate" (change)="onValueDateChange()" />
+                @if (step2.get('valueDate')!.errors?.['required'] && step2.get('valueDate')!.touched) {
+                  <span class="de-error">Value date is required</span>
+                }
+              </div>
+              <div class="de-field">
+                <label>
+                  Maturity Date
+                  @if (depositType === 'TERM') { <span style="color:var(--de-red)"> *</span> }
+                  @if (depositType === 'CALL') { <span class="de-hint" style="text-transform:none;margin-left:6px">Not applicable for Call</span> }
+                </label>
+                <input type="date" class="de-input"
+                  [class.is-invalid]="step2.get('maturityDate')!.invalid && step2.get('maturityDate')!.touched"
+                  formControlName="maturityDate" [min]="todayStr"
+                  [attr.disabled]="depositType === 'CALL' ? '' : null"
+                  (change)="onMaturityManual()" />
+                @if (step2.get('maturityDate')!.errors?.['required'] && step2.get('maturityDate')!.touched) { <span class="de-error">Maturity date is required for Term deposits</span> }
+                @if (step2.get('maturityDate')!.errors?.['pastDate'] && step2.get('maturityDate')!.touched) { <span class="de-error">Maturity date must not be in the past</span> }
+                @if (depositDays > 0) {
+                  <span class="mm-days-badge">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+                    {{ depositDays }} days
+                  </span>
+                }
+              </div>
+            </div>
+            @if (depositType === 'TERM') {
+              <div @slideDown class="mm-period-row">
+                <span class="mm-period-row__label">Quick Period</span>
+                @for (p of quickPeriods; track p.label) {
+                  <button type="button" class="mm-period-btn"
+                    [class.mm-period-btn--active]="activePeriodBtn === p.label"
+                    (click)="applyPeriod(p)">{{ p.label }}</button>
+                }
+              </div>
+            }
+          </div>
+
+          <!-- CARD 2: Compounding Rule -->
+          <div class="de-card mm-card mm-card--relative">
+            <div class="de-card__header">
+              <div class="de-card__icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+              </div>
+              <h3>Compounding Rule</h3>
+            </div>
+            @if (depositType === 'CALL') {
+              <div class="mm-overlay" @overlayFade>
+                <div class="mm-overlay__badge">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+                  Not applicable for Call Deposits
+                </div>
+              </div>
+            }
+            <div class="de-grid-4 mm-compound-grid">
+              @for (opt of compoundingOptions; track opt.id) {
+                <button type="button" class="mm-compound-tile"
+                  [class.mm-compound-tile--active-navy]="compoundingRule === opt.id && opt.id === 'NONE'"
+                  [class.mm-compound-tile--active-teal]="compoundingRule === opt.id && opt.id !== 'NONE'"
+                  [disabled]="depositType === 'CALL'" (click)="setCompounding(opt.id)">
+                  <svg class="mm-compound-tile__icon" width="22" height="22" viewBox="0 0 24 24" fill="none" [innerHTML]="opt.icon"></svg>
+                  <span class="mm-compound-tile__label">{{ opt.label }}</span>
+                  <span class="mm-compound-tile__sub">{{ opt.sub }}</span>
+                </button>
+              }
+            </div>
+            @if (compoundingRule !== 'NONE' && compoundSchedule.length > 0) {
+              <div @slideDown class="mm-sched">
+                <div class="mm-sched__label">Capitalisation Schedule</div>
+                <table class="mm-sched__table">
+                  <thead><tr><th>#</th><th>Event Date</th><th>Type</th><th>Period</th></tr></thead>
+                  <tbody>
+                    @for (row of compoundSchedule; track row.n) {
+                      <tr [class.mm-sched__row--maturity]="row.isMaturity">
+                        <td class="mm-sched__n">{{ row.n }}</td>
+                        <td class="mm-sched__date">{{ fmtDate(row.date) }}</td>
+                        <td><span class="de-badge" [class.de-badge--teal]="!row.isMaturity" [class.de-badge--navy]="row.isMaturity">{{ row.type }}</span></td>
+                        <td class="mm-sched__period">{{ row.period }}</td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            }
+            <p class="de-hint" style="margin-top:12px">ACT/365 and 30/360 are fully supported. Others are configurable.</p>
+          </div>
+
+          <!-- CARD 5: Deal Summary Preview -->
+          <div class="mm-summary-card">
+            <div class="mm-summary-card__header">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+              Deal Summary Preview
+            </div>
+            <div class="mm-summary-card__grid">
+              <div class="mm-summary-row"><span class="mm-summary-row__label">Face Value</span><span class="mm-summary-row__val">{{ summaryData['faceValue'] }}</span></div>
+              <div class="mm-summary-row"><span class="mm-summary-row__label">Deposit Type</span><span class="mm-summary-row__val">{{ summaryData['depositType'] }}</span></div>
+              <div class="mm-summary-row"><span class="mm-summary-row__label">Value Date</span><span class="mm-summary-row__val">{{ summaryData['valueDate'] }}</span></div>
+              <div class="mm-summary-row"><span class="mm-summary-row__label">Maturity Date</span><span class="mm-summary-row__val">{{ summaryData['maturityDate'] }}</span></div>
+              <div class="mm-summary-row"><span class="mm-summary-row__label">Deposit Period</span><span class="mm-summary-row__val">{{ summaryData['depositPeriod'] }}</span></div>
+              <div class="mm-summary-row"><span class="mm-summary-row__label">Compounding</span><span class="mm-summary-row__val">{{ summaryData['compounding'] }}</span></div>
+              <div class="mm-summary-row mm-summary-row--muted"><span class="mm-summary-row__label">Maturity Value</span><span class="mm-summary-row__val mm-summary-row__val--pending">(calculated in Interest tab)</span></div>
+            </div>
+          </div>
+
+        </form>
+      </div>
+    }
+
+    <!-- ── INTEREST ────────────────────────────────────────────────────────── -->
+    @if (activePanel === 'interest') {
+      <div @panelFade class="dc-panel">
+
+        <div class="dc-panel-title">
+          <div class="dc-panel-title__icon">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+            </svg>
+          </div>
+          Interest &amp; Calculation
+        </div>
+
+        <form [formGroup]="step3" autocomplete="off" class="mm-form">
+
+          <!-- CARD 1: Interest Basis -->
+          <div class="de-card mm-card">
+            <div class="de-card__header">
+              <div class="de-card__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+              <h3>Interest Basis</h3>
+            </div>
+            <div class="mm-basis-toggle">
+              <button type="button" class="mm-basis-btn" [class.mm-basis-btn--active-navy]="interestBasis === 'FIXED'" (click)="setInterestBasis('FIXED')">
+                <div class="mm-basis-btn__icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="4" y1="8" x2="20" y2="8"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="16" x2="20" y2="16"/></svg></div>
+                <div class="mm-basis-btn__body"><span class="mm-basis-btn__title">FIXED RATE</span><span class="mm-basis-btn__sub">User-defined rate p.a.</span></div>
+                @if (interestBasis === 'FIXED') { <span class="mm-basis-btn__check"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span> }
+              </button>
+              <button type="button" class="mm-basis-btn" [class.mm-basis-btn--active-amber]="interestBasis === 'FLOATING'" (click)="setInterestBasis('FLOATING')">
+                <div class="mm-basis-btn__icon"><svg width="22" height="22" viewBox="0 0 32 20" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M2 10 C5 4 8 16 11 10 S17 4 20 10 S26 16 30 10"/></svg></div>
+                <div class="mm-basis-btn__body"><span class="mm-basis-btn__title">FLOATING RATE</span><span class="mm-basis-btn__sub">Benchmark + Spread</span></div>
+                @if (interestBasis === 'FLOATING') { <span class="mm-basis-btn__check mm-basis-btn__check--amber"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span> }
+              </button>
+            </div>
+          </div>
+
+          <!-- CARD 2: Rate Setup -->
+          <div class="de-card mm-card mm-card--clip">
+            @if (interestBasis === 'FIXED') {
+              <div @cardSlide class="mm-rate-panel">
+                <div class="de-card__header">
+                  <div class="de-card__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="15" x2="20" y2="15"/></svg></div>
+                  <h3>Fixed Rate Setup</h3>
+                  <span class="de-badge de-badge--navy" style="margin-left:auto">FIXED</span>
+                </div>
+                <div class="de-grid-2">
+                  <div class="de-field">
+                    <label>Interest Rate <span style="color:var(--de-red)">*</span></label>
+                    <div class="mm-rate-group" [class.mm-rate-group--invalid]="step3.get('interestRate')!.invalid && step3.get('interestRate')!.touched">
+                      <input formControlName="interestRate" type="number" step="0.01" min="0" max="100" class="de-input mm-rate-input" placeholder="0.00">
+                      <span class="mm-rate-suffix">% p.a.</span>
+                    </div>
+                    @if (step3.get('interestRate')!.errors?.['required'] && step3.get('interestRate')!.touched) { <span class="de-error">Interest rate is required</span> }
+                    @if (step3.get('interestRate')!.errors?.['min'] && step3.get('interestRate')!.touched) { <span class="de-error">Rate must be greater than zero</span> }
+                    <div class="mm-rate-range">
+                      <div class="mm-rate-range__track">
+                        <div class="mm-rate-range__fill" [style.width]="rateRangeFill"></div>
+                        <input type="range" min="0" max="100" [value]="rateRangeValue" class="mm-rate-range__input" (input)="onRangeInput($event)">
+                      </div>
+                      <div class="mm-rate-range__labels"><span>0%</span><span>5%</span><span>10%</span><span>15%</span><span>20%</span></div>
+                    </div>
+                  </div>
+                  <div class="de-field">
+                    <label>Settlement Frequency</label>
+                    <tms-select formControlName="settlementFreq" [items]="settlementFreqOptions" bindValue="id" bindLabel="label" [clearable]="false" [searchable]="false"></tms-select>
+                  </div>
+                </div>
+              </div>
+            }
+            @if (interestBasis === 'FLOATING') {
+              <div @cardSlide class="mm-rate-panel">
+                <div class="de-card__header">
+                  <div class="de-card__icon" style="background:var(--de-amber-light);color:var(--de-amber-dark)"><svg width="16" height="16" viewBox="0 0 32 20" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M2 10 C5 4 8 16 11 10 S17 4 20 10 S26 16 30 10"/></svg></div>
+                  <h3>Floating Rate Setup</h3>
+                  <span class="de-badge de-badge--amber" style="margin-left:auto">FLOATING</span>
+                </div>
+                <div class="de-grid-2">
+                  <div class="de-field">
+                    <label>Benchmark <span style="color:var(--de-red)">*</span></label>
+                    <tms-select formControlName="benchmark" [items]="benchmarkOptions" bindValue="id" bindLabel="label" subLabelKey="name" [clearable]="false" placeholder="Select benchmark…"></tms-select>
+                    @if (step3.get('benchmark')!.errors?.['required'] && step3.get('benchmark')!.touched) { <span class="de-error">Benchmark is required</span> }
+                  </div>
+                  <div class="de-field">
+                    <label>Benchmark Period <span style="color:var(--de-red)">*</span></label>
+                    <tms-select formControlName="benchmarkPeriod" [items]="benchmarkPeriodOptions" bindValue="id" bindLabel="label" [clearable]="false" [searchable]="false"></tms-select>
+                    @if (step3.get('benchmarkPeriod')!.errors?.['required'] && step3.get('benchmarkPeriod')!.touched) { <span class="de-error">Benchmark period is required</span> }
+                  </div>
+                  <div class="de-field">
+                    <label>Spread</label>
+                    <div class="mm-spread-group"><input formControlName="spread" type="number" step="1" class="de-input" placeholder="0"><span class="mm-spread-unit">bps</span></div>
+                  </div>
+                  <div class="de-field">
+                    <label>Fixing Frequency <span style="color:var(--de-red)">*</span></label>
+                    <tms-select formControlName="fixingFrequency" [items]="fixingFreqOptions" bindValue="id" bindLabel="label" [clearable]="false" [searchable]="false"></tms-select>
+                    @if (step3.get('fixingFrequency')!.errors?.['required'] && step3.get('fixingFrequency')!.touched) { <span class="de-error">Fixing frequency is required</span> }
+                  </div>
+                  <div class="de-field">
+                    <label>Settlement Frequency</label>
+                    <tms-select formControlName="settlementFreq" [items]="settlementFreqOptions" bindValue="id" bindLabel="label" [clearable]="false" [searchable]="false"></tms-select>
+                  </div>
+                  <div class="de-field">
+                    <label>All-in Rate (indicative)</label>
+                    <div class="mm-allin-display">
+                      @if (effectiveRate > 0) {
+                        <span class="mm-allin-value">{{ effectiveRate.toFixed(4) }}%</span>
+                        <span class="mm-allin-eq">{{ step3.get('benchmark')?.value ?? '—' }} + {{ step3.get('spread')?.value || '0' }} bps</span>
+                      } @else {
+                        <span class="mm-allin-placeholder">— set market rate in Card 4 to compute</span>
+                      }
+                    </div>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+
+          <!-- CARD 3: Day Count Rule -->
+          <div class="de-card mm-card">
+            <div class="de-card__header">
+              <div class="de-card__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg></div>
+              <h3>Day Count Rule</h3>
+            </div>
+            <div class="de-grid-4 mm-dc-grid">
+              @for (dc of dayCountOptions; track dc.id) {
+                <button type="button" class="mm-dc-tile" [class.mm-dc-tile--active]="dayCountRule === dc.id" (click)="setDayCount(dc.id)">
+                  <span class="mm-dc-tile__label">{{ dc.label }}</span>
+                  <span class="mm-dc-tile__sub">{{ dc.sub }}</span>
+                  <span class="mm-dc-tile__example">e.g. {{ dc.example }}</span>
+                </button>
+              }
+            </div>
+            <span class="de-hint" style="margin-top:12px;display:block">ACT/365 and 30/360 are fully supported. Others are configurable.</span>
+          </div>
+
+          <!-- CARD 4: Settlement & Stub Details -->
+          <div class="de-card mm-card">
+            <div class="de-card__header">
+              <div class="de-card__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
+              <h3>Settlement &amp; Stub Details</h3>
+            </div>
+            <div class="de-grid-2">
+              <div class="de-field">
+                <label>Back Stub Period</label>
+                <tms-select formControlName="backStubPeriod" [items]="backStubOptions" bindValue="id" bindLabel="label" [clearable]="false" [searchable]="false"></tms-select>
+                @if (backStubDesc) { <span class="de-hint">{{ backStubDesc }}</span> }
+              </div>
+              <div class="de-field">
+                <label>First Day Interest</label>
+                <div class="mm-toggle-row">
+                  <button type="button" class="mm-toggle" [class.mm-toggle--on]="includeFirstDay"
+                    (click)="step3.patchValue({ includeFirstDay: !includeFirstDay })"
+                    title="When checked, interest accrues from and including the Value Date.">
+                    <span class="mm-toggle__track"></span><span class="mm-toggle__thumb"></span>
+                  </button>
+                  <span class="mm-toggle-label">{{ includeFirstDay ? 'Included' : 'Excluded' }}</span>
+                </div>
+                <span class="de-hint">When on, interest accrues from and including the Value Date.</span>
+              </div>
+              <div class="de-field">
+                <label>Market Rate (% p.a.) @if (interestBasis === 'FLOATING') {<span style="color:var(--de-red)"> *</span>}</label>
+                <div class="mm-spread-group"><input formControlName="marketRate" type="number" step="0.01" class="de-input" placeholder="0.00"><span class="mm-spread-unit">%</span></div>
+                <span class="de-hint">Prevailing market reference rate at deal inception.</span>
+              </div>
+              <div class="de-field" style="grid-column:1/-1">
+                <label>Remarks</label>
+                <textarea formControlName="remarks" class="de-input mm-remarks" rows="3" placeholder="Internal notes or deal-specific conditions…"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- CARD 5: Maturity Value Computation -->
+          <div class="mm-mv-card">
+            <div class="mm-mv-card__header">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+              Maturity Value Computation
+            </div>
+            <div class="mm-mv-formula"><span class="mm-mv-formula__text">MV = Principal × ( 1 + Rate × Days / DCBasis )</span></div>
+            <div class="mm-mv-grid">
+              <div class="mm-mv-row"><span class="mm-mv-row__label">Principal</span><span class="mm-mv-row__val">@if (principal > 0) { {{ step2.get('currency')?.value }} {{ fmtNum(principal) }} } @else { — }</span></div>
+              <div class="mm-mv-row"><span class="mm-mv-row__label">Rate</span><span class="mm-mv-row__val">@if (effectiveRate > 0) { {{ effectiveRate.toFixed(4) }}% p.a. } @else { — }</span></div>
+              <div class="mm-mv-row"><span class="mm-mv-row__label">Days / Basis</span><span class="mm-mv-row__val">@if (depositDays > 0) { {{ depositDays }} / {{ dayCountBasis }} } @else { — }</span></div>
+              <div class="mm-mv-row"><span class="mm-mv-row__label">Interest Amount</span><span class="mm-mv-row__val">@if (interestAmount > 0) { {{ step2.get('currency')?.value }} {{ fmtNum(interestAmount) }} } @else { — }</span></div>
+              <div class="mm-mv-row mm-mv-row--total"><span class="mm-mv-row__label">Maturity Value</span><span class="mm-mv-row__val mm-mv-row__val--total">@if (maturityValue > 0) { {{ step2.get('currency')?.value }} {{ fmtNum(maturityValue) }} } @else { — }</span></div>
+            </div>
+            @if (cashFlowRows.length > 0) {
+              <div @slideDown class="mm-cf-section">
+                <div class="mm-cf-label">Periodic Cash Flows</div>
+                <table class="mm-cf-table">
+                  <thead><tr><th class="mm-cf-n">#</th><th>Date</th><th>Type</th><th>Event</th><th class="mm-cf-amount">Amount</th><th>Status</th></tr></thead>
+                  <tbody>
+                    @for (row of cashFlowRows; track $index; let i = $index) {
+                      <tr [class.mm-cf-row--maturity]="row.isMaturity">
+                        <td class="mm-cf-n">{{ i + 1 }}</td>
+                        <td class="mm-cf-date">{{ fmtDate(row.date) }}</td>
+                        <td><span class="mm-cf-type" [class.mm-cf-type--pay]="row.type === 'Pay'" [class.mm-cf-type--rec]="row.type === 'Rec'">{{ row.type }}</span></td>
+                        <td class="mm-cf-event">{{ row.event }}</td>
+                        <td class="mm-cf-amount">{{ step2.get('currency')?.value }} {{ fmtNum(row.amount) }}</td>
+                        <td><span class="de-badge de-badge--neutral">Projected</span></td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            }
+          </div>
+
+        </form>
+      </div>
+    }
+
+    <!-- ── SETTLEMENT — PRINCIPAL ─────────────────────────────────────────── -->
+    @if (activePanel === 'settlement-principal') {
+      <div @panelFade class="dc-panel">
+        <div class="dc-panel-title">
+          <div class="dc-panel-title__icon dc-panel-title__icon--ph">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          </div>
+          Principal Settlement
+        </div>
+
+        <!-- TODO: wire to settlement API -->
+        <div class="dc-stl-section">
+          <div class="dc-stl-header">
+            <span class="dc-stl-header__title">Principal</span>
+            <span class="dc-stl-header__sub">Notional principal movements for this deal</span>
+          </div>
+          <div class="dc-stl-table-wrap">
+            <table class="dc-stl-table">
+              <thead>
+                <tr>
+                  <th>Trade Date</th>
+                  <th>Value Date</th>
+                  <th>Maturity Date</th>
+                  <th class="dc-stl-amount">Amount</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                @if (principal > 0) {
+                  <tr>
+                    <td class="dc-stl-mono">{{ step1.get('dealDate')?.value ? fmtDate(step1.get('dealDate')!.value ?? '') : '—' }}</td>
+                    <td class="dc-stl-mono">{{ step2.get('valueDate')?.value ? fmtDate(step2.get('valueDate')!.value ?? '') : '—' }}</td>
+                    <td class="dc-stl-mono">{{ step2.get('maturityDate')?.value ? fmtDate(step2.get('maturityDate')!.value ?? '') : '—' }}</td>
+                    <td class="dc-stl-amount dc-stl-mono">{{ step2.get('currency')?.value }} {{ fmtNum(principal) }}</td>
+                    <td><span class="dc-stl-badge dc-stl-badge--wt">WT</span></td>
+                  </tr>
+                } @else {
+                  <tr><td colspan="5" class="dc-stl-empty">No principal data — complete the Deposit &amp; Dates section first.</td></tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="dc-ph-note">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <!-- TODO: connect to settlement API endpoint -->
+          Settlement instructions and confirmation details will appear here after deal booking.
+        </div>
+      </div>
+    }
+
+    <!-- ── SETTLEMENT — INTEREST ──────────────────────────────────────────── -->
+    @if (activePanel === 'settlement-interest') {
+      <div @panelFade class="dc-panel">
+        <div class="dc-panel-title">
+          <div class="dc-panel-title__icon dc-panel-title__icon--ph">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          </div>
+          Interest Settlement
+        </div>
+
+        <!-- TODO: wire to settlement API -->
+        <div class="dc-stl-section">
+          <div class="dc-stl-header">
+            <span class="dc-stl-header__title">Interest</span>
+            <span class="dc-stl-header__sub">Interest accrual and settlement schedule</span>
+          </div>
+          <div class="dc-stl-table-wrap">
+            <table class="dc-stl-table">
+              <thead>
+                <tr>
+                  <th>Trade Date</th>
+                  <th>Value Date</th>
+                  <th>Maturity Date</th>
+                  <th class="dc-stl-amount">Amount</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                @if (interestAmount > 0) {
+                  <tr>
+                    <td class="dc-stl-mono">{{ step1.get('dealDate')?.value ? fmtDate(step1.get('dealDate')!.value ?? '') : '—' }}</td>
+                    <td class="dc-stl-mono">{{ step2.get('valueDate')?.value ? fmtDate(step2.get('valueDate')!.value ?? '') : '—' }}</td>
+                    <td class="dc-stl-mono">{{ step2.get('maturityDate')?.value ? fmtDate(step2.get('maturityDate')!.value ?? '') : '—' }}</td>
+                    <td class="dc-stl-amount dc-stl-mono">{{ step2.get('currency')?.value }} {{ fmtNum(interestAmount) }}</td>
+                    <td><span class="dc-stl-badge dc-stl-badge--wt">WT</span></td>
+                  </tr>
+                } @else {
+                  <tr><td colspan="5" class="dc-stl-empty">No interest data — complete the Interest section first.</td></tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="dc-ph-note">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <!-- TODO: connect to settlement API endpoint -->
+          Interest settlement instructions and SSI matching will appear here after deal booking.
+        </div>
+      </div>
+    }
+
+    <!-- ── ADDITIONAL ────────────────────────────────────────────────────────── -->
+    @if (activePanel === 'additional') {
+      <div @panelFade class="dc-panel">
+
+        <div class="dc-panel-title">
+          <div class="dc-panel-title__icon dc-panel-title__icon--ph">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+          </div>
+          Additional Information
+        </div>
+
+        <!-- Card 1: Reference & Source -->
+        <div class="de-card mm-card">
+          <div class="de-card__header">
+            <div class="de-card__icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+              </svg>
+            </div>
+            <h3>Reference &amp; Source</h3>
+          </div>
+          <!-- TODO: wire to deal additional-info API -->
+          <div class="de-grid-2">
+
+            <div class="de-field">
+              <label>External Reference</label>
+              <input type="text" class="de-input" readonly
+                [value]="step1.get('dealId')?.value ?? ''" />
+              <span class="de-hint">System-generated. Can be overridden post-authorization.</span>
+            </div>
+
+            <div class="de-field">
+              <label>Trade Source</label>
+              <div class="dc-add-select">
+                <span class="dc-add-select__val">— not set —</span>
+                <!-- TODO: replace with tms-select when API is wired -->
+              </div>
+              <span class="de-hint">e.g. Bloomberg, Reuters, Phone, Internal</span>
+            </div>
+
+            <div class="de-field">
+              <label>Confirmation Method</label>
+              <div class="dc-add-select">
+                <span class="dc-add-select__val">— not set —</span>
+                <!-- TODO: wire confirmation method options -->
+              </div>
+              <span class="de-hint">e.g. SWIFT MT320, Email, Telex</span>
+            </div>
+
+            <div class="de-field">
+              <label>Booking Entity</label>
+              <input type="text" class="de-input" readonly placeholder="e.g. HO Treasury" />
+              <!-- TODO: populate from auth user context -->
+            </div>
+
+            <div class="de-field" style="grid-column:1/-1">
+              <label>Internal Narrative</label>
+              <textarea class="de-input mm-remarks" rows="3" readonly
+                placeholder="Additional internal notes for this deal…"></textarea>
+              <!-- TODO: enable once deal is saved to DB -->
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Card 2: Settlement Standing Instructions -->
+        <div class="de-card mm-card">
+          <div class="de-card__header">
+            <div class="de-card__icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="2" y="7" width="20" height="14" rx="2"/>
+                <path d="M16 7V5a2 2 0 0 0-4 0v2M12 12v4M10 14h4"/>
+              </svg>
+            </div>
+            <h3>Settlement Standing Instructions</h3>
+          </div>
+          <!-- TODO: fetch matched SSIs from SSI module API -->
+          <div class="dc-ph-note">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0">
+              <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+            SSI matching, nostro account assignment, and correspondent bank details will be available after the deal is saved.
+          </div>
+        </div>
+
+        <!-- Card 3: UDF Fields -->
+        <div class="de-card mm-card">
+          <div class="de-card__header">
+            <div class="de-card__icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+              </svg>
+            </div>
+            <h3>User-Defined Fields</h3>
+          </div>
+          <!-- TODO: load UDF schema from udf-maintenance API and render dynamic fields -->
+          <div class="dc-ph-note">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0">
+              <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+            Custom UDF fields configured in UDF Maintenance will appear here automatically.
+          </div>
+        </div>
+
+      </div>
+    }
+
+    <!-- ── CHARGES ────────────────────────────────────────────────────────────── -->
+    @if (activePanel === 'charges') {
+      <div @panelFade class="dc-panel">
+
+        <div class="dc-panel-title">
+          <div class="dc-panel-title__icon dc-panel-title__icon--ph">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="1" x2="12" y2="23"/>
+              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+            </svg>
+          </div>
+          Charges
+        </div>
+
+        <!-- Info banner -->
+        <div class="dc-ph-note">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          Charges are auto-populated based on predefined rules. Review and modify if needed.
+        </div>
+
+        <div class="de-card mm-card">
+          <div class="de-card__header">
+            <div class="de-card__icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="18" height="18" rx="2"/>
+                <path d="M3 9h18M9 21V9"/>
+              </svg>
+            </div>
+            <h3>Transaction Charges</h3>
+            <span class="de-badge de-badge--neutral" style="margin-left:auto;font-family:var(--font-mono)">
+              {{ chargeRows.length }} charge{{ chargeRows.length !== 1 ? 's' : '' }}
+            </span>
+          </div>
+          <!-- TODO: fetch charges from charges/fees API using dealId -->
+          <div class="dc-stl-table-wrap">
+            <table class="dc-stl-table">
+              <thead>
+                <tr>
+                  <th>Charge Type</th>
+                  <th>Currency</th>
+                  <th class="dc-stl-amount">Amount</th>
+                  <th>Rate</th>
+                  <th>Basis</th>
+                  <th>Modify</th>
+                </tr>
+              </thead>
+              <tbody>
+                @if (chargeRows.length > 0) {
+                  @for (row of chargeRows; track $index) {
+                    <tr>
+                      <td>{{ row.type }}</td>
+                      <td class="dc-stl-mono">{{ row.currency }}</td>
+                      <td class="dc-stl-amount dc-stl-mono">{{ fmtNum(row.amount, 2) }}</td>
+                      <td class="dc-stl-mono">{{ row.rate }}</td>
+                      <td>{{ row.basis }}</td>
+                      <td>
+                        <!-- TODO: open charge-edit modal using dealId + charge index -->
+                        <button type="button" class="dc-charge-edit-btn">Edit</button>
+                      </td>
+                    </tr>
+                  }
+                } @else {
+                  <tr>
+                    <td colspan="6" class="dc-stl-empty">No charges applicable for this deal type.</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <div class="dc-charge-footer">
+            <!-- TODO: add manual charge via charges API -->
+            <button type="button" class="de-btn de-btn--outline de-btn--sm">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Add Charge
+            </button>
+          </div>
+        </div>
+
+      </div>
+    }
+
+    <!-- ── BDC DETAILS ──────────────────────────────────────────────────────── -->
+    @if (activePanel === 'bdc') {
+      <div @panelFade class="dc-panel">
+
+        <div class="dc-panel-title">
+          <div class="dc-panel-title__icon dc-panel-title__icon--ph">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="4" width="18" height="18" rx="2"/>
+              <line x1="3" y1="10" x2="21" y2="10"/>
+              <line x1="8" y1="2" x2="8" y2="6"/>
+              <line x1="16" y1="2" x2="16" y2="6"/>
+            </svg>
+          </div>
+          BDC Details
+        </div>
+
+        <!-- Business Day Convention card -->
+        <div class="de-card mm-card">
+          <div class="de-card__header">
+            <div class="de-card__icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+              </svg>
+            </div>
+            <h3>Business Day Convention</h3>
+          </div>
+
+          <div class="de-grid-2">
+            <div class="de-field mm-field">
+              <label>BDC Rule</label>
+              <!-- TODO: wire to BDC configuration API -->
+              <tms-select
+                [(ngModel)]="bdcRule"
+                [items]="bdcRuleOptions"
+                bindValue="id"
+                bindLabel="label"
+                subLabelKey="name"
+                [clearable]="false"
+                [searchable]="false"
+                placeholder="Select BDC rule">
+              </tms-select>
+              <span class="de-hint">Defines how payment dates falling on weekends or holidays are adjusted.</span>
+            </div>
+
+            <div class="de-field mm-field">
+              <label>Calendar</label>
+              <div class="dc-add-select">
+                <span class="dc-add-select__val">BD — Bangladesh Business Days</span>
+                <!-- TODO: load holiday calendar from calendar API -->
+              </div>
+              <span class="de-hint">Holiday calendar applied when adjusting dates.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Interest Schedule card -->
+        <div class="de-card mm-card">
+          <div class="de-card__header">
+            <div class="de-card__icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/>
+              </svg>
+            </div>
+            <h3>Interest Schedule</h3>
+            @if (bdcScheduleRows.length > 0) {
+              <span class="de-badge de-badge--teal" style="margin-left:auto;font-family:var(--font-mono)">
+                {{ bdcScheduleRows.length }} event{{ bdcScheduleRows.length !== 1 ? 's' : '' }}
+              </span>
+            } @else {
+              <span class="de-badge de-badge--neutral" style="margin-left:auto;font-family:var(--font-mono)">0 events</span>
+            }
+          </div>
+
+          <!-- Direction note -->
+          <div class="dc-bdc-dir-note">
+            @if (direction === 'ACCEPT') {
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--de-red)" stroke-width="2" style="flex-shrink:0">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+              </svg>
+              <span>ACCEPT — the bank <strong>pays</strong> interest (expense). Rows show outgoing cash flows.</span>
+            } @else if (direction === 'PLACE') {
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--de-teal)" stroke-width="2" style="flex-shrink:0">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+              </svg>
+              <span>PLACE — the bank <strong>receives</strong> interest (income). Rows show incoming cash flows.</span>
+            } @else {
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0">
+                <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+              </svg>
+              <span>Select a deal direction in Basics to see the correct cash flow labels.</span>
+            }
+          </div>
+
+          <!-- TODO: fetch confirmed schedule from payment-schedule API after deal booking -->
+          <div class="dc-stl-table-wrap">
+            <table class="dc-stl-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Date</th>
+                  <th>Type</th>
+                  <th>Event</th>
+                  <th class="dc-stl-amount">Amount</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                @if (bdcScheduleRows.length > 0) {
+                  @for (row of bdcScheduleRows; track $index) {
+                    <tr [class.dc-sched-row--maturity]="row.isMaturity">
+                      <td class="dc-stl-mono" style="color:var(--de-neutral-400)">{{ row.n }}</td>
+                      <td class="dc-stl-mono">{{ fmtDate(row.date) }}</td>
+                      <td>
+                        <span class="mm-cf-type"
+                          [class.mm-cf-type--pay]="row.type === 'Pay'"
+                          [class.mm-cf-type--rec]="row.type === 'Rec'">
+                          {{ row.type }}
+                        </span>
+                      </td>
+                      <td class="dc-sched-event">{{ row.event }}</td>
+                      <td class="dc-stl-amount dc-stl-mono">
+                        {{ step2.get('currency')?.value }} {{ fmtNum(row.amount, 2) }}
+                      </td>
+                      <td><span class="dc-stl-badge dc-stl-badge--wt">Pending</span></td>
+                    </tr>
+                  }
+                } @else {
+                  <tr>
+                    <td colspan="6" class="dc-stl-empty">
+                      @if (!step2.get('valueDate')?.value || !step2.get('maturityDate')?.value) {
+                        Deal not yet saved — complete Deposit &amp; Dates first.
+                      } @else if (settlementFreq === 'AT_MATURITY' || !settlementFreq) {
+                        Settlement is at maturity — no periodic schedule.
+                      } @else {
+                        No schedule generated yet.
+                      }
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    }
+
+    <!-- ── MESSAGES ───────────────────────────────────────────────────────────── -->
+    @if (activePanel === 'messages') {
+      <div @panelFade class="dc-panel">
+
+        <div class="dc-panel-title">
+          <div class="dc-panel-title__icon dc-panel-title__icon--ph">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            </svg>
+          </div>
+          Messages
+        </div>
+
+        <div class="de-card mm-card">
+          <div class="de-card__header">
+            <div class="de-card__icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+              </svg>
+            </div>
+            <h3>SWIFT / Confirmation Messages</h3>
+            <span class="de-badge de-badge--neutral" style="margin-left:auto;font-family:var(--font-mono)">0 messages</span>
+          </div>
+          <!-- TODO: fetch SWIFT messages from messaging API using dealId -->
+
+          <!-- Message type filter row (shell only) -->
+          <div class="dc-msg-filter">
+            <button type="button" class="dc-msg-filter__btn dc-msg-filter__btn--active">All</button>
+            <button type="button" class="dc-msg-filter__btn">Outgoing</button>
+            <button type="button" class="dc-msg-filter__btn">Incoming</button>
+            <button type="button" class="dc-msg-filter__btn">Confirmation</button>
+          </div>
+
+          <!-- Empty state -->
+          <div class="dc-msg-empty">
+            <div class="dc-msg-empty__icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+              </svg>
+            </div>
+            <p class="dc-msg-empty__title">No messages generated yet</p>
+            <p class="dc-msg-empty__sub">
+              SWIFT MT320 confirmations and deal notifications will appear here once the deal is authorized.
+            </p>
+          </div>
+        </div>
+
+      </div>
+    }
+
+    <!-- ── PAYMENT SCHEDULE ───────────────────────────────────────────────────── -->
+    @if (activePanel === 'schedule') {
+      <div @panelFade class="dc-panel">
+
+        <div class="dc-panel-title">
+          <div class="dc-panel-title__icon dc-panel-title__icon--ph">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="4" width="18" height="18" rx="2"/>
+              <line x1="3" y1="10" x2="21" y2="10"/>
+              <line x1="8" y1="2" x2="8" y2="6"/>
+              <line x1="16" y1="2" x2="16" y2="6"/>
+            </svg>
+          </div>
+          Payment Schedule
+        </div>
+
+        <div class="de-card mm-card">
+          <div class="de-card__header">
+            <div class="de-card__icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/>
+              </svg>
+            </div>
+            <h3>Payment Schedule</h3>
+            @if (cashFlowRows.length > 0) {
+              <span class="de-badge de-badge--teal" style="margin-left:auto;font-family:var(--font-mono)">
+                {{ cashFlowRows.length }} events
+              </span>
+            } @else {
+              <span class="de-badge de-badge--neutral" style="margin-left:auto;font-family:var(--font-mono)">0 events</span>
+            }
+          </div>
+          <!-- TODO: fetch finalized schedule from payment-schedule API using dealId after booking -->
+
+          <div class="dc-stl-table-wrap">
+            <table class="dc-stl-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Type</th>
+                  <th>Event</th>
+                  <th class="dc-stl-amount">Amount</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                @if (cashFlowRows.length > 0) {
+                  @for (row of cashFlowRows; track $index) {
+                    <tr [class.dc-sched-row--maturity]="row.isMaturity">
+                      <td class="dc-stl-mono">{{ fmtDate(row.date) }}</td>
+                      <td>
+                        <span class="mm-cf-type"
+                          [class.mm-cf-type--pay]="row.type === 'Pay'"
+                          [class.mm-cf-type--rec]="row.type === 'Rec'">
+                          {{ row.type }}
+                        </span>
+                      </td>
+                      <td class="dc-sched-event">{{ row.event }}</td>
+                      <td class="dc-stl-amount dc-stl-mono">
+                        {{ step2.get('currency')?.value }} {{ fmtNum(row.amount) }}
+                      </td>
+                      <td>
+                        <span class="dc-stl-badge dc-stl-badge--wt">Projected</span>
+                      </td>
+                    </tr>
+                  }
+                } @else {
+                  <tr>
+                    <td colspan="5" class="dc-stl-empty">
+                      Payment schedule will appear after deal is saved.
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+
+          @if (cashFlowRows.length === 0) {
+            <div class="dc-ph-note" style="margin-top:16px">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0">
+                <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+              </svg>
+              To preview cash flows, complete the Interest section and set a periodic Settlement Frequency.
+            </div>
+          }
+        </div>
+
+      </div>
+    }
+
+  </div>
+</div>
+
+
+<!-- ─── Submit Confirmation Modal ─────────────────────────────────────────── -->
+@if (showModal) {
+  <div class="de-modal-backdrop" @overlayFade (click)="cancelModal()">
+    <div class="de-modal mm-confirm-modal" (click)="$event.stopPropagation()">
+      <button type="button" class="mm-modal-close" (click)="cancelModal()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+      <div class="de-modal__header">
+        <h2>Confirm Deal Submission</h2>
+        <p>Review the deal details before sending for checker authorization.</p>
+      </div>
+      <div class="mm-modal-grid">
+        <div class="mm-modal-row"><span class="mm-modal-row__label">Deal ID</span><span class="mm-modal-row__val">{{ step1.get('dealId')?.value ?? '—' }}</span></div>
+        <div class="mm-modal-row"><span class="mm-modal-row__label">Direction</span><span class="mm-modal-row__val">{{ s1Direction }}</span></div>
+        <div class="mm-modal-row"><span class="mm-modal-row__label">Amount</span><span class="mm-modal-row__val">@if (principal > 0) { {{ step2.get('currency')?.value }} {{ fmtNum(principal) }} } @else { — }</span></div>
+        <div class="mm-modal-row"><span class="mm-modal-row__label">@if (interestBasis === 'FIXED') { Rate } @else { All-in Rate }</span><span class="mm-modal-row__val">@if (effectiveRate > 0) { {{ effectiveRate.toFixed(4) }}% p.a. } @else { — }</span></div>
+        <div class="mm-modal-row"><span class="mm-modal-row__label">Maturity Date</span><span class="mm-modal-row__val">{{ fmtDate(step2.get('maturityDate')?.value ?? '') }}</span></div>
+        <div class="mm-modal-row mm-modal-row--highlight"><span class="mm-modal-row__label">Maturity Value</span><span class="mm-modal-row__val">@if (maturityValue > 0) { {{ step2.get('currency')?.value }} {{ fmtNum(maturityValue) }} } @else { — }</span></div>
+      </div>
+      <div class="mm-modal-warning">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;margin-top:1px"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        Once submitted, this deal enters the maker-checker workflow and cannot be edited until authorized.
+      </div>
+      <div class="de-modal__footer">
+        <button type="button" class="de-btn de-btn--ghost" (click)="cancelModal()">Cancel</button>
+        <button type="button" class="de-btn de-btn--primary" (click)="confirmSubmit()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          Confirm &amp; Submit
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ─── Toast ──────────────────────────────────────────────────────────────── -->
+@if (showToast) {
+  <div class="de-toast-container" @overlayFade>
+    <div class="de-toast"
+      [class.de-toast--success]="!toastIsError && toastType === 'success'"
+      [class.de-toast--warning]="!toastIsError && toastType === 'warning'"
+      [class.de-toast--error]="toastIsError">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        @if (!toastIsError) { <polyline points="20 6 9 17 4 12"/> }
+        @else { <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/> }
+      </svg>
+      {{ toastMsg }}
+    </div>
+  </div>
+}
+

@@ -1,0 +1,69 @@
+Angular Money Market app. Fix these 4 issues only.
+Do NOT touch any other logic, components, or styling.
+
+---
+
+## FIX 1 — Dropdown list position
+All mat-select dropdowns across the app are opening in wrong position.
+Add this to global styles.css:
+.cdk-overlay-container .mat-select-panel {
+  margin-top: 48px !important;
+}
+Also on every mat-select add: panelClass="dropdown-panel"
+And in styles.css:
+.dropdown-panel {
+  max-height: 250px !important;
+  overflow-y: auto !important;
+}
+Do NOT change any dropdown data or logic.
+
+---
+
+## FIX 2 — Sticky info bar under navbar
+Find the existing sticky info bar added below the navbar on form pages.
+It is currently showing in wrong format. Fix it:
+- Position: fixed, top = navbar height (check existing navbar height, 
+  typically 64px), left: 0, right: 0
+- Height: 36px, z-index: 999
+- Background: #E3F2FD (light blue), border-bottom: 1px solid #BBDEFB
+- Text color: #1565C0, font-size: 13px, font-weight: 500
+- Layout: flex row, items centered vertically, gap: 24px, padding: 0 24px
+- Each field shown as: [Label in grey]: [Value in dark blue bold]
+  Example: "Deal Date: 2026-05-05  |  Dealer: Ahmed Rahman  |  Portfolio: —"
+- Separator between fields: light grey " | "
+- Add margin-top to page content equal to navbar height + 36px so 
+  content is not hidden behind both bars
+
+---
+
+## FIX 3 — Fixed footer above page bottom
+Find the existing fixed footer on form pages.
+It is currently showing in wrong format. Fix it:
+- Position: fixed, bottom: 0, left: 0, right: 0
+- Height: 52px, z-index: 1100
+- Background: #F5F5F5 (light grey), border-top: 1px solid #E0E0E0
+- Layout: flex row, space-between, items centered, padding: 0 24px
+- Left side text: "This record requires checker authorization before becoming active"
+  font-size: 12px, color: #757575
+- Right side buttons in this order:
+  [Cancel] — mat-stroked-button, color: #616161
+  [Save as Draft] — mat-stroked-button, color: #1565C0
+  [Submit for Approval] — mat-raised-button, background: #1976D2, color: white
+- Button height: 36px, border-radius: 4px, font-size: 13px
+- Add padding-bottom: 52px to page content so footer does not overlap last field
+
+---
+
+## FIX 4 — Remove Actions column from User Management list
+In /user-management page, find the users list table.
+Remove the Actions column and all its buttons (edit/delete icons) from the 
+users list table completely.
+Do NOT touch the groups table or any other part of user management.
+Do NOT remove any other functionality.
+
+---
+
+## CONSTRAINTS
+- Do NOT change any business logic, API calls, or form validators
+- Do NOT install new packages
+- Do NOT modify any other page or component beyond what is listed above

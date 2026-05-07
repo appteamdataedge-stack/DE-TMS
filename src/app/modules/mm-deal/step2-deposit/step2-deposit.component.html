@@ -1,0 +1,364 @@
+<!-- ─── Breadcrumb ─────────────────────────────────────────────────────── -->
+<nav class="de-breadcrumb">
+  <a routerLink="/">Home</a><span class="sep">›</span>
+  <span>Money Market</span><span class="sep">›</span>
+  <span>MM Deals</span><span class="sep">›</span>
+  <a routerLink="/mm-deal/create/basics">New Deal</a><span class="sep">›</span>
+  <span class="current">Deposit &amp; Dates</span>
+</nav>
+
+<!-- ─── Page header ───────────────────────────────────────────────────── -->
+<div class="mm-page-header">
+  <div>
+    <h1 style="font-size:22px;font-weight:700;color:var(--de-navy);margin:0 0 4px;display:flex;align-items:center;gap:12px">
+      New Money Market Deal
+      <span class="de-badge de-badge--neutral" style="font-family:var(--font-mono);font-size:12px">
+        {{ step1.get('dealId')?.value }}
+      </span>
+    </h1>
+    <p class="mm-page-sub">Step 2 of 3 — Configure deposit amount, tenor, and compounding</p>
+  </div>
+</div>
+
+<!-- ─── Step bar ──────────────────────────────────────────────────────── -->
+<de-deal-step-bar [currentStep]="2"></de-deal-step-bar>
+
+<!-- ─── Step 1 summary strip ─────────────────────────────────────────── -->
+<div class="mm-s1-strip">
+  <span class="mm-s1-strip__label">Step 1</span>
+  <span class="de-badge de-badge--{{ s1Direction === 'ACCEPT' ? 'teal' : 'navy' }}">
+    {{ s1Direction }}
+  </span>
+  @if (s1Counterparty) {
+    <span class="mm-s1-chip">{{ s1Counterparty.name }}</span>
+  }
+  @if (s1Instrument) {
+    <span class="mm-s1-chip">{{ s1Instrument.name }}</span>
+  }
+  <span class="de-badge de-badge--{{ s1PricingType === 'DISCOUNTING' ? 'amber' : 'navy' }}">
+    {{ s1PricingType }}
+  </span>
+  <a routerLink="/mm-deal/create/basics" class="mm-s1-strip__edit">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+    Edit
+  </a>
+</div>
+
+<!-- ─── Form ────────────────────────────────────────────────────────────── -->
+<form [formGroup]="step2" autocomplete="off" class="mm-form">
+
+  <!-- ── CARD 1: Deposit Type ──────────────────────────────────────────── -->
+  <div class="de-card mm-card">
+    <div class="de-card__header">
+      <div class="de-card__icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/>
+        </svg>
+      </div>
+      <h3>Deposit Type</h3>
+    </div>
+
+    <div class="mm-dtype-grid">
+
+      <button type="button" class="mm-dtype-card"
+        [class.mm-dtype-card--active]="depositType === 'TERM'"
+        (click)="step2.patchValue({depositType:'TERM'})">
+        <div class="mm-dtype-card__icon mm-dtype-card__icon--term">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg>
+        </div>
+        <div class="mm-dtype-card__body">
+          <span class="mm-dtype-card__title">TERM</span>
+          <span class="mm-dtype-card__sub">Fixed maturity deposit</span>
+          <span class="mm-dtype-card__desc">Defined start and end date. Compounding available.</span>
+        </div>
+        @if (depositType === 'TERM') {
+          <span class="mm-dtype-card__check">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+          </span>
+        }
+      </button>
+
+      <button type="button" class="mm-dtype-card"
+        [class.mm-dtype-card--active]="depositType === 'CALL'"
+        (click)="step2.patchValue({depositType:'CALL'})">
+        <div class="mm-dtype-card__icon mm-dtype-card__icon--call">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18.364 5.636A9 9 0 0 1 12 21a9 9 0 0 1-6.364-15.364"/><path d="M12 3v9"/></svg>
+        </div>
+        <div class="mm-dtype-card__body">
+          <span class="mm-dtype-card__title">CALL</span>
+          <span class="mm-dtype-card__sub">Open-ended call deposit</span>
+          <span class="mm-dtype-card__desc">No fixed maturity. Callable at any time. No compounding.</span>
+        </div>
+        @if (depositType === 'CALL') {
+          <span class="mm-dtype-card__check">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+          </span>
+        }
+      </button>
+
+    </div>
+  </div>
+
+  <!-- ── CARD 2: Amount & Currency ─────────────────────────────────────── -->
+  <div class="de-card mm-card">
+    <div class="de-card__header">
+      <div class="de-card__icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><path d="M8 14h8"/></svg>
+      </div>
+      <h3>{{ amountLabel }}</h3>
+    </div>
+
+    <div class="de-field">
+      <label>{{ amountLabel }} <span style="color:var(--de-red)">*</span></label>
+
+      <!-- Combined currency + amount input -->
+      <div class="mm-amount-group"
+        [class.mm-amount-group--invalid]="step2.get('amount')!.invalid && step2.get('amount')!.touched">
+        <!-- Currency select -->
+        <div class="mm-amount-group__ccy">
+          <tms-select
+            formControlName="currency"
+            [items]="svc.currencies"
+            bindValue="code"
+            bindLabel="code"
+            subLabelKey="name"
+            [clearable]="false"
+            [searchable]="false">
+          </tms-select>
+        </div>
+        <div class="mm-amount-group__divider"></div>
+        <!-- Amount input -->
+        <div class="mm-amount-group__input">
+          <input
+            class="de-input mm-amount-input"
+            [(ngModel)]="rawAmount"
+            [ngModelOptions]="{standalone:true}"
+            (input)="onAmountInput()"
+            (blur)="onAmountBlur()"
+            placeholder="e.g. 10M, 500K, 1B"
+            inputmode="decimal" />
+        </div>
+      </div>
+
+      <!-- Formatted display -->
+      @if (formattedDisplay) {
+        <span class="mm-amount-display">{{ formattedDisplay }}</span>
+      }
+
+      <!-- Errors -->
+      @if (step2.get('amount')!.errors?.['required'] && step2.get('amount')!.touched) {
+        <span class="de-error">Face value amount is required</span>
+      }
+      @if (step2.get('amount')!.errors?.['min'] && step2.get('amount')!.touched) {
+        <span class="de-error">Amount must be greater than zero</span>
+      }
+      @if (step2.get('amount')!.errors?.['invalidFormat'] && step2.get('amount')!.touched) {
+        <span class="de-error">Invalid format. Use numbers or shorthand (10M, 500K, 1B)</span>
+      }
+      <span class="de-hint">Shorthand supported: 10M → 10,000,000 · 500K → 500,000 · 1B → 1,000,000,000</span>
+    </div>
+  </div>
+
+  <!-- ── CARD 3: Value Date & Tenor ─────────────────────────────────────── -->
+  <div class="de-card mm-card">
+    <div class="de-card__header">
+      <div class="de-card__icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg>
+      </div>
+      <h3>Value Date &amp; Tenor</h3>
+    </div>
+
+    <div class="de-grid-2">
+
+      <!-- Value Date -->
+      <div class="de-field">
+        <label>Value Date <span style="color:var(--de-red)">*</span></label>
+        <input type="date" class="de-input"
+          [class.is-invalid]="step2.get('valueDate')!.invalid && step2.get('valueDate')!.touched"
+          formControlName="valueDate"
+          (change)="onValueDateChange()" />
+        @if (step2.get('valueDate')!.errors?.['required'] && step2.get('valueDate')!.touched) {
+          <span class="de-error">Value date is required</span>
+        }
+      </div>
+
+      <!-- Maturity Date -->
+      <div class="de-field">
+        <label>
+          Maturity Date
+          @if (depositType === 'TERM') {<span style="color:var(--de-red)"> *</span>}
+          @if (depositType === 'CALL') {<span class="de-hint" style="text-transform:none;margin-left:6px">Not applicable for Call</span>}
+        </label>
+        <input type="date" class="de-input"
+          [class.is-invalid]="step2.get('maturityDate')!.invalid && step2.get('maturityDate')!.touched"
+          formControlName="maturityDate"
+          [min]="todayStr"
+          [attr.disabled]="depositType === 'CALL' ? '' : null"
+          (change)="onMaturityManual()" />
+        @if (step2.get('maturityDate')!.errors?.['required'] && step2.get('maturityDate')!.touched) {
+          <span class="de-error">Maturity date is required for Term deposits</span>
+        }
+        @if (step2.get('maturityDate')!.errors?.['pastDate'] && step2.get('maturityDate')!.touched) {
+          <span class="de-error">Maturity date must not be in the past</span>
+        }
+        @if (depositDays > 0) {
+          <span class="mm-days-badge">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+            {{ depositDays }} days
+          </span>
+        }
+      </div>
+
+    </div>
+
+    <!-- Quick period buttons -->
+    @if (depositType === 'TERM') {
+      <div @slideDown class="mm-period-row">
+        <span class="mm-period-row__label">Quick Period</span>
+        @for (p of quickPeriods; track p.label) {
+          <button type="button" class="mm-period-btn"
+            [class.mm-period-btn--active]="activePeriodBtn === p.label"
+            (click)="applyPeriod(p)">
+            {{ p.label }}
+          </button>
+        }
+      </div>
+    }
+
+  </div>
+
+  <!-- ── CARD 4: Compounding Rule ───────────────────────────────────────── -->
+  <div class="de-card mm-card mm-card--relative">
+    <div class="de-card__header">
+      <div class="de-card__icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+      </div>
+      <h3>Compounding Rule</h3>
+    </div>
+
+    <!-- CALL overlay -->
+    @if (depositType === 'CALL') {
+      <div class="mm-overlay" @overlayFade>
+        <div class="mm-overlay__badge">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+          Not applicable for Call Deposits
+        </div>
+      </div>
+    }
+
+    <!-- 4 compounding tiles -->
+    <div class="de-grid-4 mm-compound-grid">
+      @for (opt of compoundingOptions; track opt.id) {
+        <button type="button" class="mm-compound-tile"
+          [class.mm-compound-tile--active-navy]="compoundingRule === opt.id && opt.id === 'NONE'"
+          [class.mm-compound-tile--active-teal]="compoundingRule === opt.id && opt.id !== 'NONE'"
+          [disabled]="depositType === 'CALL'"
+          (click)="setCompounding(opt.id)">
+          <svg class="mm-compound-tile__icon" width="22" height="22" viewBox="0 0 24 24" fill="none" [innerHTML]="opt.icon"></svg>
+          <span class="mm-compound-tile__label">{{ opt.label }}</span>
+          <span class="mm-compound-tile__sub">{{ opt.sub }}</span>
+        </button>
+      }
+    </div>
+
+    <!-- Capitalization schedule (animated reveal) -->
+    @if (compoundingRule !== 'NONE' && compoundSchedule.length > 0) {
+      <div @slideDown class="mm-sched">
+        <div class="mm-sched__label">Capitalisation Schedule</div>
+        <table class="mm-sched__table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Event Date</th>
+              <th>Type</th>
+              <th>Period</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of compoundSchedule; track row.n) {
+              <tr [class.mm-sched__row--maturity]="row.isMaturity">
+                <td class="mm-sched__n">{{ row.n }}</td>
+                <td class="mm-sched__date">{{ fmtDate(row.date) }}</td>
+                <td>
+                  <span class="de-badge"
+                    [class.de-badge--teal]="!row.isMaturity"
+                    [class.de-badge--navy]="row.isMaturity">
+                    {{ row.type }}
+                  </span>
+                </td>
+                <td class="mm-sched__period">{{ row.period }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+
+    <p class="de-hint" style="margin-top:12px">ACT/365 and 30/360 are fully supported. Others are configurable.</p>
+  </div>
+
+  <!-- ── CARD 5: Deal Summary Preview (dark navy) ────────────────────────── -->
+  <div class="mm-summary-card">
+    <div class="mm-summary-card__header">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      Deal Summary Preview
+    </div>
+
+    <div class="mm-summary-card__grid">
+      <div class="mm-summary-row">
+        <span class="mm-summary-row__label">Face Value</span>
+        <span class="mm-summary-row__val">{{ summaryData['faceValue'] }}</span>
+      </div>
+      <div class="mm-summary-row">
+        <span class="mm-summary-row__label">Deposit Type</span>
+        <span class="mm-summary-row__val">{{ summaryData['depositType'] }}</span>
+      </div>
+      <div class="mm-summary-row">
+        <span class="mm-summary-row__label">Value Date</span>
+        <span class="mm-summary-row__val">{{ summaryData['valueDate'] }}</span>
+      </div>
+      <div class="mm-summary-row">
+        <span class="mm-summary-row__label">Maturity Date</span>
+        <span class="mm-summary-row__val">{{ summaryData['maturityDate'] }}</span>
+      </div>
+      <div class="mm-summary-row">
+        <span class="mm-summary-row__label">Deposit Period</span>
+        <span class="mm-summary-row__val">{{ summaryData['depositPeriod'] }}</span>
+      </div>
+      <div class="mm-summary-row">
+        <span class="mm-summary-row__label">Compounding</span>
+        <span class="mm-summary-row__val">{{ summaryData['compounding'] }}</span>
+      </div>
+      <div class="mm-summary-row mm-summary-row--muted">
+        <span class="mm-summary-row__label">Maturity Value</span>
+        <span class="mm-summary-row__val mm-summary-row__val--pending">(calculated on next step)</span>
+      </div>
+    </div>
+  </div>
+
+</form>
+
+<!-- ─── Wizard footer ────────────────────────────────────────────────────── -->
+<div class="mm-wizard-footer">
+  <button type="button" class="de-btn de-btn--ghost" routerLink="/mm-deal/create/basics">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+    Back
+  </button>
+  <div class="mm-wizard-footer__right">
+    <button type="button" class="de-btn de-btn--outline" (click)="saveDraft()">Save as Draft</button>
+    <button type="button" class="de-btn de-btn--primary" (click)="onNext()">
+      Next: Interest &amp; Calculation
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- ─── Toast ──────────────────────────────────────────────────────────── -->
+@if (showToast) {
+  <div class="de-toast-container">
+    <div class="de-toast de-toast--success">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+      {{ toastMsg }}
+    </div>
+  </div>
+}

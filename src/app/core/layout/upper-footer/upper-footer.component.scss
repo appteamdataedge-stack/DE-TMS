@@ -1,0 +1,62 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.uf {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 52px;
+  padding: 0 24px;
+  background: #FFFFFF;
+  border-top: 1px solid #E0E0E0;
+  box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.06);
+}
+
+.uf__message {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #757575;
+}
+
+.uf__actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.uf__cancel {
+  padding: 6px 16px;
+  border: 1px solid #B0BEC5;
+  border-radius: 6px;
+  background: transparent;
+  color: #546E7A;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.uf__draft {
+  padding: 6px 16px;
+  border: 1px solid #1565C0;
+  border-radius: 6px;
+  background: transparent;
+  color: #1565C0;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.uf__submit {
+  padding: 6px 16px;
+  border: none;
+  border-radius: 6px;
+  background: #1565C0;
+  color: #FFFFFF;
+  cursor: pointer;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}

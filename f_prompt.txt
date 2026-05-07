@@ -1,0 +1,132 @@
+Angular Money Market app. Fix these issues by editing specific files.
+Do NOT change any logic, validators, or API calls.
+
+---
+
+## FIX 1 — bottom-nav component (Sticky info bar below navbar)
+File: src/app/core/layout/bottom-nav/bottom-nav.component.ts (.html, .scss)
+
+In the SCSS file, fix position:
+.bottom-nav (or whatever the host/root class is) {
+  position: fixed !important;
+  top: 64px !important;
+  left: 240px !important;   /* same as sidebar width */
+  right: 0 !important;
+  width: auto !important;
+  height: 36px !important;
+  z-index: 998 !important;
+  background: #EEF4FB !important;
+  border-bottom: 1px solid #C5D9EE !important;
+  display: flex !important;
+  align-items: center !important;
+  padding: 0 24px !important;
+  gap: 16px !important;
+  font-size: 13px !important;
+  color: #1565C0 !important;
+}
+Make sure this component is included in the main layout component
+(app-layout or shell component) so it appears on ALL pages, not just one.
+Check app/core/layout/ for the shell/layout component and add
+<app-bottom-nav> there if not already present.
+
+---
+
+## FIX 2 — Create upper-footer component (Fixed footer above page bottom)
+File: src/app/core/layout/upper-footer/
+Create these files:
+- upper-footer.component.ts
+- upper-footer.component.html
+- upper-footer.component.scss
+
+HTML content:
+<div class="upper-footer">
+  <span class="auth-text">
+    <mat-icon>lock</mat-icon>
+    This record requires checker authorization before becoming active
+  </span>
+  <div class="footer-actions">
+    <button mat-stroked-button (click)="onCancel()">Cancel</button>
+    <button mat-stroked-button color="primary" (click)="onSaveDraft()">Save as Draft</button>
+    <button mat-raised-button color="primary" (click)="onSubmit()">
+      Submit for Approval <mat-icon>lock</mat-icon>
+    </button>
+  </div>
+</div>
+
+SCSS:
+.upper-footer {
+  position: fixed !important;
+  bottom: 0 !important;
+  left: 240px !important;   /* same as sidebar width */
+  right: 0 !important;
+  width: auto !important;
+  height: 52px !important;
+  z-index: 1100 !important;
+  background: #FFFFFF !important;
+  border-top: 1px solid #E0E0E0 !important;
+  box-shadow: 0 -2px 6px rgba(0,0,0,0.07) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 0 24px !important;
+}
+.auth-text {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #757575;
+}
+.footer-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+TS: add onCancel(), onSaveDraft(), onSubmit() as empty methods 
+with TODO comments for wiring later.
+
+Declare and add <app-upper-footer> in the SAME layout/shell component
+where <app-bottom-nav> was added so it appears on ALL pages.
+
+Search entire codebase for any hardcoded Cancel/Save Draft/Submit for Approval
+button bars inside individual component templates. Remove all of them.
+Keep ONLY the global upper-footer component.
+
+---
+
+## FIX 3 — Main layout content area padding
+In the main content area of the layout/shell component CSS:
+.main-content (or equivalent class) {
+  padding-top: 100px !important;  /* 64px navbar + 36px bottom-nav */
+  padding-bottom: 60px !important; /* 52px upper-footer + 8px gap */
+}
+
+---
+
+## FIX 4 — Dropdown fix
+In styles.scss add:
+.cdk-overlay-container {
+  z-index: 9999 !important;
+}
+.mat-mdc-select-panel {
+  margin-top: 0 !important;
+  max-height: 220px !important;
+  overflow-y: auto !important;
+}
+In EVERY component that has a mat-select, add to the select element:
+[disableOptionCentering]="true" panelClass="mat-mdc-select-panel"
+
+For dropdowns showing blank options when clicked:
+In each component with a dropdown, ensure the options array is populated
+inside ngOnInit() before the template renders.
+If options are hardcoded in template only, move them to a TS array 
+bound with *ngFor on <mat-option>.
+
+---
+
+## CONSTRAINTS
+- Do NOT change any form logic, bindings, validators, or API calls
+- Do NOT install new packages
+- The two layout components (bottom-nav, upper-footer) must be registered
+  in the correct Angular module so they work across ALL pages

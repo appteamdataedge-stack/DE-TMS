@@ -1,0 +1,146 @@
+# ══════════════════════════════════════════════════════════════
+# X3 — BP CREATION + UPM FROM EXCEL (exact fields from sheets)
+# ══════════════════════════════════════════════════════════════
+X3) send << 'PROMPT'
+Implement Business Partner Creation and User Profile Maintenance
+exactly as specified in the uploaded Excel file (BP_ID_UPM_Module.xlsx).
+ 
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+BP CREATION: /partners/create
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ 
+Step 1 — Category selector (3 tiles):
+  Individual (BP_ID prefix: 1xxx)
+  Corporate (BP_ID prefix: 2xxx)
+  Bank (BP_ID prefix: 3xxx)
+Note: BP_ID is system-generated unique. Prefix differs by category.
+ 
+INDIVIDUAL FIELDS (from Excel BusinessPartner sheet):
+Card "Personal Information":
+  First Name: text REQUIRED
+  Middle Name: text optional
+  Last Name: text REQUIRED
+  Date of Birth: datepicker optional
+  Mobile No. with ISD Code: [ISD tms-select "+880"] + [number] REQUIRED
+  Email Address: email optional
+ 
+Card "Addresses" (multi-record via + Add Address button):
+  Address Type: tms-select [Communication, Office, Permanent]
+  House/Plot No.: text
+  Road No./Address Line 1: text REQUIRED
+  Address Line 2: text optional
+  City: text REQUIRED
+  Zip/Pin Code: text optional
+  State: text optional
+  Country: tms-select REQUIRED (LOV)
+ 
+CORPORATE FIELDS (from Excel):
+Card "Entity Information":
+  Entity Name: text REQUIRED
+  Short Name: text optional
+  Date of Incorporation: datepicker optional
+  Constitution: tms-select REQUIRED [Proprietorship, Partnership, Ltd, PLC, LLP, Others]
+  Contact Person Name: text optional
+  Designation: text optional
+  Mobile No. with ISD: flex row optional
+  Email: email optional
+ 
+Card "Addresses" (multi-record):
+  Address Type: tms-select [Communication, Regd. Office, Branch Office]
+  Same address fields as Individual
+ 
+BANK FIELDS (from Excel):
+Card "Bank Information":
+  Bank Name: text REQUIRED
+  Branch Name: text optional
+  Short Name: text optional
+  Country: tms-select REQUIRED (LOV)
+  SWIFT Code: text, pattern /^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$/
+  Routing No.: text optional
+  Contact Person Name: text optional
+  Designation: text optional
+  Mobile with ISD: flex row optional
+ 
+Card "Addresses" (multi-record):
+  Address Type: tms-select [Communication, Regd. Office, Branch Office]
+  Same address fields
+ 
+COMMON FIELDS (all categories, bottom card):
+  BP_ID: readonly auto-generated
+  BP Status: toggle Active/Inactive
+  Effective Date: datepicker REQUIRED
+  Blacklisted: toggle No/Yes (if Yes → rose banner)
+  Remarks: textarea optional
+  Currency Scope: seg [All, Selected] + multi-select if Selected
+  Maker-Checker: mandatory (Submit for Approval button)
+  Audit Trail: logged automatically
+ 
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+BP ROLE ASSIGNMENT: /partners/:id/roles
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ 
+From Excel BP_Role Assignment sheet:
+  BP_Id: shown (readonly from BP)
+  Role: tms-select LOV (multiple allowed):
+    Employee, Counterparty, Settlement Bank, Correspondent Bank,
+    Intermediary Bank, Broker, Clearing Member, Custodian Bank,
+    Paying Agent, Issuer (optional for securities)
+  Rule: "A BP can have multiple roles simultaneously"
+ 
+IF Role = Employee (additional fields appear):
+  Emp_ID: text REQUIRED
+  Designation: text REQUIRED
+  Department: text optional (NOTE: Department added from Excel — was missing)
+  Date of Joining: datepicker REQUIRED
+  Date of Leaving: datepicker optional
+    Rule: if set → auto-set Status = Inactive
+  Status: toggle Active/Inactive
+  Login User Name: text REQUIRED
+ 
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+USER PROFILE MAINTENANCE: /settings/user-profiles
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ 
+From Excel UPM sheet — EXACT fields and layout:
+ 
+Search Section:
+  BP_ID: search field (filtered: Role = Employee only)
+  Employee Name: readonly auto-display (First + Middle + Last Name)
+ 
+Profile Section:
+  Segment: tms-select LOV [Front Office, Mid Office, Back Office, System Admin, Others]
+  Responsibility: tms-select LOV [Dealer, Chief Dealer, Approver, Risk Officer, Operations, ...]
+  Group Based Rights: toggle Yes/No
+ 
+IF Group Based Rights = No (individual rights matrix from Excel):
+  TABLE LAYOUT (matches Excel exactly):
+  Columns: BP_ID | Employee Name | Rights | Portfolio Assignment | Deal Limit | Overnight Limit
+ 
+  Rights per module (checkbox grid):
+  MONEY MARKET:    Create ☐  View ☐  Modify ☐  Recall ☐  Authorise ☐  Cancel ☐  Reverse ☐
+  SECURITIES:      Create ☐  View ☐  Modify ☐              Authorise ☐  Cancel ☐  Reverse ☐
+  FOREX:           Create ☐  View ☐  Modify ☐              Authorise ☐  Cancel ☐  Reverse ☐
+ 
+  Portfolio Assignment: tms-select multi (LOV from Portfolio table)
+ 
+  Deal Limit (+Add rows):
+    Currency (LOV) | Amount
+    [+ Add Row] to add more currency-amount pairs
+ 
+  Overnight Limit (+Add rows):
+    Currency (LOV) | Amount
+    [+ Add Row] to add more
+ 
+  Note below: "Currency-wise validation available. Gross/overall validation not available."
+ 
+IF Group Based Rights = Yes:
+  Group_Id: tms-select (LOV from Groups)
+  Rights auto-populate from group definition (readonly preview)
+ 
+GROUP MAINTENANCE SECTION (below user list):
+  Group_Id: auto-generated
+  Group_Name: text REQUIRED
+  Same rights matrix as individual + Portfolio Assignment + Deal Limit + Overnight Limit
+PROMPT
+;;
+ 
