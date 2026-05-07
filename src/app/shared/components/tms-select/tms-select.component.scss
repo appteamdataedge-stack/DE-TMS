@@ -144,12 +144,11 @@
   position: fixed !important;
   z-index: 99999 !important;
   background: #FFFFFF !important;
-  border: 1px solid #E0E0E0 !important;
+  border: 1px solid #D0D9E8 !important;
   border-radius: 8px !important;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.14) !important;
+  box-shadow: 0 4px 20px rgba(25, 118, 210, 0.15) !important;
   max-height: 220px !important;
   overflow-y: auto !important;
-  min-width: 200px !important;
 }
 
 // ── Search ────────────────────────────────────────────────────────────────
@@ -182,7 +181,7 @@
 // ── Options ───────────────────────────────────────────────────────────────
 
 .tms-options {
-  overflow-y: auto;
+  overflow: visible !important;
   overscroll-behavior: contain;
 }
 

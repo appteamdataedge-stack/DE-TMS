@@ -132,11 +132,22 @@ export class TmsSelectComponent implements ControlValueAccessor, OnInit, OnDestr
     const panel   = this.host.nativeElement.querySelector('.tms-panel')   as HTMLElement | null;
     if (!trigger || !panel) return;
     const rect = trigger.getBoundingClientRect();
+    const viewportHeight = window.innerHeight;
+    const spaceBelow = viewportHeight - rect.bottom;
+    const panelHeight = Math.min(220, panel.scrollHeight);
+
     panel.style.position = 'fixed';
-    panel.style.top      = (rect.bottom + 2) + 'px';
     panel.style.left     = rect.left + 'px';
     panel.style.width    = rect.width + 'px';
     panel.style.zIndex   = '99999';
+
+    if (spaceBelow >= panelHeight) {
+      panel.style.top    = (rect.bottom + 2) + 'px';
+      panel.style.bottom = 'auto';
+    } else {
+      panel.style.bottom = (viewportHeight - rect.top + 2) + 'px';
+      panel.style.top    = 'auto';
+    }
   }
 
   @HostListener('window:scroll') onWindowScroll(): void {

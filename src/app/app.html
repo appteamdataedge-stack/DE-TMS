@@ -10,7 +10,6 @@
       }
       <div class="shell-aside">
         <de-sidebar [activeItem]="activeRoute" [isOpen]="sidebarOpen"></de-sidebar>
-        <de-footer></de-footer>
       </div>
       <main class="shell-main">
         @if (showInfoBar) {
@@ -22,6 +21,7 @@
         @if (showFooter) {
           <app-upper-footer></app-upper-footer>
         }
+        <de-footer></de-footer>
       </main>
     </div>
     
