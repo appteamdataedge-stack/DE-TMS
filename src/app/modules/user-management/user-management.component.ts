@@ -1,4 +1,4 @@
-import { Component, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -102,9 +102,16 @@ interface LimitRow { currency: string; amount: string; }
   templateUrl: './user-management.component.html',
   styleUrl:    './user-management.component.scss'
 })
-export class UserManagementComponent {
+export class UserManagementComponent implements OnInit {
 
   private cdr = inject(ChangeDetectorRef);
+
+  ngOnInit(): void {
+    const storedUsers  = JSON.parse(localStorage.getItem('tms_users')  || 'null');
+    const storedGroups = JSON.parse(localStorage.getItem('tms_groups') || 'null');
+    if (storedUsers)  this.users  = storedUsers;
+    if (storedGroups) this.groups = storedGroups;
+  }
 
   // ── Shared reference data ──────────────────────────────────────────────────
 
@@ -347,6 +354,7 @@ export class UserManagementComponent {
       isSystemAdmin: this.cuRole === 'System Admin',
     };
     this.users = [...this.users, newUser];
+    localStorage.setItem('tms_users', JSON.stringify(this.users));
 
     // TODO: replace localStorage fallback with real POST /api/users when backend is ready
     if (this.cuUsername.trim() && this.cuPassword.trim()) {
@@ -512,6 +520,7 @@ export class UserManagementComponent {
       description: this.cgDesc || 'No description',
       colorClass: 'teal', hiddenSections: [], sections
     }];
+    localStorage.setItem('tms_groups', JSON.stringify(this.groups));
     this.createGroupOpen = false;
     this.showToast(`Group "${this.cgName}" created successfully.`);
   }

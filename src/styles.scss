@@ -997,3 +997,9 @@ nav.de-bottom-nav {
 }
 .uf__submit { background: #1976D2 !important; }
 .uf__draft  { color: #1976D2 !important; border-color: #1976D2 !important; }
+
+// ── tms-select: allow panel to escape clipping containers ────────────────────
+.de-card, .dc-panel, .dc-main,
+.de-grid-2, .de-field, .mm-field, .ssi-row-2 {
+  overflow: visible !important;
+}
