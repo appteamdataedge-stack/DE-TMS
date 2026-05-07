@@ -385,7 +385,7 @@
 .dc-stl-table-wrap {
   border: 1px solid var(--de-neutral-200);
   border-radius: var(--radius-lg);
-  overflow: hidden;
+  overflow: visible;
 }
 
 .dc-stl-table {

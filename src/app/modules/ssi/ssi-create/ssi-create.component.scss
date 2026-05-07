@@ -83,7 +83,7 @@
   display: inline-flex;
   border: 1px solid var(--de-neutral-200);
   border-radius: var(--radius-md);
-  overflow: hidden;
+  overflow: visible;
 
   &__btn {
     padding: 8px 18px;
@@ -148,7 +148,7 @@
   background: var(--de-teal-bg);
   border: 1.5px solid var(--de-teal-light);
   border-radius: var(--radius-md);
-  overflow: hidden;
+  overflow: visible;
   margin-top: 6px;
 
   &__prop {

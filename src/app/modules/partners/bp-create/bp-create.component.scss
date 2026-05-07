@@ -160,7 +160,7 @@
   display: flex;
   border: 1px solid var(--de-neutral-300);
   border-radius: var(--radius-md);
-  overflow: hidden;
+  overflow: visible;
   transition: border-color .15s, box-shadow .15s;
 
   &:focus-within { border-color: var(--de-teal); box-shadow: 0 0 0 3px rgba(15,163,131,.12); }

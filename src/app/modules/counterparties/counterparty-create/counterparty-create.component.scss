@@ -84,7 +84,7 @@
   display: inline-flex;
   border: 1px solid var(--de-neutral-200);
   border-radius: var(--radius-md);
-  overflow: hidden;
+  overflow: visible;
 
   &__btn {
     padding: 8px 20px;

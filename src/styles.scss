@@ -846,8 +846,8 @@ table tbody tr:hover td {
 
 // ── tms-select panel z-index override ────────────────────────────────────────
 .tms-panel {
-  z-index: 99999 !important;
-  position: fixed !important;
+  z-index: 9999 !important;
+  position: absolute !important;
 }
 
 // ── FIX 5 — Global color theme: clean white and blue ─────────────────────────
